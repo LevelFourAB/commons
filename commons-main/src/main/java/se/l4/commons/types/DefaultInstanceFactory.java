@@ -1,4 +1,4 @@
-package se.l4.commons.serialization.spi;
+package se.l4.commons.types;
 
 import java.lang.annotation.Annotation;
 

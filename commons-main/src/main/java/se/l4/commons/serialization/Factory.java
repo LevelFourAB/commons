@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import se.l4.commons.serialization.spi.InstanceFactory;
+import se.l4.commons.types.InstanceFactory;
 
 /**
  * Annotation for usage with constructors. This can be placed on constructors that

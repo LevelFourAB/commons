@@ -19,6 +19,7 @@ import se.l4.commons.serialization.SerializerCollection;
 import se.l4.commons.serialization.SerializerOrResolver;
 import se.l4.commons.serialization.Use;
 import se.l4.commons.serialization.collections.ArraySerializerResolver;
+import se.l4.commons.types.InstanceFactory;
 
 /**
  * Finder of {@link SerializerResolver}s, used when implementing a

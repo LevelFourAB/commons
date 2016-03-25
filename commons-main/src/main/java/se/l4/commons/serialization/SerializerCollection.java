@@ -2,9 +2,9 @@ package se.l4.commons.serialization;
 
 import java.lang.annotation.Annotation;
 
-import se.l4.commons.serialization.spi.InstanceFactory;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.Type;
+import se.l4.commons.types.InstanceFactory;
 
 
 /**

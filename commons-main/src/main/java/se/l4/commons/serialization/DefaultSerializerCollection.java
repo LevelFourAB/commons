@@ -9,8 +9,6 @@ import se.l4.commons.serialization.collections.ListSerializerResolver;
 import se.l4.commons.serialization.collections.MapSerializerResolver;
 import se.l4.commons.serialization.collections.SetSerializerResolver;
 import se.l4.commons.serialization.enums.EnumSerializerResolver;
-import se.l4.commons.serialization.spi.DefaultInstanceFactory;
-import se.l4.commons.serialization.spi.InstanceFactory;
 import se.l4.commons.serialization.spi.NamingCallback;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.SerializerResolverRegistry;
@@ -23,6 +21,8 @@ import se.l4.commons.serialization.standard.LongSerializer;
 import se.l4.commons.serialization.standard.ShortSerializer;
 import se.l4.commons.serialization.standard.StringSerializer;
 import se.l4.commons.serialization.standard.UuidSerializer;
+import se.l4.commons.types.DefaultInstanceFactory;
+import se.l4.commons.types.InstanceFactory;
 
 /**
  * Default implementation of {@link SerializerCollection}.

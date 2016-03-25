@@ -1,9 +1,9 @@
 package se.l4.commons.serialization;
 
-import se.l4.commons.serialization.spi.InstanceFactory;
 import se.l4.commons.serialization.spi.NamingCallback;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.SerializerResolverRegistry;
+import se.l4.commons.types.InstanceFactory;
 
 /**
  * Implementation of {@link SerializerCollection} that wraps another
