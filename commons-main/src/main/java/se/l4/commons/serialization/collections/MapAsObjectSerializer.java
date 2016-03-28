@@ -35,6 +35,12 @@ public class MapAsObjectSerializer<V>
 		Map<String, V> result = new HashMap<String, V>();
 		while(in.peek() != Token.OBJECT_END)
 		{
+			if(in.peek() == Token.NULL)
+			{
+				in.next();
+				continue;
+			}
+			
 			in.next(Token.KEY);
 			String key = in.getString();
 			if(key.startsWith("_aurochs_:"))
