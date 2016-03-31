@@ -187,6 +187,19 @@ public class BinaryTest
 	}
 	
 	@Test
+	public void severalObjectValuesWithNull()
+		throws IOException
+	{
+		output.writeObjectStart("");
+		output.writeNull("key1");
+		output.write("key2", 12);
+		output.writeObjectEnd("");
+		
+		assertStream(OBJECT_START, KEY, NULL, KEY, VALUE, OBJECT_END);
+		assertStreamValues("key1", null, "key2", 12);
+	}
+	
+	@Test
 	public void listWithSeveralValues()
 		throws IOException
 	{
