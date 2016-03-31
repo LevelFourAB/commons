@@ -37,6 +37,7 @@ public class MapAsObjectSerializer<V>
 		{
 			if(in.peek() == Token.NULL)
 			{
+				// Due to old error with writing of null values
 				in.next();
 				continue;
 			}
@@ -70,7 +71,7 @@ public class MapAsObjectSerializer<V>
 			V value = e.getValue();
 			if(value == null)
 			{
-				stream.writeNull(name);
+				stream.writeNull(e.getKey());
 			}
 			else
 			{
