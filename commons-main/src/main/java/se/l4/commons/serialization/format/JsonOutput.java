@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -61,7 +62,7 @@ public class JsonOutput
 	 */
 	public JsonOutput(OutputStream out, boolean beautify)
 	{
-		this(new OutputStreamWriter(out), beautify);
+		this(new OutputStreamWriter(out, StandardCharsets.UTF_8), beautify);
 	}
 	
 	/**

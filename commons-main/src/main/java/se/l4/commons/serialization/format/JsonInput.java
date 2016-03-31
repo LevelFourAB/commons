@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -30,7 +31,7 @@ public class JsonInput
 	
 	public JsonInput(InputStream in)
 	{
-		this(new InputStreamReader(in));
+		this(new InputStreamReader(in, StandardCharsets.UTF_8));
 	}
 	
 	public JsonInput(Reader in)
