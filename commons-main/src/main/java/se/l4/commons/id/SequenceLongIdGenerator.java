@@ -1,5 +1,6 @@
 package se.l4.commons.id;
 
+import java.time.Clock;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -19,10 +20,17 @@ public class SequenceLongIdGenerator
 	private volatile int sequence;
 	private volatile long lastTime;
 	
+	private final Clock clock;
 	private final Lock lock;
 	
 	public SequenceLongIdGenerator()
 	{
+		this(Clock.systemUTC());
+	}
+	
+	public SequenceLongIdGenerator(Clock clock)
+	{
+		this.clock = clock;
 		lock = new ReentrantLock();
 	}
 	
@@ -32,7 +40,7 @@ public class SequenceLongIdGenerator
 		lock.lock();
 		try
 		{
-			long time = System.currentTimeMillis() - SimpleLongIdGenerator.EPOCH_START;
+			long time = clock.millis() - SimpleLongIdGenerator.EPOCH_START;
 			if(lastTime > time)
 			{
 				// Time is moving backwards, refuse to generate anything
@@ -56,7 +64,7 @@ public class SequenceLongIdGenerator
 						throw new RuntimeException("Interrupted id generation; " + e.getMessage(), e);
 					}
 					
-					timeRightNow = System.currentTimeMillis() - SimpleLongIdGenerator.EPOCH_START;
+					timeRightNow = clock.millis() - SimpleLongIdGenerator.EPOCH_START;
 				}
 				while(timeRightNow == time);
 				
