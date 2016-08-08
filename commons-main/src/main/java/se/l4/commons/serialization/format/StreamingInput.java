@@ -40,8 +40,10 @@ public interface StreamingInput
 		throws IOException;
 	
 	/**
-	 * Skip the started object or list. This method should only be used when
-	 * when token is either {@link Token#OBJECT_START} or {@link Token#LIST_START}.
+	 * Skip the started object, list or value. This method should only be used when
+	 * when token is either {@link Token#OBJECT_START}, {@link Token#LIST_START}
+	 * or {@link Token#VALUE}. See {@link #skipValue()} for skipping reading
+	 * when the current token is {@link Token#KEY}.
 	 * 
 	 * @throws IOException
 	 */

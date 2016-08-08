@@ -87,6 +87,7 @@ public abstract class AbstractStreamingInput
 	public void skip()
 		throws IOException
 	{
+		Token start = token;
 		Token stop;
 		switch(token)
 		{
@@ -96,8 +97,10 @@ public abstract class AbstractStreamingInput
 			case OBJECT_START:
 				stop = Token.OBJECT_END;
 				break;
+			case VALUE:
+				return;
 			default:
-				throw raiseException("Can only skip when start of object or list, token is now " + token);
+				throw raiseException("Can only skip when start of object, start of list or value, token is now " + token);
 		}
 		
 		int currentLevel = level;
@@ -107,7 +110,7 @@ public abstract class AbstractStreamingInput
 			// Loop until no more tokens or if we stopped and the level has been reset
 			if(next == null)
 			{
-				throw raiseException("No more tokens, but end of skipped value not found");
+				throw raiseException("No more tokens, but end of skipped value not found. Started at " + start + " and tried to find " + stop);
 			}
 			else if(next == stop && level == currentLevel)
 			{
