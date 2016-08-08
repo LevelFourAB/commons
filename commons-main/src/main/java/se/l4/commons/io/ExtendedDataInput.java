@@ -7,6 +7,9 @@ import java.io.IOException;
 public interface ExtendedDataInput
 	extends DataInput, Closeable
 {
+	int read()
+		throws IOException;
+	
 	int readVInt()
 		throws IOException;
 	

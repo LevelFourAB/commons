@@ -25,6 +25,13 @@ public class ExtendedDataInputStream
 	}
 	
 	@Override
+	public int read()
+		throws IOException
+	{
+		return super.read();
+	}
+	
+	@Override
 	public int readVInt()
 		throws IOException
 	{
