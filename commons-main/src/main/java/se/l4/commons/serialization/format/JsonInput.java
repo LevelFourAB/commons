@@ -165,7 +165,7 @@ public class JsonInput
 			case ']':
 				return Token.LIST_END;
 			case '"':
-				if(current() != Token.KEY && ! lists[level])
+				if(current() != null && current() != Token.KEY && ! lists[level])
 				{
 					return Token.KEY;
 				}

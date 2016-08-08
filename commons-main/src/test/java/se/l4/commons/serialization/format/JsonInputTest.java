@@ -28,14 +28,25 @@ import com.google.common.base.Charsets;
  */
 public class JsonInputTest
 {
+	@Test
+	public void testString()
+		throws Exception
+	{
+		String v = "\"value\"";
+		StreamingInput input = createInput(v);
+		assertStream(input, VALUE);
+		
+		input = createInput(v);
+		assertStreamValues(input, "value");
+	}
 
 	@Test
 	public void testKeyValue()
 		throws Exception
 	{
-		String v = "\"key\": \"value\"";
+		String v = "{\"key\": \"value\"}";
 		StreamingInput input = createInput(v);
-		assertStream(input, KEY, VALUE);
+		assertStream(input, OBJECT_START, KEY, VALUE, OBJECT_END);
 		
 		input = createInput(v);
 		assertStreamValues(input, "key", "value");
@@ -59,13 +70,13 @@ public class JsonInputTest
 	{
 		StreamingInput input;
 		
-		input = createInput("\"key\": \"va\\\"lue\"");
+		input = createInput("{\"key\": \"va\\\"lue\"}");
 		assertStreamValues(input, "key", "va\"lue");
 		
-		input = createInput("\"key\": \"va\\nlue\"");
+		input = createInput("{\"key\": \"va\\nlue\"}");
 		assertStreamValues(input, "key", "va\nlue");
 		
-		input = createInput("\"key\": \"va\\u4580lue\"");
+		input = createInput("{\"key\": \"va\\u4580lue\"}");
 		assertStreamValues(input, "key", "va\u4580lue");
 	}
 	
@@ -260,10 +271,9 @@ public class JsonInputTest
 	public void testBinary()
 		throws Exception
 	{
-		String v = "\"key\": \"a2FrYQ==\"";
+		String v = "\"a2FrYQ==\"";
 		StreamingInput input = createInput(v);
-		input.next(); // key
-		input.next(); // value
+		input.next(Token.VALUE);
 		
 		assertThat(input.getByteArray(), is("kaka".getBytes(Charsets.UTF_8)));
 	}
