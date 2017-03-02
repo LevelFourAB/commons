@@ -41,11 +41,19 @@ public class ArraySerializer
 	{
 		in.next(Token.LIST_START);
 		
-		List<Object> list = new ArrayList<Object>();
+		List<Object> list = new ArrayList<>();
 		while(in.peek() != Token.LIST_END)
 		{
-			Object value = in.peek() == Token.NULL ? null : itemSerializer.read(in);
-			list.add(value);
+			if(in.peek() == Token.NULL)
+			{
+				in.next(Token.NULL);
+				list.add(null);
+			}
+			else
+			{
+				Object value = itemSerializer.read(in);
+				list.add(value);
+			}
 		}
 		
 		in.next(Token.LIST_END);
