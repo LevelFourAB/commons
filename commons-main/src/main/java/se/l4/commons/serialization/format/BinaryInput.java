@@ -93,10 +93,15 @@ public class BinaryInput
 	private void readBuffer(int len)
 		throws IOException
 	{
-		int read = in.read(buffer, 0, len);
-		if(read != len)
+		int n = 0;
+		while(n < len)
 		{
-			throw new EOFException("Expected to read " + len + " bytes, but could only read " + read);
+			int count = in.read(buffer, n, len - n);
+			if(count < 0)
+			{
+				throw new EOFException("Expected to read " + len + " bytes, but could only read " + n);
+			}
+			n += count;
 		}
 	}
 	
