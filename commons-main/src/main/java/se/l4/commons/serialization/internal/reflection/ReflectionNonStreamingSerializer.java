@@ -21,10 +21,12 @@ public class ReflectionNonStreamingSerializer<T>
 	implements Serializer<T>
 {
 	private final TypeInfo<T> type;
+	private final int size;
 
 	public ReflectionNonStreamingSerializer(TypeInfo<T> type)
 	{
 		this.type = type;
+		this.size = type.getAllFields().length;
 	}
 	
 	@Override
@@ -34,7 +36,7 @@ public class ReflectionNonStreamingSerializer<T>
 		in.next(Token.OBJECT_START);
 
 		// First create a map with all the data
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<>(size);
 		while(in.peek() != Token.OBJECT_END)
 		{
 			in.next(Token.KEY);
