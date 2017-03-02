@@ -28,6 +28,7 @@ public class JsonInput
 	private int limit;
 	
 	private final boolean[] lists;
+	private final String[] names;
 	
 	public JsonInput(InputStream in)
 	{
@@ -39,6 +40,7 @@ public class JsonInput
 		this.in = in;
 		
 		lists = new boolean[20];
+		names = new String[20];
 		buffer = new char[1024];
 	}
 	
@@ -47,6 +49,19 @@ public class JsonInput
 		throws IOException
 	{
 		in.close();
+	}
+	
+	@Override
+	protected IOException raiseException(String message)
+	{
+		StringBuilder path = new StringBuilder();
+		for(int i=1; i<level; i++)
+		{
+			if(i > 1) path.append(" > ");
+			
+			path.append(names[i]);
+		}
+		return new IOException(message + (level > 0 ? " (at " + path + ")" : ""));
 	}
 	
 	private void readWhitespace()
@@ -132,7 +147,7 @@ public class JsonInput
 		
 		if(read < minChars)
 		{
-			throw new IOException("Needed " + minChars + " but got " + read);
+			throw raiseException("Needed " + minChars + " but got " + read);
 		}
 		
 		return true;
@@ -252,7 +267,7 @@ public class JsonInput
 		char c = read();
 		if(readStart)
 		{
-			if(c != '"') throw new IOException("Expected \", but got " + c);
+			if(c != '"') throw raiseException("Expected \", but got " + c);
 			c = read();
 		}
 		
@@ -323,7 +338,7 @@ public class JsonInput
 		Token t = next();
 		if(t != expected)
 		{
-			throw new IOException("Expected "+ expected + " but got " + t);
+			throw raiseException("Expected "+ expected + " but got " + t);
 		}
 		return t;
 	}
@@ -356,9 +371,10 @@ public class JsonInput
 				char next = readNext();
 				if(next != ':')
 				{
-					throw new IOException("Expected :, got " + next);
+					throw raiseException("Expected :, got " + next);
 				}
 				
+				names[level] = key;
 				setValue(key);
 				return token;
 			}
