@@ -16,6 +16,7 @@ import se.l4.commons.serialization.internal.TypeViaResolvedType;
 import se.l4.commons.serialization.internal.reflection.FactoryDefinition;
 import se.l4.commons.serialization.internal.reflection.FieldDefinition;
 import se.l4.commons.serialization.internal.reflection.ReflectionNonStreamingSerializer;
+import se.l4.commons.serialization.internal.reflection.ReflectionOnlySingleFactorySerializer;
 import se.l4.commons.serialization.internal.reflection.ReflectionStreamingSerializer;
 import se.l4.commons.serialization.internal.reflection.TypeInfo;
 import se.l4.commons.serialization.spi.AbstractSerializerResolver;
@@ -29,7 +30,7 @@ import se.l4.commons.serialization.standard.SimpleTypeSerializer;
 /**
  * Serializer that will use reflection to access fields and methods in a
  * class. Will export anything annotated with {@link Expose}.
- * 
+ *
  * <p>
  * <ul>
  * 	<li>{@link Named} can be used if you want a field to have a specific name
@@ -39,7 +40,7 @@ import se.l4.commons.serialization.standard.SimpleTypeSerializer;
  * 	<li>{@link AllowAny} will cause dynamic serialization to be used for a
  * 		field.
  * </ul>
- * 
+ *
  * @author Andreas Holstenson
  */
 public class ReflectionSerializer<T>
@@ -48,39 +49,39 @@ public class ReflectionSerializer<T>
 	public ReflectionSerializer()
 	{
 	}
-	
+
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Serializer<T> find(TypeEncounter encounter)
 	{
 		Type type = encounter.getType();
 		SerializerCollection collection = encounter.getCollection();
-		
+
 		ImmutableMap.Builder<String, FieldDefinition> builder = ImmutableMap.builder();
 		ImmutableMap.Builder<String, FieldDefinition> nonRenamedFields = ImmutableMap.builder();
-		
+
 		TypeResolver typeResolver = new TypeResolver();
 		MemberResolver memberResolver = new MemberResolver(typeResolver);
-		
+
 		Type[] params = type.getParameters();
-		ResolvedType rt = params.length == 0 
+		ResolvedType rt = params.length == 0
 			? typeResolver.resolve(type.getErasedType())
 			: resolveWithParams(typeResolver, type);
-		
+
 		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(rt, null, null);
-		
+
 		for(ResolvedField field : typeWithMembers.getMemberFields())
 		{
 			Field reflectiveField = field.getRawMember();
-			
+
 			if(! reflectiveField.isAnnotationPresent(Expose.class))
 			{
 				continue;
 			}
-			
+
 			// Resolve the serializer to use for the field
 			ResolvedType fieldType = field.getType();
-			
+
 			Serializer<?> serializer;
 			if(reflectiveField.isAnnotationPresent(Use.class))
 			{
@@ -129,66 +130,80 @@ public class ReflectionSerializer<T>
 					throw new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType() + "; " + e.getMessage(), e);
 				}
 			}
-			
+
 			if(serializer == null)
 			{
 				throw new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType() + "; No serializer found");
 			}
-			
+
 			boolean skipIfDefault = reflectiveField.isAnnotationPresent(SkipDefaultValue.class);
 
 			// Force the field to be accessible
 			reflectiveField.setAccessible(true);
-			
+
 			// Define how we access this field
 			String name = getName(reflectiveField);
 			FieldDefinition def = new FieldDefinition(reflectiveField, name, serializer, fieldType.getErasedType(), skipIfDefault);
 			builder.put(name, def);
 			nonRenamedFields.put(reflectiveField.getName(), def);
 		}
-		
+
 		// Create field map and cache
 		ImmutableMap<String, FieldDefinition> fields = builder.build();
 		ImmutableMap<String, FieldDefinition> nonRenamed = builder.build();
 		FieldDefinition[] fieldsCache = fields.values().toArray(new FieldDefinition[0]);
-		
+
 		// Get all of the factories
 		boolean hasSerializerInFactory = false;
 		List<FactoryDefinition<T>> factories = Lists.newArrayList();
-		
+
 		for(ResolvedConstructor constructor : typeWithMembers.getConstructors())
 		{
-			FactoryDefinition<T> def = new FactoryDefinition<T>(collection, fields, nonRenamed, constructor);
+			FactoryDefinition<T> def = new FactoryDefinition<>(collection, fields, nonRenamed, constructor);
 			hasSerializerInFactory |= def.hasSerializedFields();
-			
+
 			if(def.hasSerializedFields() || def.isInjectable())
 			{
 				factories.add(def);
 			}
 		}
-		
+
 		if(factories.isEmpty())
 		{
 			throw new SerializationException("Unable to create any instance of " + type + ", at least a default constructor is needed");
 		}
-		
+
 		FactoryDefinition<T>[] factoryCache = factories.toArray(new FactoryDefinition[factories.size()]);
-		
+
 		// Create the actual serializer to use
 		TypeInfo<T> typeInfo = new TypeInfo<T>((Class) type.getErasedType(), factoryCache, fields, fieldsCache);
-		
-		return hasSerializerInFactory 
-			? new ReflectionNonStreamingSerializer<T>(typeInfo)
-			: new ReflectionStreamingSerializer<T>(typeInfo);
+
+		if(hasSerializerInFactory)
+		{
+			FactoryDefinition<T> factoryWithEverything = typeInfo.findSingleFactoryWithEverything();
+			if(factoryWithEverything == null)
+			{
+				// There is no factory that takes in every single field, use a non-streaming serializer
+				return new ReflectionNonStreamingSerializer<>(typeInfo);
+			}
+			else
+			{
+				return new ReflectionOnlySingleFactorySerializer<>(typeInfo, factoryWithEverything);
+			}
+		}
+		else
+		{
+			return new ReflectionStreamingSerializer<>(typeInfo);
+		}
 	}
-	
+
 	private static ResolvedType resolveWithParams(TypeResolver typeResolver, Type type)
 	{
 		if(type instanceof TypeViaResolvedType)
 		{
 			return ((TypeViaResolvedType) type).getResolvedType();
 		}
-		
+
 		return null;
 	}
 
@@ -202,7 +217,7 @@ public class ReflectionSerializer<T>
 				return annotation.value();
 			}
 		}
-		
+
 		return field.getName();
 	}
 }

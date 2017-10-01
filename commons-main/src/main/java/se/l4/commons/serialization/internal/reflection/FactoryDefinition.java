@@ -21,14 +21,14 @@ import se.l4.commons.serialization.SerializerCollection;
 
 /**
  * Factory that can be used to create an instance of a certain object.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
 public class FactoryDefinition<T>
 {
 	private final SerializerCollection collection;
-	private final Argument[] arguments;
+	final Argument[] arguments;
 	private final boolean hasSerializedFields;
 	private final boolean isInjectable;
 	private final Constructor<?> raw;
@@ -39,51 +39,51 @@ public class FactoryDefinition<T>
 			ResolvedConstructor constructor)
 	{
 		this.collection = collection;
-		
-		List<Argument> args = new ArrayList<FactoryDefinition.Argument>();
-		
+
+		List<Argument> args = new ArrayList<>();
+
 		raw = constructor.getRawMember();
-		
+
 		ConstructorProperties cp = raw.getAnnotation(ConstructorProperties.class);
 		String[] names = cp == null ? null : cp.value();
-		
+
 		Annotation[][] annotations = raw.getParameterAnnotations();
-		
+
 		boolean hasSerializedFields = false;
-		
+
 		for(int i=0, n=constructor.getArgumentCount(); i<n; i++)
 		{
 			ResolvedType type = constructor.getArgumentType(i);
-			
+
 			Expose expose = findExpose(annotations[i]);
 			if(expose != null)
 			{
 				// Try to serialize
 				if("".equals(expose.value()))
 				{
-					throw new SerializationException("The annotation @" + 
-						Expose.class.getSimpleName() + 
-						" when used in a constructor must have a name (for " + 
+					throw new SerializationException("The annotation @" +
+						Expose.class.getSimpleName() +
+						" when used in a constructor must have a name (for " +
 						raw.getDeclaringClass() + ")");
 				}
-				
+
 				FieldDefinition def = fields.get(expose.value());
 				if(def == null)
 				{
 					throw new SerializationException(expose + " was used on a " +
-							"constructor but the there was no such field declared" + 
+							"constructor but the there was no such field declared" +
 							" (for " + raw.getDeclaringClass() + ")");
 				}
 				else if(Primitives.wrap(def.getType()) != Primitives.wrap(type.getErasedType()))
 				{
 					throw new SerializationException(expose + " was used on a " +
 						"constructor but the type of the argument was different " +
-						"from the field. The field was resolved to " + 
-						def.getType() + " but the argument was of type " + 
-						type.getErasedType() + 
+						"from the field. The field was resolved to " +
+						def.getType() + " but the argument was of type " +
+						type.getErasedType() +
 						" (for " + raw.getDeclaringClass() + ")");
 				}
-				
+
 				args.add(new SerializedArgument(def.getType(), expose.value()));
 				hasSerializedFields = true;
 			}
@@ -100,11 +100,11 @@ public class FactoryDefinition<T>
 						continue;
 					}
 				}
-				
+
 				args.add(new InjectedArgument(type.getErasedType(), annotations[i]));
 			}
 		}
-		
+
 		boolean isInjectable = args.isEmpty();
 		for(Annotation a : constructor.getRawMember().getAnnotations())
 		{
@@ -117,12 +117,12 @@ public class FactoryDefinition<T>
 				isInjectable = true;
 			}
 		}
-		
+
 		arguments = args.toArray(new Argument[args.size()]);
 		this.hasSerializedFields = hasSerializedFields;
 		this.isInjectable = isInjectable;
 	}
-	
+
 	private static Expose findExpose(Annotation[] annotations)
 	{
 		for(Annotation a : annotations)
@@ -132,34 +132,52 @@ public class FactoryDefinition<T>
 				return (Expose) a;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Get if this factory has any serialized fields.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean hasSerializedFields()
 	{
 		return hasSerializedFields;
 	}
-	
+
 	/**
 	 * Get if this factory is marked as injectable.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isInjectable()
 	{
 		return isInjectable;
 	}
-	
+
+	/**
+	 * Get the number of fields this factory covers.
+	 *
+	 * @return
+	 */
+	public int getFieldCount()
+	{
+		int result = 0;
+		for(Argument a : arguments)
+		{
+			if(a instanceof FactoryDefinition.SerializedArgument)
+			{
+				result++;
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * Get a score for this factory based on the given data. The higher the
 	 * score the more arguments were found.
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 */
@@ -170,9 +188,9 @@ public class FactoryDefinition<T>
 		{
 			return 0;
 		}
-		
+
 		int score = 0;
-		
+
 		for(Argument arg : arguments)
 		{
 			if(arg instanceof FactoryDefinition.SerializedArgument)
@@ -183,14 +201,14 @@ public class FactoryDefinition<T>
 				}
 			}
 		}
-		
+
 		return score;
 	}
-	
+
 	/**
 	 * Create a new instance using the given deserialized data. The data
 	 * is only used if this factory has any serialized fields.
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 */
@@ -202,7 +220,7 @@ public class FactoryDefinition<T>
 		{
 			args[i] = arguments[i].getValue(data);
 		}
-		
+
 		try
 		{
 			return (T) raw.newInstance(args);
@@ -224,24 +242,63 @@ public class FactoryDefinition<T>
 			throw new SerializationException("Unable to create; " + e.getCause().getMessage(), e.getCause());
 		}
 	}
-	
-	private interface Argument
+
+	/**
+	 * Create a new instance using a plain arguments array.
+	 *
+	 * @param args
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public T create(Object[] args)
+	{
+		for(int i=0, n=args.length; i<n; i++)
+		{
+			if(arguments[i] instanceof FactoryDefinition.InjectedArgument)
+			{
+				args[i] = arguments[i].getValue(null);
+			}
+		}
+
+		try
+		{
+			return (T) raw.newInstance(args);
+		}
+		catch(IllegalArgumentException e)
+		{
+			throw new SerializationException("Unable to create; " + e.getMessage(), e);
+		}
+		catch(InstantiationException e)
+		{
+			throw new SerializationException("Unable to create; " + e.getMessage(), e);
+		}
+		catch(IllegalAccessException e)
+		{
+			throw new SerializationException("Unable to create; " + e.getMessage(), e);
+		}
+		catch(InvocationTargetException e)
+		{
+			throw new SerializationException("Unable to create; " + e.getCause().getMessage(), e.getCause());
+		}
+	}
+
+	interface Argument
 	{
 		Object getValue(Map<String, Object> data);
 	}
-	
-	private class SerializedArgument
+
+	class SerializedArgument
 		implements Argument
 	{
 		private final Class<?> type;
-		private final String name;
+		final String name;
 
 		public SerializedArgument(Class<?> type, String name)
 		{
 			this.type = type;
 			this.name = name;
 		}
-		
+
 		@Override
 		public Object getValue(Map<String, Object> data)
 		{
@@ -250,11 +307,11 @@ public class FactoryDefinition<T>
 			{
 				return Defaults.defaultValue(type);
 			}
-			
+
 			return value;
 		}
 	}
-	
+
 	private class InjectedArgument
 		implements Argument
 	{
@@ -274,7 +331,7 @@ public class FactoryDefinition<T>
 				.create(type, annotations);
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
