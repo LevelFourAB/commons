@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.google.common.base.Defaults;
+
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -23,28 +25,34 @@ public class ReflectionOnlySingleFactorySerializer<T>
 {
 	private final TypeInfo<T> type;
 	private final FactoryDefinition<T> factory;
-	private final int arguments;
+	private final Object[] defaultArguments;
 
 	private final String[] names;
 	private final FieldDefinition[] fields;
 	private final int[] mapping;
 
+	@SuppressWarnings("unchecked")
 	public ReflectionOnlySingleFactorySerializer(TypeInfo<T> type, FactoryDefinition<T> factory)
 	{
 		this.type = type;
 		this.factory = factory;
 
-		arguments = factory.arguments.length;
 		Map<String, Integer> tempMapping = new TreeMap<>();
+		Object[] defaultArguments = new Object[factory.arguments.length];
 		for(int i=0, n=factory.arguments.length; i<n; i++)
 		{
 			FactoryDefinition.Argument arg = factory.arguments[i];
 			if(arg instanceof FactoryDefinition.SerializedArgument)
 			{
-				String name = ((FactoryDefinition.SerializedArgument) arg).name;
+				FactoryDefinition.SerializedArgument serializedArg = (FactoryDefinition.SerializedArgument) arg;
+
+				String name = serializedArg.name;
 				tempMapping.put(name, i);
+				defaultArguments[i] = Defaults.defaultValue(serializedArg.type);
+
 			}
 		}
+		this.defaultArguments = defaultArguments;
 
 		String[] names = new String[tempMapping.size()];
 		FieldDefinition[] fields = new FieldDefinition[tempMapping.size()];
@@ -55,7 +63,9 @@ public class ReflectionOnlySingleFactorySerializer<T>
 			names[i] = e.getKey();
 			fields[i] = type.getField(e.getKey());
 			mapping[i] = e.getValue();
+
 			i++;
+
 		}
 
 		this.names = names;
@@ -69,7 +79,7 @@ public class ReflectionOnlySingleFactorySerializer<T>
 	{
 		in.next(Token.OBJECT_START);
 
-		Object[] args = new Object[arguments];
+		Object[] args = Arrays.copyOf(defaultArguments, defaultArguments.length);
 
 		while(in.peek() != Token.OBJECT_END)
 		{

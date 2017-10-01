@@ -290,7 +290,7 @@ public class FactoryDefinition<T>
 	class SerializedArgument
 		implements Argument
 	{
-		private final Class<?> type;
+		final Class<?> type;
 		final String name;
 
 		public SerializedArgument(Class<?> type, String name)
