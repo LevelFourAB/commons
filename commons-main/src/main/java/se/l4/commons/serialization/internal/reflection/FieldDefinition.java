@@ -73,7 +73,7 @@ public class FieldDefinition
 		{
 			// Consume and return null
 			in.next();
-			return null;
+			return Defaults.defaultValue(type);
 		}
 		
 		return serializer.read(in);
