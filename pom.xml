@@ -22,7 +22,12 @@
 	</properties>
 
 	<modules>
-		<module>commons-main</module>
+		<module>commons-id</module>
+		<module>commons-types</module>
+		<module>commons-io</module>
+
+		<module>commons-serialization</module>
+		<module>commons-config</module>
 	</modules>
 	
 	<!-- License -->
@@ -33,6 +38,30 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<!-- Common test dependencies -->
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.9</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-core</artifactId>
+		    <version>2.0.44-beta</version>
+		    <scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.bval</groupId>
+		    <artifactId>bval-jsr</artifactId>
+		    <version>1.1.1</version>
+		    <scope>test</scope>
+		</dependency>
+	</dependencies>
 	
 	<!-- Managed dependencies used by several projects -->
 	<dependencyManagement>

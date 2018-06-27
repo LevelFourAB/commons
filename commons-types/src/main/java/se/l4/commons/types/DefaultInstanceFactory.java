@@ -1,7 +1,5 @@
 package se.l4.commons.types;
 
-import se.l4.commons.serialization.SerializationException;
-
 /**
  * Default implementation of {@link InstanceFactory}.
  * 
@@ -21,11 +19,11 @@ public class DefaultInstanceFactory
 		}
 		catch(InstantiationException e)
 		{
-			throw new SerializationException("Unable to create; " + e.getCause().getMessage(), e.getCause());
+			throw new InstanceException("Unable to create; " + e.getCause().getMessage(), e.getCause());
 		}
 		catch(IllegalAccessException e)
 		{
-			throw new SerializationException("Unable to create; " + e.getMessage(), e);
+			throw new InstanceException("Unable to create; " + e.getMessage(), e);
 		}
 	}
 
