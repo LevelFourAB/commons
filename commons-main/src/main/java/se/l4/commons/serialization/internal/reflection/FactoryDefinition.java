@@ -4,9 +4,11 @@ import java.beans.ConstructorProperties;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.members.ResolvedConstructor;
@@ -18,6 +20,7 @@ import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.Factory;
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.types.InstanceException;
 
 /**
  * Factory that can be used to create an instance of a certain object.
@@ -71,7 +74,7 @@ public class FactoryDefinition<T>
 				if(def == null)
 				{
 					throw new SerializationException(expose + " was used on a " +
-							"constructor but the there was no such field declared" +
+							"constructor but there was no such field declared" +
 							" (for " + raw.getDeclaringClass() + ")");
 				}
 				else if(Primitives.wrap(def.getType()) != Primitives.wrap(type.getErasedType()))
@@ -101,7 +104,8 @@ public class FactoryDefinition<T>
 					}
 				}
 
-				args.add(new InjectedArgument(type.getErasedType(), annotations[i]));
+				Type javaType = constructor.getRawMember().getParameters()[i].getParameterizedType();
+				args.add(new InjectedArgument(javaType, annotations[i]));
 			}
 		}
 
@@ -315,20 +319,24 @@ public class FactoryDefinition<T>
 	private class InjectedArgument
 		implements Argument
 	{
-		private final Class<?> type;
-		private final Annotation[] annotations;
+		private final Supplier<?> supplier;
 
-		public InjectedArgument(Class<?> type, Annotation[] annotations)
+		public InjectedArgument(Type type, Annotation[] annotations)
 		{
-			this.type = type;
-			this.annotations = annotations;
+			supplier = collection.getInstanceFactory().supplier(type, annotations);
 		}
 
 		@Override
 		public Object getValue(Map<String, Object> data)
 		{
-			return collection.getInstanceFactory()
-				.create(type, annotations);
+			try
+			{
+				return supplier.get();
+			}
+			catch(InstanceException e)
+			{
+				throw new SerializationException("Unable to get object for argument; " + e.getMessage(), e);
+			}
 		}
 	}
 

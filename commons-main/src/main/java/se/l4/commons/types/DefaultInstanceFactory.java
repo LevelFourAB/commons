@@ -1,7 +1,5 @@
 package se.l4.commons.types;
 
-import java.lang.annotation.Annotation;
-
 import se.l4.commons.serialization.SerializationException;
 
 /**
@@ -31,9 +29,4 @@ public class DefaultInstanceFactory
 		}
 	}
 
-	@Override
-	public <T> T create(Class<T> type, Annotation[] annotations)
-	{
-		throw new SerializationException("Automatic type creation for parameters with annotations is not supported");
-	}
 }
