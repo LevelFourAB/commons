@@ -10,7 +10,7 @@ public class CollectionSerializers
 	private CollectionSerializers()
 	{
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Serializer<?> resolveSerializer(TypeEncounter encounter, Type type)
 	{
@@ -18,13 +18,13 @@ public class CollectionSerializers
 		{
 			return new DynamicSerializer(encounter.getCollection());
 		}
-		
+
 		Item item = encounter.getHint(Item.class);
 		if(item != null)
 		{
 			return encounter.getCollection().findVia((Class) item.value(), type);
 		}
-		
+
 		return encounter.getCollection().find(type);
 	}
 }

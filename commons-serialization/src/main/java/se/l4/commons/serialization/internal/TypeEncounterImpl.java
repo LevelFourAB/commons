@@ -9,7 +9,7 @@ import se.l4.commons.serialization.spi.TypeEncounter;
 
 /**
  * Implementation of {@link TypeEncounter}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -19,28 +19,28 @@ public class TypeEncounterImpl
 	private final SerializerCollection collection;
 	private final Type type;
 	private final List<Annotation> annotations;
-	
-	public TypeEncounterImpl(SerializerCollection collection, 
-			Type type, 
+
+	public TypeEncounterImpl(SerializerCollection collection,
+			Type type,
 			List<Annotation> annotations)
 	{
 		this.collection = collection;
 		this.type = type;
 		this.annotations = annotations;
 	}
-	
+
 	@Override
 	public SerializerCollection getCollection()
 	{
 		return collection;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends Annotation> T getHint(Class<T> type)
 	{
 		if(annotations == null) return null;
-		
+
 		for(Annotation a : annotations)
 		{
 			if(type.isAssignableFrom(a.getClass()))
@@ -48,10 +48,10 @@ public class TypeEncounterImpl
 				return (T) a;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Type getType()
 	{

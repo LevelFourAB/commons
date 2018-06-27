@@ -2,7 +2,7 @@ package se.l4.commons.serialization;
 
 /**
  * Exception that is related to errors with serialization.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -30,5 +30,5 @@ public class SerializationException
 	{
 		super(cause);
 	}
-	
+
 }

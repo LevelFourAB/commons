@@ -13,7 +13,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Serializer for {@link List}.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>
@@ -27,7 +27,7 @@ public class ListSerializer<T>
 	public ListSerializer(Serializer<T> itemSerializer)
 	{
 		this.itemSerializer = itemSerializer;
-		
+
 		formatDefinition = SerializerFormatDefinition.builder()
 			.list(itemSerializer)
 			.build();
@@ -38,7 +38,7 @@ public class ListSerializer<T>
 		throws IOException
 	{
 		in.next(Token.LIST_START);
-		
+
 		List<T> list = new ArrayList<T>();
 		while(in.peek() != Token.LIST_END)
 		{
@@ -52,12 +52,12 @@ public class ListSerializer<T>
 			{
 				value = itemSerializer.read(in);
 			}
-			
+
 			list.add(value);
 		}
-		
+
 		in.next(Token.LIST_END);
-		
+
 		return list;
 	}
 
@@ -66,7 +66,7 @@ public class ListSerializer<T>
 		throws IOException
 	{
 		stream.writeListStart(name);
-		
+
 		if(object instanceof RandomAccess)
 		{
 			for(int i=0, n=object.size(); i<n; i++)
@@ -96,10 +96,10 @@ public class ListSerializer<T>
 				}
 			}
 		}
-		
+
 		stream.writeListEnd(name);
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{

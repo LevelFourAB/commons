@@ -8,7 +8,7 @@ import se.l4.commons.types.InstanceFactory;
 /**
  * Implementation of {@link SerializerCollection} that wraps another
  * collection.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -17,7 +17,7 @@ public class WrappedSerializerCollection
 {
 	private final SerializerResolverRegistry resolverRegistry;
 	private final SerializerCollection other;
-	
+
 	public WrappedSerializerCollection(SerializerCollection other)
 	{
 		this.other = other;
@@ -33,21 +33,21 @@ public class WrappedSerializerCollection
 			}
 		);
 	}
-	
+
 	@Override
 	public InstanceFactory getInstanceFactory()
 	{
 		return other.getInstanceFactory();
 	}
-	
+
 	@Override
 	public <T> SerializerCollection bind(Class<T> type, SerializerResolver<? extends T> resolver)
 	{
 		resolverRegistry.bind(type, resolver);
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public SerializerResolver<?> getResolver(Class<?> type)
 	{
@@ -56,7 +56,7 @@ public class WrappedSerializerCollection
 		{
 			return resolver;
 		}
-		
+
 		return resolverRegistry.getResolver(type);
 	}
 }

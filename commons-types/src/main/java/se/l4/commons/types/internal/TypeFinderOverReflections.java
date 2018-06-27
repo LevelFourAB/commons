@@ -13,7 +13,7 @@ import se.l4.commons.types.TypeFinder;
 
 /**
  * Implementation of {@link TypeFinder} that uses {@link Reflections}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -34,7 +34,7 @@ public class TypeFinderOverReflections
 	{
 		return reflections.getTypesAnnotatedWith(annotationType);
 	}
-	
+
 	@Override
 	public Set<? extends Object> getTypesAnnotatedWithAsInstances(Class<? extends Annotation> annotationType)
 	{
@@ -55,14 +55,14 @@ public class TypeFinderOverReflections
 
 	/**
 	 * Create the given types.
-	 * 
+	 *
 	 * @param types
 	 * @return
 	 */
 	private <T> Set<? extends T> create(Iterable<Class<? extends T>> types)
 	{
 		ImmutableSet.Builder<T> builder = ImmutableSet.builder();
-		
+
 		for(Class<? extends T> t : types)
 		{
 			if(! Modifier.isAbstract(t.getModifiers()) && ! t.isInterface())
@@ -71,7 +71,7 @@ public class TypeFinderOverReflections
 				builder.add(instance);
 			}
 		}
-		
+
 		return builder.build();
 	}
 }

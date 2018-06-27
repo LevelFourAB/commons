@@ -28,7 +28,7 @@ import se.l4.commons.types.InstanceFactory;
 
 /**
  * Default implementation of {@link SerializerCollection}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -37,16 +37,16 @@ public class DefaultSerializerCollection
 {
 	private final InstanceFactory instanceFactory;
 	private final SerializerResolverRegistry resolverRegistry;
-	
+
 	public DefaultSerializerCollection()
 	{
 		this(new DefaultInstanceFactory());
 	}
-	
+
 	public DefaultSerializerCollection(InstanceFactory instanceFactory)
 	{
 		this.instanceFactory = instanceFactory;
-		
+
 		resolverRegistry = new SerializerResolverRegistry(
 			instanceFactory,
 			new NamingCallback()
@@ -58,7 +58,7 @@ public class DefaultSerializerCollection
 				}
 			}
 		);
-		
+
 		// Standard types
 		bind(Boolean.class, new BooleanSerializer(), "", "boolean");
 		bind(Float.class, new FloatSerializer(), "", "float");
@@ -69,33 +69,33 @@ public class DefaultSerializerCollection
 		bind(String.class, new StringSerializer(), "", "string");
 		bind(byte[].class, new ByteArraySerializer(), "", "byte[]");
 		bind(UUID.class, new UuidSerializer(), "", "uuid");
-		
+
 		// Collections
 		bind(List.class, new ListSerializerResolver());
 		bind(Map.class, new MapSerializerResolver());
 		bind(Set.class, new SetSerializerResolver());
-		
+
 		// Enums
 		bind(Enum.class, new EnumSerializerResolver());
 
 		// Optional<T>
 		bind(Optional.class, new OptionalSerializerResolver());
 	}
-	
+
 	@Override
 	public InstanceFactory getInstanceFactory()
 	{
 		return instanceFactory;
 	}
-	
+
 	@Override
 	public <T> SerializerCollection bind(Class<T> type, SerializerResolver<? extends T> resolver)
 	{
 		resolverRegistry.bind(type, resolver);
-		
+
 		return this;
 	}
-	
+
 	public SerializerResolver<?> getResolver(Class<?> type)
 	{
 		return resolverRegistry.getResolver(type);

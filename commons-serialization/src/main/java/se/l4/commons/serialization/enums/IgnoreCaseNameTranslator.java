@@ -4,7 +4,7 @@ import se.l4.commons.serialization.format.ValueType;
 
 /**
  * {@link ValueTranslator} that uses the {@link Enum#name() name} of the enum.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -17,19 +17,19 @@ public class IgnoreCaseNameTranslator
 	{
 		values = type.getEnumConstants();
 	}
-	
+
 	@Override
 	public ValueType getType()
 	{
 		return ValueType.STRING;
 	}
-	
+
 	@Override
 	public String fromEnum(Enum<?> value)
 	{
 		return value.name();
 	}
-	
+
 	@Override
 	public Enum<?> toEnum(String value)
 	{
@@ -40,7 +40,7 @@ public class IgnoreCaseNameTranslator
 				return e;
 			}
 		}
-		
+
 		return null;
 	}
 

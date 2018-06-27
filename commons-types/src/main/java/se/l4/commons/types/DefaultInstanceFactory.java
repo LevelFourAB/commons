@@ -2,7 +2,7 @@ package se.l4.commons.types;
 
 /**
  * Default implementation of {@link InstanceFactory}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

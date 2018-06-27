@@ -15,14 +15,14 @@ public class NullInput
 	{
 		this.key = key;
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
 	{
 		// Nothing to close
 	}
-	
+
 	@Override
 	public Token peek()
 		throws IOException
@@ -54,7 +54,7 @@ public class NullInput
 		{
 			throw new IOException(key + ": Expected "+ expected + " but got " + token);
 		}
-		
+
 		return token;
 	}
 
@@ -128,5 +128,5 @@ public class NullInput
 		return null;
 	}
 
-	
+
 }

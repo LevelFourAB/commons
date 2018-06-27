@@ -9,19 +9,19 @@ public interface ExtendedDataInput
 {
 	int read()
 		throws IOException;
-	
+
 	int readVInt()
 		throws IOException;
-	
+
 	long readVLong()
 		throws IOException;
-	
+
 	String readString()
 		throws IOException;
-	
+
 	Bytes readBytes()
 		throws IOException;
-	
+
 	Bytes readTemporaryBytes()
 		throws IOException;
 }

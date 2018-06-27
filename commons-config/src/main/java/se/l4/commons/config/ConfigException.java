@@ -2,7 +2,7 @@ package se.l4.commons.config;
 
 /**
  * Exception thrown when something is wrong with the configuration.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -29,5 +29,5 @@ public class ConfigException
 	{
 		super(cause);
 	}
-	
+
 }

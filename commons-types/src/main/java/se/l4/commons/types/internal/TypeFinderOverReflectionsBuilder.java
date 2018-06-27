@@ -12,7 +12,7 @@ import se.l4.commons.types.TypeFinderBuilder;
 
 /**
  * Builder for {@link TypeFinderOverReflections}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -21,7 +21,7 @@ public class TypeFinderOverReflectionsBuilder
 {
 	private InstanceFactory factory;
 	private Set<String> packages;
-	
+
 	public TypeFinderOverReflectionsBuilder()
 	{
 		factory = new DefaultInstanceFactory();

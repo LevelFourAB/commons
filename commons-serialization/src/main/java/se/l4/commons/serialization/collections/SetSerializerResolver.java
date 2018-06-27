@@ -23,17 +23,17 @@ public class SetSerializerResolver
 	public Serializer<Set<?>> find(TypeEncounter encounter)
 	{
 		Type[] params = encounter.getType().getParameters();
-		Type type = params.length == 0 ? new TypeViaClass(Object.class) : params[0];  
-		
+		Type type = params.length == 0 ? new TypeViaClass(Object.class) : params[0];
+
 		// Check that we can create the type of list requested
 		Class<?> erasedType = encounter.getType().getErasedType();
 		if(erasedType != Set.class)
 		{
 			throw new SerializationException("Sets can only be serialized if they are declared as the interface Set");
 		}
-		
+
 		Serializer<?> itemSerializer = CollectionSerializers.resolveSerializer(encounter, type);
-			
+
 		return new SetSerializer(itemSerializer);
 	}
 

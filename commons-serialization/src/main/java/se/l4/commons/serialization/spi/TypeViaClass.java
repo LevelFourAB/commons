@@ -2,7 +2,7 @@ package se.l4.commons.serialization.spi;
 
 /**
  * Implementation of {@link TypeViaClass} that wraps a {@link Class}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -10,20 +10,20 @@ public class TypeViaClass
 	implements Type
 {
 	private static final Type[] EMPTY_TYPE_ARRAY = new Type[0];
-	
+
 	private final Class<?> type;
 
 	public TypeViaClass(Class<?> type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public Class<?> getErasedType()
 	{
 		return type;
 	}
-	
+
 	@Override
 	public Type[] getParameters()
 	{
@@ -58,7 +58,7 @@ public class TypeViaClass
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString()
 	{

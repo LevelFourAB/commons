@@ -12,7 +12,7 @@ import se.l4.commons.serialization.format.ValueType;
 
 /**
  * Serializer for {@link UUID} that transforms into a byte array.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -32,14 +32,14 @@ public class UuidSerializer
 		in.next(Token.VALUE);
 		return fromBytes0(in.getByteArray());
 	}
-	
+
 	@Override
 	public void write(UUID object, String name, StreamingOutput stream)
 		throws IOException
 	{
 		stream.write(name, toBytes0(object));
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{
@@ -49,7 +49,7 @@ public class UuidSerializer
 	private static UUID fromBytes0(byte[] bytes)
 	{
 		if(bytes == null) return null;
-		
+
 		long msb = 0;
 		long lsb = 0;
 		for(int i=0; i<8; i++)
@@ -57,22 +57,22 @@ public class UuidSerializer
 			msb = (msb << 8) | (bytes[i] & 0xff);
 			lsb = (lsb << 8) | (bytes[8 + i] & 0xff);
 		}
-		
+
 		return new UUID(msb, lsb);
 	}
-	
+
 	private static byte[] toBytes0(UUID uuid)
 	{
 		long msb = uuid.getMostSignificantBits();
 		long lsb = uuid.getLeastSignificantBits();
-		
+
 		byte[] buffer = new byte[16];
 		for(int i=0; i<8; i++)
 		{
 			buffer[i] = (byte) (msb >>> 8 * (7 - i));
 			buffer[8+i] = (byte) (lsb >>> 8 * (7 - i));
 		}
-		
+
 		return buffer;
 	}
 }

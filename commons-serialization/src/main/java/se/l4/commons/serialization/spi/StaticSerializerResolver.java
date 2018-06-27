@@ -4,7 +4,7 @@ import se.l4.commons.serialization.Serializer;
 
 /**
  * Resolver for types that have only one serializer.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>
@@ -18,7 +18,7 @@ public class StaticSerializerResolver<T>
 	{
 		this.serializer = serializer;
 	}
-	
+
 	@Override
 	public Serializer<T> find(TypeEncounter encounter)
 	{

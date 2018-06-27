@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 /**
  * Streamer that outputs JSON.
- * 
+ *
  * @author andreas
  *
  */
@@ -22,7 +22,7 @@ public class JsonOutput
 		'0', '1', '2', '3', '4', '5', '6', '7',
 		'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 	};
-	
+
 	private final static char[] BASE64 = {
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
 		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -30,33 +30,33 @@ public class JsonOutput
 		'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 	};
-	
+
 	private static final int LEVELS = 20;
-	
+
 	protected final Writer writer;
 	private final boolean beautify;
-	
+
 	private boolean[] lists;
 	private boolean[] hasData;
-	
+
 	private int level;
 
 	private final char[] encoded;
-	
+
 	/**
 	 * Create a JSON streamer that will write to the given output.
-	 * 
+	 *
 	 * @param out
 	 */
 	public JsonOutput(OutputStream out)
 	{
 		this(out, false);
 	}
-	
+
 	/**
 	 * Create a JSON streamer that will write to the given output, optionally
 	 * with beautification of the generated JSON.
-	 * 
+	 *
 	 * @param out
 	 * @param beautify
 	 */
@@ -64,21 +64,21 @@ public class JsonOutput
 	{
 		this(new OutputStreamWriter(out, StandardCharsets.UTF_8), beautify);
 	}
-	
+
 	/**
 	 * Create a JSON streamer that will write to the given output.
-	 * 
+	 *
 	 * @param out
 	 */
 	public JsonOutput(Writer writer)
 	{
 		this(writer, false);
 	}
-	
+
 	/**
 	 * Create a JSON streamer that will write to the given output, optionally
 	 * with beautification of the generated JSON.
-	 * 
+	 *
 	 * @param out
 	 * @param beautify
 	 */
@@ -86,13 +86,13 @@ public class JsonOutput
 	{
 		this.writer = writer;
 		this.beautify = beautify;
-		
+
 		lists = new boolean[LEVELS];
 		hasData = new boolean[LEVELS];
-		
+
 		encoded = new char[4];
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
@@ -100,10 +100,10 @@ public class JsonOutput
 		flush();
 		writer.close();
 	}
-	
+
 	/**
 	 * Escape and write the given string.
-	 * 
+	 *
 	 * @param in
 	 * @throws IOException
 	 */
@@ -147,7 +147,7 @@ public class JsonOutput
 			{
 				writer.write('\\');
 				writer.write('u');
-				
+
 				int v = c;
 				int pos = 4;
 				do
@@ -156,7 +156,7 @@ public class JsonOutput
 					v >>>= 4;
 				}
 				while (v != 0);
-				
+
 				for(int j=0; j<pos; j++) writer.write('0');
 				writer.write(encoded, pos, 4 - pos);
 			}
@@ -169,38 +169,38 @@ public class JsonOutput
 
 	/**
 	 * Increase the level by one.
-	 * 
+	 *
 	 * @param list
 	 */
 	private void increaseLevel(boolean list)
 	{
 		level++;
-		
+
 		if(hasData.length == level)
 		{
 			// Grow lists when needed
 			hasData = Arrays.copyOf(hasData, hasData.length * 2);
 			lists = Arrays.copyOf(lists, hasData.length * 2);
 		}
-		
+
 		hasData[level] = false;
 		lists[level] = list;
 	}
-	
+
 	/**
 	 * Decrease the level by one.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void decreaseLevel()
 		throws IOException
 	{
 		level--;
-		
+
 		if(beautify && hasData[level])
 		{
 			writer.write('\n');
-			
+
 			for(int i=0; i<level; i++)
 			{
 				writer.write("\t");
@@ -210,43 +210,43 @@ public class JsonOutput
 
 	/**
 	 * Start a write, will output commas and beautification if needed.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void startWrite()
 		throws IOException
 	{
 		if(hasData[level]) writer.write(',');
-		
+
 		hasData[level] = true;
-		
+
 		if(beautify && level > 0)
 		{
 			writer.write('\n');
-			
+
 			for(int i=0; i<level; i++)
 			{
 				writer.write('\t');
 			}
 		}
 	}
-	
+
 	/**
 	 * Check if the name should be written or not.
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean shouldOutputName()
 	{
 		return level != 0 && ! lists[level];
 	}
-	
+
 	@Override
 	public void writeObjectStart(String name)
 		throws IOException
 	{
 		startWrite();
-		
+
 		if(shouldOutputName())
 		{
 			writer.write('"');
@@ -255,27 +255,27 @@ public class JsonOutput
 			writer.write('"');
 			writer.write(':');
 		}
-		
+
 		writer.write('{');
-		
+
 		increaseLevel(false);
 	}
-	
+
 	@Override
 	public void writeObjectEnd(String name)
 		throws IOException
 	{
 		decreaseLevel();
-		
+
 		writer.write('}');
 	}
-	
+
 	@Override
 	public void writeListStart(String name)
 		throws IOException
 	{
 		startWrite();
-		
+
 		if(shouldOutputName())
 		{
 			writer.write('"');
@@ -284,12 +284,12 @@ public class JsonOutput
 			writer.write('"');
 			writer.write(':');
 		}
-		
+
 		writer.write('[');
-		
+
 		increaseLevel(true);
 	}
-	
+
 	@Override
 	public void writeListEnd(String name)
 		throws IOException
@@ -297,13 +297,13 @@ public class JsonOutput
 		decreaseLevel();
 		writer.write(']');
 	}
-	
+
 	@Override
 	public void write(String name, String value)
 		throws IOException
 	{
 		startWrite();
-		
+
 		if(shouldOutputName())
 		{
 			writer.write('"');
@@ -312,7 +312,7 @@ public class JsonOutput
 			writer.write('"');
 			writer.write(':');
 		}
-		
+
 		if(value == null)
 		{
 			writer.write("null");
@@ -324,12 +324,12 @@ public class JsonOutput
 			writer.write('"');
 		}
 	}
-	
+
 	private void writeUnescaped(String name, String value)
 		throws IOException
 	{
 		startWrite();
-		
+
 		if(shouldOutputName())
 		{
 			writer.write('"');
@@ -338,7 +338,7 @@ public class JsonOutput
 			writer.write('"');
 			writer.write(':');
 		}
-		
+
 		if(value == null)
 		{
 			writer.write("null");
@@ -348,48 +348,48 @@ public class JsonOutput
 			writer.write(value);
 		}
 	}
-	
+
 	@Override
 	public void write(String name, int number)
 		throws IOException
 	{
-		writeUnescaped(name, Integer.toString(number));	
+		writeUnescaped(name, Integer.toString(number));
 	}
-	
+
 	@Override
 	public void write(String name, long number)
 		throws IOException
 	{
-		writeUnescaped(name, Long.toString(number));	
+		writeUnescaped(name, Long.toString(number));
 	}
-	
+
 	@Override
 	public void write(String name, float number)
 		throws IOException
 	{
 		writeUnescaped(name, Float.toString(number));
 	}
-	
+
 	@Override
 	public void write(String name, double number)
 		throws IOException
 	{
 		writeUnescaped(name, Double.toString(number));
 	}
-	
+
 	@Override
 	public void write(String name, boolean bool)
 		throws IOException
 	{
 		writeUnescaped(name, Boolean.toString(bool));
 	}
-	
+
 	@Override
 	public void write(String name, byte[] data)
 		throws IOException
 	{
 		startWrite();
-		
+
 		if(shouldOutputName())
 		{
 			writer.write('"');
@@ -397,13 +397,13 @@ public class JsonOutput
 			writer.write('"');
 			writer.write(':');
 		}
-		
+
 		if(data == null)
 		{
 			writer.write("null");
 			return;
 		}
-		
+
 		writer.write('"');
 
 		int i = 0;
@@ -416,13 +416,13 @@ public class JsonOutput
 		{
 			write(data, i, data.length - i);
 		}
-		
+
 		writer.write('"');
 	}
-	
+
 	/**
 	 * Write some BASE64 encoded bytes.
-	 * 
+	 *
 	 * @param data
 	 * @param pos
 	 * @param chars
@@ -433,11 +433,11 @@ public class JsonOutput
 		throws IOException
 	{
 		char[] chars = BASE64;
-		
+
 		int loc = (len > 0 ? (data[pos] << 24) >>> 8 : 0) |
 			(len > 1 ? (data[pos+1] << 24) >>> 16 : 0) |
 			(len > 2 ? (data[pos+2] << 24) >>> 24 : 0);
-		
+
 		switch(len)
 		{
 			case 3:
@@ -459,14 +459,14 @@ public class JsonOutput
 				writer.write('=');
 		}
 	}
-	
+
 	@Override
 	public void writeNull(String name)
 		throws IOException
 	{
 		write(name, (String) null);
 	}
-	
+
 	@Override
 	public void flush() throws IOException
 	{

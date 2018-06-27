@@ -10,9 +10,9 @@ import se.l4.commons.serialization.format.Token;
 import se.l4.commons.serialization.format.ValueType;
 
 /**
- * Serializer for byte arrays as they have special meaning in 
+ * Serializer for byte arrays as they have special meaning in
  * {@link StreamingInput} and {@link StreamingOutput}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

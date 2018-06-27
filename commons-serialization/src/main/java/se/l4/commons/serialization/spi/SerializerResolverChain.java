@@ -13,7 +13,7 @@ public class SerializerResolverChain<T>
 {
 	private final SerializerResolver<T>[] resolvers;
 	private final Set<Class<? extends Annotation>> hints;
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public SerializerResolverChain(Collection<SerializerResolver<T>> resolvers)
 	{
@@ -25,11 +25,11 @@ public class SerializerResolverChain<T>
 			resolverArray[i++] = r;
 			builder.addAll(r.getHints());
 		}
-		
+
 		this.hints = builder.build();
 		this.resolvers = resolverArray;
 	}
-	
+
 	@Override
 	public Serializer<T> find(TypeEncounter encounter)
 	{
@@ -38,10 +38,10 @@ public class SerializerResolverChain<T>
 			Serializer<T> serializer = resolver.find(encounter);
 			if(serializer != null) return serializer;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Set<Class<? extends Annotation>> getHints()
 	{

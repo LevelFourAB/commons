@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 
 
 /**
- * Annotation to give the serialization library a hint on how a certain enum 
+ * Annotation to give the serialization library a hint on how a certain enum
  * should be mapped.
- *  
+ *
  * @author Andreas Holstenson
  *
  */
@@ -20,10 +20,10 @@ import java.lang.annotation.Target;
 public @interface MapEnumVia
 {
 	/**
-	 * The translator to use. The default translator is 
-	 * {@link NameTranslator}. {@link OrdinalTranslator} can be used to 
-	 * serialize enums using {@link Enum#ordinal()}. 
-	 * 
+	 * The translator to use. The default translator is
+	 * {@link NameTranslator}. {@link OrdinalTranslator} can be used to
+	 * serialize enums using {@link Enum#ordinal()}.
+	 *
 	 * @return
 	 */
 	Class<? extends ValueTranslator<?>> value();

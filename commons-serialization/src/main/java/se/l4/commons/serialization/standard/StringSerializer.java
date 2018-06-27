@@ -11,7 +11,7 @@ import se.l4.commons.serialization.format.ValueType;
 
 /**
  * Serializer for {@link String}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -41,7 +41,7 @@ public class StringSerializer
 	}
 
 	@Override
-	public SerializerFormatDefinition getFormatDefinition() 
+	public SerializerFormatDefinition getFormatDefinition()
 	{
 		return formatDefinition;
 	}

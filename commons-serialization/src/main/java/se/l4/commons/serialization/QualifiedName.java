@@ -2,7 +2,7 @@ package se.l4.commons.serialization;
 
 /**
  * Name for a {@link Serializer}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -16,12 +16,12 @@ public class QualifiedName
 		this.namespace = namespace;
 		this.name = name;
 	}
-	
+
 	public String getName()
 	{
 		return name;
 	}
-	
+
 	public String getNamespace()
 	{
 		return namespace;

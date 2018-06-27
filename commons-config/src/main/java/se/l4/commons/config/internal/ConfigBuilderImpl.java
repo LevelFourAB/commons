@@ -21,65 +21,65 @@ import se.l4.commons.serialization.SerializerCollection;
 
 /**
  * Builder for configuration instances.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
 public class ConfigBuilderImpl implements ConfigBuilder
 {
 	private final List<Bytes> suppliers;
-	
+
 	private SerializerCollection collection;
 	private ValidatorFactory validatorFactory;
-	
+
 	private File root;
-	
+
 	public ConfigBuilderImpl()
 	{
 		suppliers = new ArrayList<>();
 		collection = new DefaultSerializerCollection();
 	}
-	
+
 	@Override
 	public ConfigBuilder withSerializerCollection(SerializerCollection serializers)
 	{
 		this.collection = serializers;
 		return this;
 	}
-	
+
 	@Override
 	public ConfigBuilder withValidatorFactory(ValidatorFactory validation)
 	{
 		this.validatorFactory = validation;
 		return this;
 	}
-	
+
 	@Override
 	public ConfigBuilder withRoot(String root)
 	{
 		return withRoot(new File(root));
 	}
-	
+
 	@Override
 	public ConfigBuilder withRoot(Path path)
 	{
 		return withRoot(path.toFile());
 	}
-	
+
 	@Override
 	public ConfigBuilder withRoot(File root)
 	{
 		this.root = root;
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public ConfigBuilder addFile(String path)
 	{
 		return addFile(new File(path));
 	}
-	
+
 	@Override
 	public ConfigBuilder addFile(Path path)
 	{
@@ -93,7 +93,7 @@ public class ConfigBuilderImpl implements ConfigBuilder
 		{
 			root = file.getParentFile();
 		}
-		
+
 		suppliers.add(Bytes.create(() -> {
 			if(! file.exists())
 			{
@@ -107,25 +107,25 @@ public class ConfigBuilderImpl implements ConfigBuilder
 			{
 				throw new ConfigException("Can not read " + file + ", check permissions");
 			}
-			
+
 			return new FileInputStream(file);
 		}));
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public ConfigBuilder addStream(final InputStream stream)
 	{
 		suppliers.add(Bytes.create(() -> stream));
 		return this;
 	}
-	
+
 	@Override
 	public Config build()
 	{
 		Map<String, Object> data = new HashMap<String, Object>();
-		
+
 		for(Bytes bytes : suppliers)
 		{
 			try(InputStream in = bytes.asInputStream())
@@ -138,7 +138,7 @@ public class ConfigBuilderImpl implements ConfigBuilder
 				throw new ConfigException("Unable to read configuration; " + e.getMessage(), e);
 			}
 		}
-		
+
 		return new DefaultConfig(collection, validatorFactory, root, data);
 	}
 }

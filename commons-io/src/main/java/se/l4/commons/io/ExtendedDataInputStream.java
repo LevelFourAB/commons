@@ -18,19 +18,19 @@ public class ExtendedDataInputStream
 			return new char[1024];
 		}
 	};
-	
+
 	public ExtendedDataInputStream(InputStream in)
 	{
 		super(in);
 	}
-	
+
 	@Override
 	public int read()
 		throws IOException
 	{
 		return super.read();
 	}
-	
+
 	@Override
 	public int readVInt()
 		throws IOException
@@ -42,13 +42,13 @@ public class ExtendedDataInputStream
 			final byte b = (byte) read();
 			result |= (b & 0x7F) << shift;
 			if((b & 0x80) == 0) return result;
-			
+
 			shift += 7;
 		}
-		
+
 		throw new EOFException("Invalid integer");
 	}
-	
+
 	@Override
 	public long readVLong()
 		throws IOException
@@ -60,20 +60,20 @@ public class ExtendedDataInputStream
 			final byte b = (byte) read();
 			result |= (long) (b & 0x7F) << shift;
 			if((b & 0x80) == 0) return result;
-			
+
 			shift += 7;
 		}
-		
+
 		throw new EOFException("Invalid long");
 	}
-	
+
 	@Override
 	public String readString()
 		throws IOException
 	{
 		int length = readVInt();
 		char[] chars = length < CHARS_SIZE ? CHARS.get() : new char[length];
-		
+
 		for(int i=0; i<length; i++)
 		{
 			int c = in.read() & 0xff;
@@ -88,15 +88,15 @@ public class ExtendedDataInputStream
 			}
 			else if(t == 14)
 			{
-				chars[i] = (char) ((c & 0x0f) << 12 
+				chars[i] = (char) ((c & 0x0f) << 12
 					| (in.read() & 0x3f) << 6
 					| (in.read() & 0x3f) << 0);
 			}
 		}
-		
+
 		return new String(chars, 0, length);
 	}
-	
+
 	@Override
 	public Bytes readBytes()
 		throws IOException
@@ -107,19 +107,19 @@ public class ExtendedDataInputStream
 		{
 			int len = readVInt();
 			if(len == 0) return builder.build();
-			
+
 			readFully(buffer, 0, len);
 			builder.addChunk(buffer, 0, len);
 		}
 	}
-	
+
 	@Override
 	public Bytes readTemporaryBytes()
 		throws IOException
 	{
 		return new TemporaryBytes(this);
 	}
-	
+
 	private static class TemporaryBytes
 		implements Bytes
 	{
@@ -129,14 +129,14 @@ public class ExtendedDataInputStream
 		{
 			this.parent = parent;
 		}
-		
+
 		@Override
 		public InputStream asInputStream()
 			throws IOException
 		{
 			return new TemporaryInputStream(parent);
 		}
-		
+
 		@Override
 		public byte[] toByteArray()
 			throws IOException
@@ -144,7 +144,7 @@ public class ExtendedDataInputStream
 			throw new UnsupportedOperationException();
 		}
 	}
-	
+
 	private static class TemporaryInputStream
 		extends InputStream
 	{
@@ -157,7 +157,7 @@ public class ExtendedDataInputStream
 			this.in = in;
 			this.remaining = 0;
 		}
-		
+
 		@Override
 		public int read()
 			throws IOException
@@ -175,11 +175,11 @@ public class ExtendedDataInputStream
 					return -1;
 				}
 			}
-			
+
 			remaining--;
 			return in.readUnsignedByte();
 		}
-		
+
 		@Override
 		public int read(byte[] b, int off, int len)
 			throws IOException
@@ -197,7 +197,7 @@ public class ExtendedDataInputStream
 					return -1;
 				}
 			}
-			
+
 			len = Math.min(len, remaining);
 			in.readFully(b, off, len);
 			return len;

@@ -23,7 +23,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Tests for {@link MapInput}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -35,22 +35,22 @@ public class ObjectStreamsTest
 	{
 		Map<String, Object> data = createMap();
 		data.put("key", "value");
-		
+
 		assertStream(createInput(data), OBJECT_START, KEY, VALUE, OBJECT_END);
 		assertStreamValues(createInput(data), "key", "value");
 	}
-	
+
 	@Test
 	public void testSingleNumber()
 		throws Exception
 	{
 		Map<String, Object> data = createMap();
 		data.put("key", 12.0);
-		
+
 		assertStream(createInput(data), OBJECT_START, KEY, VALUE, OBJECT_END);
 		assertStreamValues(createInput(data), "key", 12.0);
 	}
-	
+
 	@Test
 	public void testMultipleValues()
 		throws Exception
@@ -58,11 +58,11 @@ public class ObjectStreamsTest
 		Map<String, Object> data = createMap();
 		data.put("key1", "value1");
 		data.put("key2", "value2");
-		
+
 		assertStream(createInput(data), OBJECT_START, KEY, VALUE, KEY, VALUE, OBJECT_END);
 		assertStreamValues(createInput(data), "key1", "value1", "key2", "value2");
 	}
-	
+
 	@Test
 	public void testList()
 		throws Exception
@@ -70,11 +70,11 @@ public class ObjectStreamsTest
 		List<Object> data = new ArrayList<Object>();
 		data.add("value1");
 		data.add("value2");
-		
+
 		assertStream(createInput(data), LIST_START, VALUE, VALUE, LIST_END);
 		assertStreamValues(createInput(data), "value1", "value2");
 	}
-	
+
 	@Test
 	public void testListInMap()
 		throws Exception
@@ -82,18 +82,18 @@ public class ObjectStreamsTest
 		List<Object> list = new ArrayList<Object>();
 		list.add("value1");
 		list.add("value2");
-		
+
 		Map<String, Object> data = createMap();
 		data.put("key1", list);
-		
-		
+
+
 		assertStream(createInput(data), OBJECT_START, KEY, LIST_START, VALUE, VALUE, LIST_END, OBJECT_END);
 		assertStreamValues(createInput(data), "key1", "value1", "value2");
 	}
-	
+
 	/**
 	 * Assert that the stream contains the specified tokens.
-	 * 
+	 *
 	 * @param in
 	 * @param tokens
 	 * @throws IOException
@@ -116,16 +116,16 @@ public class ObjectStreamsTest
 				fail("Token at " + (i-1) + " was expected to be " + tokens[i-1] + ", but found " + t);
 			}
 		}
-		
+
 		if(i < tokens.length)
 		{
 			fail("Did not read all tokens, expected " + tokens.length + " but only read " + i + ".\nTokens were " + history.toString());
 		}
 	}
-	
+
 	/**
 	 * Assert that KEY and VALUE tokens contain the specified values.
-	 * 
+	 *
 	 * @param in
 	 * @param values
 	 * @throws IOException
@@ -145,12 +145,12 @@ public class ObjectStreamsTest
 					{
 						fail("Did not expect more values, but got " + in.getValue());
 					}
-					
+
 					assertEquals(values[i++], in.getValue());
 					break;
 			}
 		}
-		
+
 		if(i < values.length)
 		{
 			fail("Did not read all values, expected " + values.length + " but only read " + i);
@@ -161,7 +161,7 @@ public class ObjectStreamsTest
 	{
 		return MapInput.resolveInput("", in);
 	}
-	
+
 	protected Map<String, Object> createMap()
 	{
 		return new LinkedHashMap<String, Object>();

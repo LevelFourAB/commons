@@ -17,7 +17,7 @@ import se.l4.commons.serialization.spi.TypeViaClass;
 
 /**
  * Implementation of {@link SerializerDefinition.Builder}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -25,12 +25,12 @@ public class SerializerFormatDefinitionBuilderImpl
 	implements Builder
 {
 	private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
-	
+
 	private final List<FieldDefinition> fields;
 	private int type;
 	private ValueType valueType;
 	private SerializerFormatDefinition itemDefinition;
-	
+
 	public SerializerFormatDefinitionBuilderImpl()
 	{
 		fields = new ArrayList<FieldDefinition>();
@@ -42,7 +42,7 @@ public class SerializerFormatDefinitionBuilderImpl
 	{
 		return new FieldBuilderImpl(name);
 	}
-	
+
 	@Override
 	public Builder list(SerializerFormatDefinition itemDefinition)
 	{
@@ -50,20 +50,20 @@ public class SerializerFormatDefinitionBuilderImpl
 		this.itemDefinition = itemDefinition;
 		return this;
 	}
-	
+
 	@Override
 	public Builder list(Serializer<?> itemSerializer)
 	{
 		return list(itemSerializer.getFormatDefinition());
 	}
-	
+
 	@Override
 	public Builder object()
 	{
 		type = 1;
 		return this;
 	}
-	
+
 	@Override
 	public Builder value(ValueType valueType)
 	{
@@ -71,7 +71,7 @@ public class SerializerFormatDefinitionBuilderImpl
 		this.valueType = valueType;
 		return this;
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition build()
 	{
@@ -79,17 +79,17 @@ public class SerializerFormatDefinitionBuilderImpl
 		{
 			return SerializerFormatDefinition.forValue(valueType);
 		}
-		
+
 		return new SerializerFormatDefinition(type, valueType, fields);
 	}
-	
+
 	private class FieldBuilderImpl
 		implements FieldBuilder
 	{
 		private final Collection<Annotation> hints;
 		private String name;
 		private Type type;
-		
+
 		public FieldBuilderImpl(String name)
 		{
 			this.name = name;
@@ -112,13 +112,13 @@ public class SerializerFormatDefinitionBuilderImpl
 			}
 			return this;
 		}
-		
+
 		@Override
 		public FieldBuilder withType(Class<?> type)
 		{
 			return withType(new TypeViaClass(type));
 		}
-		
+
 		@Override
 		public FieldBuilder withType(Type type)
 		{
@@ -131,13 +131,13 @@ public class SerializerFormatDefinitionBuilderImpl
 		{
 			return using(serializer.getFormatDefinition());
 		}
-		
+
 		@Override
 		public Builder using(ValueType valueType)
 		{
 			return using(SerializerFormatDefinition.forValue(valueType));
 		}
-		
+
 		@Override
 		public Builder using(SerializerFormatDefinition def)
 		{

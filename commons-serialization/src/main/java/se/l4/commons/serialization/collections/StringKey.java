@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Indicate that a {@link Map} has a string key and that key should be treated
  * as an object key during serialization.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

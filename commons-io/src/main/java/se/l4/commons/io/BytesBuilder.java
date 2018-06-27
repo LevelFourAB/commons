@@ -8,44 +8,44 @@ import java.io.InputStream;
 public class BytesBuilder
 {
 	private final ByteArrayOutputStream out;
-	
+
 	public BytesBuilder()
 	{
 		out = new ByteArrayOutputStream(8192);
 	}
-	
+
 	public BytesBuilder addChunk(byte[] buffer)
 	{
 		return addChunk(buffer, 0, buffer.length);
 	}
-	
+
 	public BytesBuilder addChunk(byte[] buffer, int off, int len)
 	{
 		out.write(buffer, off, len);
 		return this;
 	}
-	
+
 	public Bytes build()
 	{
 		return Bytes.create(out.toByteArray());
 	}
-	
+
 	static Bytes createViaLazyDataOutput(IoConsumer<ExtendedDataOutput> creator)
 	{
 		return createViaLazyDataOutput(creator, 8192);
 	}
-	
+
 	static Bytes createViaLazyDataOutput(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
 	{
 		return new DataOutputBytes(creator, expectedSize);
 	}
-	
+
 	static Bytes createViaDataOutput(IoConsumer<ExtendedDataOutput> creator)
 			throws IOException
 	{
 		return createViaDataOutput(creator, 8192);
 	}
-	
+
 	static Bytes createViaDataOutput(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
 		throws IOException
 	{
@@ -56,7 +56,7 @@ public class BytesBuilder
 		}
 		return Bytes.create(out.toByteArray());
 	}
-	
+
 	private static class DataOutputBytes
 		implements Bytes
 	{
@@ -68,14 +68,14 @@ public class BytesBuilder
 			this.creator = creator;
 			this.expectedSize = expectedSize;
 		}
-		
+
 		@Override
 		public InputStream asInputStream()
 			throws IOException
 		{
 			return new ByteArrayInputStream(toByteArray());
 		}
-		
+
 		@Override
 		public byte[] toByteArray()
 			throws IOException
@@ -87,7 +87,7 @@ public class BytesBuilder
 			}
 			return out.toByteArray();
 		}
-		
+
 		@Override
 		public void asChunks(ByteArrayConsumer consumer)
 			throws IOException

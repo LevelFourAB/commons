@@ -10,7 +10,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Serializer for {@link Number}, {@link Boolean} or {@link String}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

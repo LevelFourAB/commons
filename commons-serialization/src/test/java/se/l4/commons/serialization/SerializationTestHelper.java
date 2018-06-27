@@ -24,13 +24,13 @@ public class SerializationTestHelper
 	private SerializationTestHelper()
 	{
 	}
-	
+
 	public static <T> void testWriteAndRead(Serializer<T> serializer, T object)
 	{
 		testWriteAndRead(serializer, object, BinaryInput::new, BinaryOutput::new);
 		testWriteAndRead(serializer, object, JsonInput::new, JsonOutput::new);
 	}
-	
+
 	public static <T> void testWriteAndRead(Serializer<T> serializer, T object,
 			Function<InputStream, StreamingInput> inputFactory,
 			Function<OutputStream, StreamingOutput> outputFactory)
@@ -44,13 +44,13 @@ public class SerializationTestHelper
 		{
 			throw Throwables.propagate(e);
 		}
-		
+
 		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 		try(StreamingInput si = inputFactory.apply(in))
 		{
 			T value = serializer.read(si);
-			
-			
+
+
 			assertThat(value, is(object));
 		}
 		catch(IOException e)

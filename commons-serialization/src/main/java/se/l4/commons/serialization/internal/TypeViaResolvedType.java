@@ -9,7 +9,7 @@ import se.l4.commons.serialization.spi.Type;
 
 /**
  * Implementation of {@link Type} that uses {@link ResolvedType}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -24,7 +24,7 @@ public class TypeViaResolvedType
 		this.rt = rt;
 		bindings = rt.getTypeBindings();
 	}
-	
+
 	public ResolvedType getResolvedType()
 	{
 		return rt;
@@ -45,10 +45,10 @@ public class TypeViaResolvedType
 		{
 			result[i] = new TypeViaResolvedType(types.get(i));
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public String toString()
 	{

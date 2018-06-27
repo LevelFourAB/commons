@@ -10,7 +10,7 @@ import se.l4.commons.serialization.SerializationException;
 
 /**
  * Resolver for embedded references to other parts of the configuration.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -19,10 +19,10 @@ public class ConfigResolver
 	private ConfigResolver()
 	{
 	}
-	
+
 	/**
 	 * Resolve the specified map and return the resolved map.
-	 * 
+	 *
 	 * @param root
 	 * @return
 	 */
@@ -35,7 +35,7 @@ public class ConfigResolver
 
 	/**
 	 * Resolve the specified map and store it in the specified target.
-	 * 
+	 *
 	 * @param root
 	 * @param target
 	 * @return
@@ -45,30 +45,30 @@ public class ConfigResolver
 		resolve(target, root, "");
 		return target;
 	}
-	
+
 	private static void resolve(Map<String, Object> newRoot, Map<String, Object> root, String currentKey)
 	{
 		for(Map.Entry<String, Object> e : root.entrySet())
 		{
 			String key = e.getKey();
 			Object value = e.getValue();
-			
+
 			if(value instanceof Map)
 			{
 				Map<String, Object> map = new HashMap<String, Object>();
-				
+
 				String newKey = currentKey.isEmpty() ? key : currentKey + '.' + key;
 				map.put(ConfigKey.NAME, newKey);
-				
+
 				resolve(map, (Map) value, newKey);
 				store(newRoot, key, map, currentKey);
 			}
 			else if(value instanceof List)
 			{
 				List<Object> list = new ArrayList<Object>();
-				
+
 				String newKey = currentKey.isEmpty() ? key : currentKey + '.' + key;
-				
+
 				resolve(list, (List) value, newKey);
 				store(newRoot, key, list, currentKey);
 			}
@@ -78,7 +78,7 @@ public class ConfigResolver
 			}
 		}
 	}
-	
+
 	private static void resolve(List<Object> newList, List<Object> oldList, String currentKey)
 	{
 		for(int i=0, n=oldList.size(); i<n; i++)
@@ -89,7 +89,7 @@ public class ConfigResolver
 			{
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put(ConfigKey.NAME, newKey);
-				
+
 				resolve(map, (Map) value, newKey);
 				value = map;
 			}
@@ -99,7 +99,7 @@ public class ConfigResolver
 				resolve(list, (List) value, newKey);
 				value = list;
 			}
-			
+
 			newList.add(value);
 		}
 	}
@@ -113,7 +113,7 @@ public class ConfigResolver
 			root.put(key.substring(1, key.length()-1), value);
 			return;
 		}
-		
+
 		String[] path = key.split("\\.");
 		StringBuilder resolvedPath = new StringBuilder(currentKey);
 		for(int i=0, n=path.length-1; i<n; i++)
@@ -136,13 +136,13 @@ public class ConfigResolver
 				Map<String, Object> newMap = new HashMap<String, Object>();
 				if(resolvedPath.length() > 0) resolvedPath.append('.');
 				resolvedPath.append(path[i]);
-				
+
 				newMap.put(ConfigKey.NAME, resolvedPath.toString());
 				current.put(path[i], newMap);
 				current = newMap;
 			}
 		}
-		
+
 		current.put(path[path.length - 1], value);
 	}
 }

@@ -13,7 +13,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Serializer for arrays.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -29,18 +29,18 @@ public class ArraySerializer
 	{
 		this.componentType = componentType;
 		this.itemSerializer = itemSerializer;
-		
+
 		formatDefinition = SerializerFormatDefinition.builder()
 			.list(itemSerializer)
 			.build();
 	}
-	
+
 	@Override
 	public Object read(StreamingInput in)
 		throws IOException
 	{
 		in.next(Token.LIST_START);
-		
+
 		List<Object> list = new ArrayList<>();
 		while(in.peek() != Token.LIST_END)
 		{
@@ -55,9 +55,9 @@ public class ArraySerializer
 				list.add(value);
 			}
 		}
-		
+
 		in.next(Token.LIST_END);
-		
+
 		Object array = Array.newInstance(componentType, list.size());
 		for(int i=0, n=list.size(); i<n; i++)
 		{
@@ -65,7 +65,7 @@ public class ArraySerializer
 		}
 		return array;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void write(Object object, String name, StreamingOutput stream)
@@ -86,7 +86,7 @@ public class ArraySerializer
 		}
 		stream.writeListEnd(name);
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{

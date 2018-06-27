@@ -20,18 +20,18 @@ public class MapAsObjectSerializer<V>
 	public MapAsObjectSerializer(Serializer<V> serializer)
 	{
 		this.serializer = serializer;
-		
+
 		formatDefinition = SerializerFormatDefinition.builder()
 			.field("*").using(serializer)
 			.build();
 	}
-	
+
 	@Override
 	public Map<String, V> read(StreamingInput in)
 		throws IOException
 	{
 		in.next(Token.OBJECT_START);
-		
+
 		Map<String, V> result = new HashMap<String, V>();
 		while(in.peek() != Token.OBJECT_END)
 		{
@@ -41,7 +41,7 @@ public class MapAsObjectSerializer<V>
 				in.next();
 				continue;
 			}
-			
+
 			in.next(Token.KEY);
 			String key = in.getString();
 			if(key.startsWith("_aurochs_:"))
@@ -49,23 +49,23 @@ public class MapAsObjectSerializer<V>
 				in.skipValue();
 				continue;
 			}
-			
+
 			V value = in.peek() == Token.NULL ? null : serializer.read(in);
-			
+
 			result.put(key, value);
 		}
-		
+
 		in.next(Token.OBJECT_END);
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public void write(Map<String, V> object, String name, StreamingOutput stream)
 		throws IOException
 	{
 		stream.writeObjectStart(name);
-		
+
 		for(Entry<String, V> e : object.entrySet())
 		{
 			V value = e.getValue();
@@ -78,10 +78,10 @@ public class MapAsObjectSerializer<V>
 				serializer.write(value, e.getKey(), stream);
 			}
 		}
-		
+
 		stream.writeObjectEnd(name);
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{

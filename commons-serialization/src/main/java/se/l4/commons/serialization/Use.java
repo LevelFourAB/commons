@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to mark which serializer to use for a certain class.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -19,7 +19,7 @@ public @interface Use
 {
 	/**
 	 * The class to use for serialization.
-	 * 
+	 *
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")

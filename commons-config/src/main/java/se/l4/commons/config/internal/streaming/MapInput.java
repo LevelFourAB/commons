@@ -11,7 +11,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Implementation of {@link StreamingInput} that works on a objects.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -26,14 +26,14 @@ public class MapInput
 		END,
 		DONE
 	}
-	
+
 	private State state;
 	private State previousState;
 	private Token token;
-	
+
 	private Map.Entry<String, Object> entry;
 	private Iterator<Map.Entry<String, Object>> iterator;
-	
+
 	private StreamingInput subInput;
 	private String key;
 
@@ -41,17 +41,17 @@ public class MapInput
 	{
 		this.key = key;
 		state = State.START;
-		
+
 		iterator = root.entrySet().iterator();
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
 	{
 		// Nothing to close
 	}
-	
+
 	public static StreamingInput resolveInput(String key, Object data)
 	{
 		if(data instanceof Map)
@@ -71,13 +71,13 @@ public class MapInput
 			return new ValueInput(key, data);
 		}
 	}
-	
+
 	private StreamingInput resolveInput()
 	{
 		String newKey = key.isEmpty() ? entry.getKey() : key + '.' + entry.getKey();
 		return resolveInput(newKey, entry.getValue());
 	}
-	
+
 	@Override
 	protected IOException raiseException(String message)
 	{
@@ -108,7 +108,7 @@ public class MapInput
 			case END:
 				return Token.OBJECT_END;
 		}
-		
+
 		return null;
 	}
 
@@ -137,17 +137,17 @@ public class MapInput
 					advancePosition();
 					return next();
 				}
-				
+
 				setState(State.VALUE);
 				return token = t;
 			case END:
 				setState(State.DONE);
 				return token = Token.OBJECT_END;
 		}
-		
+
 		return token = null;
 	}
-	
+
 	private void setState(State state)
 	{
 		previousState = this.state;
@@ -183,7 +183,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getValue();
 		}
-		
+
 		return null;
 	}
 
@@ -197,7 +197,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getString();
 		}
-		
+
 		return null;
 	}
 
@@ -209,7 +209,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getBoolean();
 		}
-		
+
 		return false;
 	}
 
@@ -221,7 +221,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getDouble();
 		}
-		
+
 		return 0;
 	}
 
@@ -233,7 +233,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getFloat();
 		}
-		
+
 		return 0;
 	}
 
@@ -245,7 +245,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getLong();
 		}
-		
+
 		return 0;
 	}
 
@@ -257,7 +257,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getInt();
 		}
-		
+
 		return 0;
 	}
 
@@ -269,7 +269,7 @@ public class MapInput
 			case VALUE:
 				return subInput.getShort();
 		}
-		
+
 		return 0;
 	}
 

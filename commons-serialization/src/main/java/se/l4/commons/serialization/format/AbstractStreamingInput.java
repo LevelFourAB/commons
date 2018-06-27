@@ -7,18 +7,18 @@ public abstract class AbstractStreamingInput
 {
 	private Object value;
 	private Token token;
-	
+
 	protected int level;
-	
+
 	public AbstractStreamingInput()
 	{
 	}
-	
+
 	protected void setValue(Object value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public Token next()
 		throws IOException
@@ -36,18 +36,18 @@ public abstract class AbstractStreamingInput
 				break;
 			default: // Do nothing
 		}
-		
+
 		return this.token = token;
 	}
-	
+
 	protected abstract Token next0()
 		throws IOException;
-	
+
 	protected IOException raiseException(String message)
 	{
 		return new IOException(message);
 	}
-	
+
 	@Override
 	public Token next(Token expected)
 		throws IOException
@@ -59,7 +59,7 @@ public abstract class AbstractStreamingInput
 		}
 		return t;
 	}
-	
+
 	@Override
 	public void skipValue()
 		throws IOException
@@ -68,7 +68,7 @@ public abstract class AbstractStreamingInput
 		{
 			throw raiseException("Value skipping can only be used with when token is " + Token.KEY);
 		}
-		
+
 		switch(peek())
 		{
 			case LIST_START:
@@ -82,7 +82,7 @@ public abstract class AbstractStreamingInput
 				next();
 		}
 	}
-	
+
 	@Override
 	public void skip()
 		throws IOException
@@ -102,7 +102,7 @@ public abstract class AbstractStreamingInput
 			default:
 				throw raiseException("Can only skip when start of object, start of list or value, token is now " + token);
 		}
-		
+
 		int currentLevel = level;
 		Token next = peek();
 		while(true)
@@ -121,22 +121,22 @@ public abstract class AbstractStreamingInput
 
 			// Read peeked value and peek for next one
 			next();
-			next = peek(); 
+			next = peek();
 		}
 	}
-	
+
 	@Override
 	public Token current()
 	{
 		return token;
 	}
-	
+
 	@Override
 	public Object getValue()
 	{
 		return value;
 	}
-	
+
 	@Override
 	public String getString()
 	{
@@ -148,37 +148,37 @@ public abstract class AbstractStreamingInput
 	{
 		return (Boolean) value;
 	}
-	
+
 	@Override
 	public double getDouble()
 	{
 		return ((Number) value).doubleValue();
 	}
-	
+
 	@Override
 	public float getFloat()
 	{
 		return ((Number) value).floatValue();
 	}
-	
+
 	@Override
 	public long getLong()
 	{
 		return ((Number) value).longValue();
 	}
-	
+
 	@Override
 	public int getInt()
 	{
 		return ((Number) value).intValue();
 	}
-	
+
 	@Override
 	public short getShort()
 	{
 		return ((Number) value).shortValue();
 	}
-	
+
 	@Override
 	public byte[] getByteArray()
 	{

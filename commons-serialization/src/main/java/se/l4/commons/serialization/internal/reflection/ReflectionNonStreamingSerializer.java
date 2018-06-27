@@ -12,7 +12,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Serializer that uses only fields or methods. Can fully stream the object.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>
@@ -28,7 +28,7 @@ public class ReflectionNonStreamingSerializer<T>
 		this.type = type;
 		this.size = type.getAllFields().length;
 	}
-	
+
 	@Override
 	public T read(StreamingInput in)
 		throws IOException
@@ -41,7 +41,7 @@ public class ReflectionNonStreamingSerializer<T>
 		{
 			in.next(Token.KEY);
 			String key = in.getString();
-			
+
 			FieldDefinition def = type.getField(key);
 			if(def == null)
 			{
@@ -53,12 +53,12 @@ public class ReflectionNonStreamingSerializer<T>
 				data.put(key, def.read(in));
 			}
 		}
-		
+
 		in.next(Token.OBJECT_END);
 
 		// Create the instance
 		T instance = type.newInstance(data);
-		
+
 		// Transfer any other fields
 		for(Map.Entry<String, Object> entry : data.entrySet())
 		{
@@ -68,7 +68,7 @@ public class ReflectionNonStreamingSerializer<T>
 				def.set(instance, entry.getValue());
 			}
 		}
-		
+
 		return instance;
 	}
 
@@ -77,15 +77,15 @@ public class ReflectionNonStreamingSerializer<T>
 		throws IOException
 	{
 		stream.writeObjectStart(name);
-		
+
 		for(FieldDefinition def : type.getAllFields())
 		{
 			def.write(object, stream);
 		}
-		
+
 		stream.writeObjectEnd(name);
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{

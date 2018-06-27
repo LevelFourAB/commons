@@ -5,7 +5,7 @@ import se.l4.commons.serialization.Serializer;
 /**
  * A callback for {@link SerializerResolver} that is used when a new resolver
  * is discovered.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

@@ -12,7 +12,7 @@ import se.l4.commons.serialization.format.ValueType;
 
 /**
  * Serializer for {@link File}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -25,19 +25,19 @@ public class FileSerializer
 	public FileSerializer(File root)
 	{
 		this.root = root;
-		
+
 		formatDefinition = SerializerFormatDefinition.forValue(ValueType.STRING);
 	}
-	
+
 	@Override
 	public File read(StreamingInput in)
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		
+
 		String file = in.getString();
 		if(file == null) return null;
-		
+
 		File temp = new File(file);
 		if(temp.isAbsolute())
 		{

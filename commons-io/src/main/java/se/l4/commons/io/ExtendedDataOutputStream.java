@@ -12,7 +12,7 @@ public class ExtendedDataOutputStream
 	{
 		super(out);
 	}
-	
+
 	@Override
 	public void writeVInt(int value)
 		throws IOException
@@ -31,7 +31,7 @@ public class ExtendedDataOutputStream
 			}
 		}
 	}
-	
+
 	@Override
 	public void writeVLong(long value)
 		throws IOException
@@ -50,7 +50,7 @@ public class ExtendedDataOutputStream
 			}
 		}
 	}
-	
+
 	@Override
 	public void writeString(String string)
 		throws IOException
@@ -76,7 +76,7 @@ public class ExtendedDataOutputStream
 			}
 		}
 	}
-	
+
 	@Override
 	public void writeBytes(Bytes bytes)
 		throws IOException

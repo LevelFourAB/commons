@@ -12,7 +12,7 @@ import javax.xml.bind.DatatypeConverter;
 /**
  * Input for JSON. Please note that this class is not intended for general use
  * and does not strictly conform to the JSON standard.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -22,35 +22,35 @@ public class JsonInput
 	private static final char NULL = 0;
 
 	private final Reader in;
-	
+
 	private final char[] buffer;
 	private int position;
 	private int limit;
-	
+
 	private final boolean[] lists;
 	private final String[] names;
-	
+
 	public JsonInput(InputStream in)
 	{
 		this(new InputStreamReader(in, StandardCharsets.UTF_8));
 	}
-	
+
 	public JsonInput(Reader in)
 	{
 		this.in = in;
-		
+
 		lists = new boolean[20];
 		names = new String[20];
 		buffer = new char[1024];
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
 	{
 		in.close();
 	}
-	
+
 	@Override
 	protected IOException raiseException(String message)
 	{
@@ -58,24 +58,24 @@ public class JsonInput
 		for(int i=1; i<level; i++)
 		{
 			if(i > 1) path.append(" > ");
-			
+
 			path.append(names[i]);
 		}
 		return new IOException(message + (level > 0 ? " (at " + path + ")" : ""));
 	}
-	
+
 	private void readWhitespace()
 		throws IOException
 	{
 		if(limit - position > 0 && ! Character.isWhitespace(buffer[position])) return;
-		
+
 		while(true)
 		{
 			if(limit - position < 1)
 			{
 				if(! readAhead(1)) return;
 			}
-			
+
 			char c = buffer[position];
 			if(Character.isWhitespace(c) || c == ',')
 			{
@@ -87,15 +87,15 @@ public class JsonInput
 			}
 		}
 	}
-	
+
 	private char readNext()
 		throws IOException
 	{
 		readWhitespace();
-		
+
 		return read();
 	}
-	
+
 	private char read()
 		throws IOException
 	{
@@ -106,10 +106,10 @@ public class JsonInput
 				throw new EOFException();
 			}
 		}
-		
+
 		return buffer[position++];
 	}
-	
+
 	private boolean readAhead(int minChars)
 		throws IOException
 	{
@@ -125,34 +125,34 @@ public class JsonInput
 		{
 			// If we have characters left we need to keep them in the buffer
 			int stop = limit - position;
-			
+
 			System.arraycopy(buffer, position, buffer, 0, stop);
-			
+
 			limit = stop;
 		}
 		else
 		{
 			limit = 0;
 		}
-		
+
 		int read = read(buffer, limit, buffer.length - limit);
-		
+
 		position = 0;
 		limit += read;
-		
+
 		if(read == 0)
 		{
 			return false;
 		}
-		
+
 		if(read < minChars)
 		{
 			throw raiseException("Needed " + minChars + " but got " + read);
 		}
-		
+
 		return true;
 	}
-	
+
 	private int read(char[] buffer, int offset, int length)
 		throws IOException
 	{
@@ -163,10 +163,10 @@ public class JsonInput
 			if(l == -1) break;
 			result += l;
 		}
-		
+
 		return result;
 	}
-	
+
 	private Token toToken(char c)
 	{
 		switch(c)
@@ -185,16 +185,16 @@ public class JsonInput
 					return Token.KEY;
 				}
 		}
-		
+
 		if(c == 'n')
 		{
 			// TODO: Better error detection?
 			return Token.NULL;
 		}
-		
+
 		return Token.VALUE;
 	}
-	
+
 	private Object readNextValue()
 		throws IOException
 	{
@@ -211,7 +211,7 @@ public class JsonInput
 			while(true)
 			{
 				value.append(c);
-				
+
 				c = peekChar(false);
 				switch(c)
 				{
@@ -223,14 +223,14 @@ public class JsonInput
 					default:
 						if(Character.isWhitespace(c)) break _outer;
 				}
-				
+
 				read();
 			}
-			
+
 			return toObject(value.toString());
 		}
 	}
-	
+
 	private Object toObject(String in)
 	{
 		if(in.equals("false"))
@@ -241,7 +241,7 @@ public class JsonInput
 		{
 			return true;
 		}
-		
+
 		try
 		{
 			return Long.parseLong(in);
@@ -256,10 +256,10 @@ public class JsonInput
 			{
 			}
 		}
-		
+
 		return in;
 	}
-	
+
 	private String readString(boolean readStart)
 		throws IOException
 	{
@@ -270,7 +270,7 @@ public class JsonInput
 			if(c != '"') throw raiseException("Expected \", but got " + c);
 			c = read();
 		}
-		
+
 		while(c != '"')
 		{
 			if(c == '\\')
@@ -281,10 +281,10 @@ public class JsonInput
 			{
 				key.append(c);
 			}
-			
+
 			c = read();
 		}
-		
+
 		return key.toString();
 	}
 
@@ -342,7 +342,7 @@ public class JsonInput
 		}
 		return t;
 	}
-	
+
 	@Override
 	public Token next0()
 		throws IOException
@@ -354,11 +354,11 @@ public class JsonInput
 			case OBJECT_END:
 			case LIST_END:
 				readNext();
-				
+
 				c = peekChar();
 				if(c == ',') read();
-				
-				return token; 
+
+				return token;
 			case OBJECT_START:
 			case LIST_START:
 				readNext();
@@ -373,7 +373,7 @@ public class JsonInput
 				{
 					throw raiseException("Expected :, got " + next);
 				}
-				
+
 				names[level] = key;
 				setValue(key);
 				return token;
@@ -381,43 +381,43 @@ public class JsonInput
 			case VALUE:
 			{
 				setValue(readNextValue());
-				
+
 				// Check for trailing commas
 				readWhitespace();
 				c = peekChar();
 				if(c == ',') read();
-				
+
 				return token;
 			}
 			case NULL:
 			{
 				readNextValue();
-				
+
 				setValue(null);
-				
+
 				// Check for trailing commas
 				readWhitespace();
 				c = peekChar();
 				if(c == ',') read();
-				
+
 				return token;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private char peekChar()
 		throws IOException
 	{
 		return peekChar(true);
 	}
-	
+
 	private char peekChar(boolean ws)
 		throws IOException
 	{
 		if(ws) readWhitespace();
-		
+
 		if(limit - position < 1)
 		{
 			if(false == readAhead(1))
@@ -425,34 +425,34 @@ public class JsonInput
 				return NULL;
 			}
 		}
-		
+
 		if(limit - position > 0)
 		{
 			return buffer[position];
 		}
-		
+
 		return NULL;
 	}
-	
+
 	@Override
 	public Token peek()
 		throws IOException
 	{
 		readWhitespace();
-		
+
 		if(limit - position < 1)
 		{
 			if(false == readAhead(1)) return null;
 		}
-		
+
 		if(limit - position > 0)
 		{
 			return toToken(buffer[position]);
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public byte[] getByteArray()
 	{

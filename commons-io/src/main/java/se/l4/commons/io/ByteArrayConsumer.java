@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * Consumer of {@code byte[]} arrays.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

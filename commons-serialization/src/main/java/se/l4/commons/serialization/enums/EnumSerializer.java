@@ -12,7 +12,7 @@ import se.l4.commons.serialization.internal.SerializerFormatDefinitionBuilderImp
 /**
  * Serializer for {@link Enum}s. The enum serializer can use different
  * {@link ValueTranslator}s to encode enums in different ways.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>
@@ -27,19 +27,19 @@ public class EnumSerializer<T extends Enum<T>>
 	public EnumSerializer(@SuppressWarnings("rawtypes") ValueTranslator translator)
 	{
 		this.translator = translator;
-		
+
 		formatDefinition = new SerializerFormatDefinitionBuilderImpl()
 			.value(translator.getType())
 			.build();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public T read(StreamingInput in)
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		
+
 		Object value;
 		switch(translator.getType())
 		{
@@ -67,10 +67,10 @@ public class EnumSerializer<T extends Enum<T>>
 			default:
 				throw new AssertionError("Unknown type: " + translator.getType());
 		}
-		
+
 		return (T) translator.toEnum(value);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void write(T object, String name, StreamingOutput stream)
@@ -104,7 +104,7 @@ public class EnumSerializer<T extends Enum<T>>
 				throw new AssertionError("Unknown type: " + translator.getType());
 		}
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{

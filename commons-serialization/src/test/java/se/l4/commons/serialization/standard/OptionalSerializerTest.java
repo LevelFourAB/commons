@@ -20,10 +20,10 @@ public class OptionalSerializerTest
 	public void testDirectEmpty()
 	{
 		Serializer<Optional<String>> s = new OptionalSerializer<>(new StringSerializer());
-		
+
 		byte[] data = s.toBytes(Optional.empty());
 		Optional<String> opt = s.fromBytes(data);
-		
+
 		assertThat("optional not null", opt, notNullValue());
 		assertThat("optional is empty", opt.isPresent(), is(false));
 	}
@@ -32,10 +32,10 @@ public class OptionalSerializerTest
 	public void testDirectNull()
 	{
 		Serializer<Optional<String>> s = new OptionalSerializer<>(new StringSerializer());
-		
+
 		byte[] data = s.toBytes(null);
 		Optional<String> opt = s.fromBytes(data);
-		
+
 		assertThat("optional not null", opt, notNullValue());
 		assertThat("optional is empty", opt.isPresent(), is(false));
 	}
@@ -44,10 +44,10 @@ public class OptionalSerializerTest
 	public void testDirectWithValue()
 	{
 		Serializer<Optional<String>> s = new OptionalSerializer<>(new StringSerializer());
-		
+
 		byte[] data = s.toBytes(Optional.of("Hello"));
 		Optional<String> opt = s.fromBytes(data);
-		
+
 		assertThat("optional not null", opt, notNullValue());
 		assertThat("optional is present", opt.isPresent(), is(true));
 		assertThat("optional is Hello", opt.get(), is("Hello"));
@@ -64,7 +64,7 @@ public class OptionalSerializerTest
 			{
 				return new Type[] { new TypeViaClass(String.class) };
 			}
-		
+
 			@Override
 			public Class<?> getErasedType()
 			{
@@ -76,7 +76,7 @@ public class OptionalSerializerTest
 
 		byte[] data = s.toBytes(Optional.of("Hello"));
 		Optional<String> opt = s.fromBytes(data);
-		
+
 		assertThat("optional not null", opt, notNullValue());
 		assertThat("optional is present", opt.isPresent(), is(true));
 		assertThat("optional is Hello", opt.get(), is("Hello"));

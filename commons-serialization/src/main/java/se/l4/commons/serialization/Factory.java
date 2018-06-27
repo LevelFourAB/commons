@@ -11,7 +11,7 @@ import se.l4.commons.types.InstanceFactory;
 /**
  * Annotation for usage with constructors. This can be placed on constructors that
  * want to be injected via {@link InstanceFactory}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

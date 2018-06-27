@@ -7,7 +7,7 @@ import se.l4.commons.serialization.spi.TypeViaClass;
 
 /**
  * Resolver for array types.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -20,13 +20,13 @@ public class ArraySerializerResolver
 	public Serializer find(TypeEncounter encounter)
 	{
 		// TODO: Generics?
-		
+
 		Class<?> componentType = encounter.getType().getErasedType()
 			.getComponentType();
-		
+
 		Serializer<?> itemSerializer = encounter.getCollection()
 			.find(new TypeViaClass(componentType));
-		
+
 		return new ArraySerializer(componentType, itemSerializer);
 	}
 

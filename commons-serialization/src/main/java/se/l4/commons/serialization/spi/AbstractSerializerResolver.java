@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Abstract implementation of {@link SerializerResolver}.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>

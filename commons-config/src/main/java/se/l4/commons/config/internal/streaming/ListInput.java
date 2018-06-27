@@ -10,7 +10,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Input that works on lists.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -24,13 +24,13 @@ public class ListInput
 		END,
 		DONE
 	}
-	
+
 	private State state;
 	private State previousState;
-	
+
 	private Iterator<Object> iterator;
 	private Object object;
-	
+
 	private StreamingInput subInput;
 	private String key;
 
@@ -38,23 +38,23 @@ public class ListInput
 	{
 		this.key = key;
 		state = State.START;
-		
+
 		iterator = root.iterator();
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
 	{
 		// Nothing to close
 	}
-	
+
 	@Override
 	protected IOException raiseException(String message)
 	{
 		return new IOException(key + ": " + message);
 	}
-	
+
 	@Override
 	public Token peek()
 		throws IOException
@@ -77,7 +77,7 @@ public class ListInput
 			case END:
 				return Token.LIST_END;
 		}
-		
+
 		return null;
 	}
 
@@ -102,17 +102,17 @@ public class ListInput
 					advancePosition();
 					return next();
 				}
-				
+
 				setState(State.VALUE);
 				return t;
 			case END:
 				setState(State.DONE);
 				return Token.LIST_END;
 		}
-		
+
 		return null;
 	}
-	
+
 	private void setState(State state)
 	{
 		previousState = this.state;
@@ -147,7 +147,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getValue();
 		}
-		
+
 		return null;
 	}
 
@@ -159,7 +159,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getString();
 		}
-		
+
 		return null;
 	}
 
@@ -171,7 +171,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getBoolean();
 		}
-		
+
 		return false;
 	}
 
@@ -183,7 +183,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getDouble();
 		}
-		
+
 		return 0;
 	}
 
@@ -195,7 +195,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getFloat();
 		}
-		
+
 		return 0;
 	}
 
@@ -207,7 +207,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getLong();
 		}
-		
+
 		return 0;
 	}
 
@@ -219,7 +219,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getInt();
 		}
-		
+
 		return 0;
 	}
 
@@ -231,7 +231,7 @@ public class ListInput
 			case VALUE:
 				return subInput.getShort();
 		}
-		
+
 		return 0;
 	}
 

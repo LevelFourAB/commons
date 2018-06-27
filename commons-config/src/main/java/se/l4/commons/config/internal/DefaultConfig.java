@@ -31,7 +31,7 @@ import se.l4.commons.serialization.format.StreamingInput;
 
 /**
  * Default implementation of {@link Config}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -41,37 +41,37 @@ public class DefaultConfig
 	private final SerializerCollection collection;
 	private final Map<String, Object> data;
 	private final ValidatorFactory validatorFactory;
-	
-	public DefaultConfig(SerializerCollection collection, 
-			ValidatorFactory validatorFactory, 
-			File root, 
+
+	public DefaultConfig(SerializerCollection collection,
+			ValidatorFactory validatorFactory,
+			File root,
 			Map<String, Object> data)
 	{
 		this.collection = new WrappedSerializerCollection(collection);
 		this.validatorFactory = validatorFactory;
 		this.data = data;
-		
+
 		collection.bind(File.class, new FileSerializer(root));
 		collection.bind(ConfigKey.class, new ConfigKey.ConfigKeySerializer(this));
 	}
-	
+
 	private static final Pattern LIST_GET = Pattern.compile("(.+)(?:\\[([0-9]+)\\])+");
-	
+
 	private String get(String path, int start, int end)
 	{
 		if(path.charAt(start) == '"') start += 1;
 		if(path.charAt(end - 1) == '"') end -= 1;
-		
+
 		return path.substring(start, end);
 	}
-	
+
 	private Object get(String path)
 	{
 		if(path == null || path.equals(""))
 		{
 			return data;
 		}
-		
+
 		List<String> parts = Lists.newArrayList();
 		boolean quoted = false;
 		int lastIndex = 0;
@@ -83,15 +83,15 @@ public class DefaultConfig
 				parts.add(get(path, lastIndex, i));
 				lastIndex = i + 1;
 			}
-			
+
 			if(c == '"')
 			{
 				quoted = ! quoted;
 			}
 		}
-		
+
 		parts.add(get(path, lastIndex, path.length()));
-		
+
 		Map<String, Object> current = data;
 		for(int i=0, n=parts.size(); i<n; i++)
 		{
@@ -105,18 +105,18 @@ public class DefaultConfig
 				{
 					return null;
 				}
-				
+
 				if(! (o instanceof List))
 				{
 					String subPath = Joiner
 						.on('.')
 						.join(parts.subList(i+1, parts.size()));
-					
+
 					throw new ConfigException("Expected list at `" + subPath + "` but got: " + o);
 				}
-				
+
 				List currentList = (List) o;
-				
+
 				String[] indexes = listGetMatcher.group(2).split(" ");
 				for(int j=0, m=indexes.length; j<m; j++)
 				{
@@ -126,17 +126,17 @@ public class DefaultConfig
 						String subPath = Joiner
 							.on('.')
 							.join(parts.subList(i+1, parts.size()));
-						
+
 						throw new ConfigException("Expected list at `" + subPath + "` to contain at least " + (idx+1) + " values");
 					}
-					
+
 					o = currentList.get(idx);
 					if(o instanceof List && j<m-1)
 					{
 						currentList = (List) o;
 					}
 				}
-				
+
 				if(i == n-1)
 				{
 					return o;
@@ -150,7 +150,7 @@ public class DefaultConfig
 					String subPath = Joiner
 						.on('.')
 						.join(parts.subList(i+1, parts.size()));
-					
+
 					throw new ConfigException("Expected several values at `" + subPath + "` but only got a single value: " + o);
 				}
 			}
@@ -161,7 +161,7 @@ public class DefaultConfig
 					// Last part of path, return the value
 					return current.get(part);
 				}
-				
+
 				Object o = current.get(part);
 				if(o instanceof Map)
 				{
@@ -173,7 +173,7 @@ public class DefaultConfig
 					String subPath = Joiner
 						.on('.')
 						.join(parts.subList(i+1, parts.size()));
-					
+
 					throw new ConfigException("Expected several values at `" + subPath + "` but only got a single value: " + o);
 				}
 			}
@@ -182,7 +182,7 @@ public class DefaultConfig
 				return null;
 			}
 		}
-		
+
 		return current.get(parts.get(parts.size() - 1));
 	}
 
@@ -191,7 +191,7 @@ public class DefaultConfig
 	{
 		return get(path, type).getOrDefault(null);
 	}
-	
+
 	@Override
 	public Collection<String> keys(String path)
 	{
@@ -199,7 +199,7 @@ public class DefaultConfig
 		{
 			return data.keySet();
 		}
-			
+
 		String[] parts = path.split("\\.");
 		Map<String, Object> current = data;
 		for(int i=0, n=parts.length; i<n; i++)
@@ -221,25 +221,25 @@ public class DefaultConfig
 				return Collections.emptyList();
 			}
 		}
-			
+
 		return Collections2.filter(current.keySet(), (s) -> ! s.startsWith("_aurochs_:"));
 	}
-	
+
 	private void validateInstance(String path, Object object)
 	{
 		if(validatorFactory == null) return;
-		
+
 		Validator validator = validatorFactory.getValidator();
 		Set<ConstraintViolation<Object>> violations = validator.validate(object);
-		
+
 		if(violations.isEmpty())
 		{
 			// No violations
 			return;
 		}
-		
+
 		StringBuilder builder = new StringBuilder("Validation failed for `" + path + "`:\n");
-		
+
 		for(ConstraintViolation<Object> violation : violations)
 		{
 			builder
@@ -248,10 +248,10 @@ public class DefaultConfig
 				.append(violation.getMessage())
 				.append("\n");
 		}
-		
+
 		throw new ConfigException(builder.toString());
 	}
-	
+
 	private String join(Path path)
 	{
 		StringBuilder builder = new StringBuilder();
@@ -261,18 +261,18 @@ public class DefaultConfig
 			{
 				builder.append(".");
 			}
-			
+
 			builder.append(node.getName());
 		}
-		
+
 		if(builder.length() > 0)
 		{
 			builder.append(": ");
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	@Override
 	public <T> Value<T> get(String path, Class<T> type)
 	{
@@ -281,20 +281,20 @@ public class DefaultConfig
 		{
 			throw new ConfigException("Unable to find a serializer suitable for " + type);
 		}
-		
+
 		Object data = get(path);
 		if(data == null)
 		{
 			return new ValueImpl<T>(path, false, null);
 		}
-		
+
 		StreamingInput input = MapInput.resolveInput(path, data);
 		try
 		{
 			T instance = serializer.read(input);
-			
+
 			validateInstance(path, instance);
-			
+
 			return new ValueImpl<T>(path, true, instance);
 		}
 		catch(ConfigException e)
@@ -306,7 +306,7 @@ public class DefaultConfig
 			throw new ConfigException("Unable to create " + type + " from data at `" + path + "`; " + e.getMessage(), e);
 		}
 	}
-	
+
 	private static class ValueImpl<T>
 		implements Value<T>
 	{
@@ -330,13 +330,13 @@ public class DefaultConfig
 			}
 			return instance;
 		}
-		
+
 		@Override
 		public T getOrDefault(T defaultInstance)
 		{
 			return exists ? instance : defaultInstance;
 		}
-		
+
 		@Override
 		public boolean exists()
 		{

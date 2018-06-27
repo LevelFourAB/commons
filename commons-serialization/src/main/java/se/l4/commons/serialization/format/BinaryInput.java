@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 /**
  * Input for binary format.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -22,21 +22,21 @@ public class BinaryInput
 			return new char[1024];
 		}
 	};
-	
+
 	private final InputStream in;
-	
+
 	private final byte[] buffer;
-	
+
 	private int peekedByte;
-	
+
 	public BinaryInput(InputStream in)
 	{
 		this.in = in;
 		buffer = new byte[8];
-		
+
 		peekedByte = -2;
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
@@ -52,7 +52,7 @@ public class BinaryInput
 		{
 			peekedByte = in.read();
 		}
-		
+
 		switch(peekedByte)
 		{
 			case -1:
@@ -84,12 +84,12 @@ public class BinaryInput
 			// Read actual data of keys and values
 			readValue();
 		}
-		
+
 		peekedByte = in.read();
-		
+
 		return current;
 	}
-	
+
 	private void readBuffer(int len)
 		throws IOException
 	{
@@ -104,7 +104,7 @@ public class BinaryInput
 			n += count;
 		}
 	}
-	
+
 	private double readDouble()
 		throws IOException
 	{
@@ -117,10 +117,10 @@ public class BinaryInput
 			((long) buffer[5] & 0xff) << 40 |
 			((long) buffer[6] & 0xff) << 48 |
 			((long) buffer[7] & 0xff) << 56;
-		
+
 		return Double.longBitsToDouble(value);
 	}
-	
+
 	private float readFloat()
 		throws IOException
 	{
@@ -129,10 +129,10 @@ public class BinaryInput
 			(buffer[1] & 0xff) << 8 |
 			(buffer[2] & 0xff) << 16 |
 			(buffer[3] & 0xff) << 24;
-		
+
 		return Float.intBitsToFloat(value);
 	}
-	
+
 	private int readInteger()
 		throws IOException
 	{
@@ -143,13 +143,13 @@ public class BinaryInput
 			final byte b = (byte) in.read();
 			result |= (b & 0x7F) << shift;
 			if((b & 0x80) == 0) return result;
-			
+
 			shift += 7;
 		}
-		
+
 		throw new EOFException("Invalid integer");
 	}
-	
+
 	private long readLong()
 		throws IOException
 	{
@@ -160,19 +160,19 @@ public class BinaryInput
 			final byte b = (byte) in.read();
 			result |= (long) (b & 0x7F) << shift;
 			if((b & 0x80) == 0) return result;
-			
+
 			shift += 7;
 		}
-		
+
 		throw new EOFException("Invalid long");
 	}
-	
+
 	private String readString()
 		throws IOException
 	{
 		int length = readInteger();
 		char[] chars = length < CHARS_SIZE ? CHARS.get() : new char[length];
-		
+
 		for(int i=0; i<length; i++)
 		{
 			int c = in.read() & 0xff;
@@ -187,12 +187,12 @@ public class BinaryInput
 			}
 			else if(t == 14)
 			{
-				chars[i] = (char) ((c & 0x0f) << 12 
+				chars[i] = (char) ((c & 0x0f) << 12
 					| (in.read() & 0x3f) << 6
 					| (in.read() & 0x3f) << 0);
 			}
 		}
-		
+
 		return new String(chars, 0, length);
 	}
 
@@ -202,15 +202,15 @@ public class BinaryInput
 		int length = readInteger();
 		byte[] buffer = new byte[length];
 		int read = in.read(buffer);
-		
+
 		if(read != length)
 		{
 			throw new EOFException("Stream ended before entire byte array was sent");
 		}
-		
+
 		return buffer;
 	}
-	
+
 	private void readValue()
 		throws IOException
 	{
@@ -261,6 +261,6 @@ public class BinaryInput
 			default:
 				throw new IOException("Unexpected value type, no idea what to do (type was " + peekedByte + ")");
 		}
-		
+
 	}
 }

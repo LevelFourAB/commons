@@ -15,7 +15,7 @@ import se.l4.commons.serialization.spi.TypeEncounter;
 /**
  * Resolver for {@link Enum enums}, can handle any enum type and supports
  * different translators between serialized and object form.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -24,13 +24,13 @@ public class EnumSerializerResolver
 {
 	private static final Set<Class<? extends Annotation>> HINTS =
 		ImmutableSet.<Class<? extends Annotation>>of(MapEnumVia.class);
-	
+
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Serializer<Enum<?>> find(TypeEncounter encounter)
 	{
 		Class<? extends Enum<?>> type = (Class<? extends Enum<?>>) encounter.getType().getErasedType();
-		
+
 		MapEnumVia hint = encounter.getHint(MapEnumVia.class);
 		ValueTranslator translator;
 		if(hint != null)
@@ -45,7 +45,7 @@ public class EnumSerializerResolver
 		{
 			translator = new NameTranslator(type);
 		}
-		
+
 		return new EnumSerializer(translator);
 	}
 
@@ -58,7 +58,7 @@ public class EnumSerializerResolver
 		{
 			Class[] types = c.getParameterTypes();
 			if(types.length != 1) continue;
-			
+
 			Class<?> t = types[0];
 			if(t.isAssignableFrom(Class.class))
 			{
@@ -77,10 +77,10 @@ public class EnumSerializerResolver
 				}
 			}
 		}
-		
+
 		throw new SerializationException("Constructor that takes Enum is required (for " + translator + ")");
 	}
-	
+
 	@Override
 	public Set<Class<? extends Annotation>> getHints()
 	{

@@ -11,7 +11,7 @@ import se.l4.commons.serialization.format.ValueType;
 
 /**
  * Serializer for {@link Float}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

@@ -17,7 +17,7 @@ import se.l4.commons.serialization.format.Token;
 
 /**
  * Definition of a field within a reflection serializer.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -42,32 +42,32 @@ public class FieldDefinition
 		this.nullHandling = serializer instanceof Serializer.NullHandling;
 		readOnly = Modifier.isFinal(field.getModifiers());
 	}
-	
+
 	public String getName()
 	{
 		return name;
 	}
-	
+
 	public Serializer getSerializer()
 	{
 		return serializer;
 	}
-	
+
 	public boolean isSkipIfDefault()
 	{
 		return skipIfDefault;
 	}
-	
+
 	public boolean isReadOnly()
 	{
 		return readOnly;
 	}
-	
+
 	public Class<?> getType()
 	{
 		return type;
 	}
-	
+
 	public Object read(StreamingInput in)
 		throws IOException
 	{
@@ -83,16 +83,16 @@ public class FieldDefinition
 			in.next();
 			return Defaults.defaultValue(type);
 		}
-		
+
 		return serializer.read(in);
 	}
-	
+
 	public void read(Object target, StreamingInput in)
 		throws IOException
 	{
 		set(target, read(in));
 	}
-	
+
 	public void set(Object target, Object value)
 		throws IOException
 	{
@@ -102,17 +102,17 @@ public class FieldDefinition
 			{
 				value = Defaults.defaultValue(type);
 			}
-			
+
 			field.set(target, value);
 		}
 		catch(Exception e)
 		{
 			Throwables.propagateIfPossible(e);
-			
+
 			throw new SerializationException("Unable to read object; " + e.getMessage(), e);
 		}
 	}
-	
+
 	public Object getValue(Object target)
 	{
 		try
@@ -127,15 +127,15 @@ public class FieldDefinition
 		{
 			throw new SerializationException("Unable to write object; " + e.getMessage(), e);
 		}
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void write(Object target, StreamingOutput stream)
 		throws IOException
 	{
 		Object value = getValue(target);
-		
+
 		if(skipIfDefault)
 		{
 			Object defaultValue = Defaults.defaultValue(type);
@@ -145,7 +145,7 @@ public class FieldDefinition
 				return;
 			}
 		}
-		
+
 		if(value == null)
 		{
 			if(nullHandling)
@@ -162,7 +162,7 @@ public class FieldDefinition
 			serializer.write(value, name, stream);
 		}
 	}
-	
+
 	public Annotation[] getHints()
 	{
 		return field.getAnnotations();

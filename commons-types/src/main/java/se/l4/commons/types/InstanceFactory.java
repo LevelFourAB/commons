@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 /**
  * Factory for instances, used to support dependency injection if available.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -14,7 +14,7 @@ public interface InstanceFactory
 {
 	/**
 	 * Create the specified type.
-	 * 
+	 *
 	 * @param <T>
 	 * @param type
 	 * @return
@@ -34,10 +34,10 @@ public interface InstanceFactory
 
 		return create((Class<T>) type);
 	}
-	
+
 	/**
 	 * Create the specified type using the given annotation as hints.
-	 * 
+	 *
 	 * @param type
 	 * @param annotations
 	 * @return
@@ -50,7 +50,7 @@ public interface InstanceFactory
 
 	/**
 	 * Create a supplier for instances of the given type.
-	 * 
+	 *
 	 * @param type
 	 *   class that the supplier should create
 	 * @return
@@ -63,7 +63,7 @@ public interface InstanceFactory
 
 	/**
 	 * Create a supplier for instances of the given type.
-	 * 
+	 *
 	 * @param type
 	 *   the type that the supplier should create
 	 * @return
@@ -75,9 +75,9 @@ public interface InstanceFactory
 	}
 
 	/**
-	 * Create a supplier for instances of the given type using the 
+	 * Create a supplier for instances of the given type using the
 	 * annotations as hints.
-	 * 
+	 *
 	 * @param type
 	 *   the type that the supplier should create
 	 * @param annotations

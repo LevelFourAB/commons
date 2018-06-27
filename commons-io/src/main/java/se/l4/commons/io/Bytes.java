@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  * Representation of a stream of bytes that can be opened.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -13,25 +13,25 @@ public interface Bytes
 {
 	/**
 	 * Open an {@link InputStream} for this instance.
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 */
 	InputStream asInputStream()
 		throws IOException;
-	
+
 	/**
 	 * Convert this instance to a byte array.
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 */
 	byte[] toByteArray()
 		throws IOException;
-	
+
 	/**
 	 * Stream this instance to the given consumer.
-	 * 
+	 *
 	 * @param consumer
 	 * @throws IOException
 	 */
@@ -40,10 +40,10 @@ public interface Bytes
 	{
 		asChunks(4096, consumer);
 	}
-	
+
 	/**
 	 * Stream this instance to the given consumer with a specific chunk size.
-	 * 
+	 *
 	 * @param size
 	 * @param consumer
 	 * @throws IOException
@@ -61,10 +61,10 @@ public interface Bytes
 			}
 		}
 	}
-	
+
 	/**
 	 * Open this instance as a {@link ExtendedDataInput}.
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -73,10 +73,10 @@ public interface Bytes
 	{
 		return new ExtendedDataInputStream(asInputStream());
 	}
-	
+
 	/**
 	 * Get an instance that represents no data.
-	 * 
+	 *
 	 * @return
 	 */
 	static Bytes empty()
@@ -86,7 +86,7 @@ public interface Bytes
 
 	/**
 	 * Create an instance for the given array of bytes.
-	 * 
+	 *
 	 * @param byteArray
 	 * @return
 	 */
@@ -94,10 +94,10 @@ public interface Bytes
 	{
 		return new BytesOverByteArray(byteArray);
 	}
-	
+
 	/**
 	 * Create an instance over the given input stream.
-	 * 
+	 *
 	 * @param stream
 	 * @return
 	 */
@@ -105,11 +105,11 @@ public interface Bytes
 	{
 		return new InputStreamBytes(stream);
 	}
-	
+
 	/**
 	 * Create an instance that will create data on demand. This will only call the creator
 	 * when the contents of the returned instance is accessed.
-	 * 
+	 *
 	 * @param creator
 	 * @return
 	 */
@@ -117,11 +117,11 @@ public interface Bytes
 	{
 		return BytesBuilder.createViaLazyDataOutput(creator);
 	}
-	
+
 	/**
 	 * Create an instance that will create data on demand. This will only call the creator
 	 * when the contents of the returned instance is accessed.
-	 * 
+	 *
 	 * @param creator
 	 * @param expectedSize
 	 * @return
@@ -130,10 +130,10 @@ public interface Bytes
 	{
 		return BytesBuilder.createViaLazyDataOutput(creator, expectedSize);
 	}
-	
+
 	/**
 	 * Create an instance by running the given function and storing the result in memory.
-	 * 
+	 *
 	 * @param creator
 	 * @return
 	 * @throws IOException
@@ -143,10 +143,10 @@ public interface Bytes
 	{
 		return BytesBuilder.createViaDataOutput(creator);
 	}
-	
+
 	/**
 	 * Create an instance by running the given function and storing the result in memory.
-	 * 
+	 *
 	 * @param creator
 	 * @param expectedSize
 	 * @return
@@ -157,7 +157,7 @@ public interface Bytes
 	{
 		return BytesBuilder.createViaDataOutput(creator, expectedSize);
 	}
-	
+
 	static BytesBuilder create()
 	{
 		return new BytesBuilder();

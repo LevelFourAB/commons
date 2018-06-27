@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Indicate that a field should not be written to the output if it is the
  * types default value.
- * 
+ *
  * @author Andreas Holstenson
  *
  */

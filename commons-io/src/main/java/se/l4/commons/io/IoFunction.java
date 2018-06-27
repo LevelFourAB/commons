@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * Function that can throw {@link IOException}.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>

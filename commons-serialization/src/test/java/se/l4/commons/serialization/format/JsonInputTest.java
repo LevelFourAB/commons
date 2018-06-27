@@ -22,7 +22,7 @@ import com.google.common.base.Charsets;
 /**
  * Test for {@link JsonInput}. Runs a set of JSON documents and makes sure
  * that we return the correct tokens.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -35,7 +35,7 @@ public class JsonInputTest
 		String v = "\"value\"";
 		StreamingInput input = createInput(v);
 		assertStream(input, VALUE);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "value");
 	}
@@ -47,11 +47,11 @@ public class JsonInputTest
 		String v = "{\"key\": \"value\"}";
 		StreamingInput input = createInput(v);
 		assertStream(input, OBJECT_START, KEY, VALUE, OBJECT_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "key", "value");
 	}
-	
+
 	@Test
 	public void testNullValue()
 		throws Exception
@@ -59,49 +59,49 @@ public class JsonInputTest
 		String v = "{\"key\": null}";
 		StreamingInput input = createInput(v);
 		assertStream(input, OBJECT_START, KEY, NULL, OBJECT_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "key", null);
 	}
-	
+
 	@Test
 	public void testStringQuote()
 		throws Exception
 	{
 		StreamingInput input;
-		
+
 		input = createInput("{\"key\": \"va\\\"lue\"}");
 		assertStreamValues(input, "key", "va\"lue");
-		
+
 		input = createInput("{\"key\": \"va\\nlue\"}");
 		assertStreamValues(input, "key", "va\nlue");
-		
+
 		input = createInput("{\"key\": \"va\\u4580lue\"}");
 		assertStreamValues(input, "key", "va\u4580lue");
 	}
-	
+
 	@Test
 	public void testEmptyObject()
 		throws Exception
 	{
 		StreamingInput input = createInput("{}");
 		assertStream(input, OBJECT_START, OBJECT_END);
-		
+
 		input = createInput("{ }");
 		assertStream(input, OBJECT_START, OBJECT_END);
 	}
-	
+
 	@Test
 	public void testEmptyList()
 		throws Exception
 	{
 		StreamingInput input = createInput("[]");
 		assertStream(input, LIST_START, LIST_END);
-		
+
 		input = createInput("[ ]");
 		assertStream(input, LIST_START, LIST_END);
 	}
-	
+
 	@Test
 	public void testListValue()
 		throws Exception
@@ -109,11 +109,11 @@ public class JsonInputTest
 		String v = "[ \"one\" ]";
 		StreamingInput input = createInput(v);
 		assertStream(input, LIST_START, VALUE, LIST_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "one");
 	}
-	
+
 	@Test
 	public void testListValues()
 		throws Exception
@@ -121,11 +121,11 @@ public class JsonInputTest
 		String v = "[ \"one\", \"two\" ]";
 		StreamingInput input = createInput(v);
 		assertStream(input, LIST_START, VALUE, VALUE, LIST_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "one", "two");
 	}
-	
+
 	@Test
 	public void testObjectValue()
 		throws Exception
@@ -133,11 +133,11 @@ public class JsonInputTest
 		String v = "{ \"key1\": \"value1\" }";
 		StreamingInput input = createInput(v);
 		assertStream(input, OBJECT_START, KEY, VALUE, OBJECT_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "key1", "value1");
 	}
-	
+
 	@Test
 	public void testObjectValues()
 		throws Exception
@@ -145,11 +145,11 @@ public class JsonInputTest
 		String v = "{ \"key1\": \"value1\", \"key2\": \"value2\" }";
 		StreamingInput input = createInput(v);
 		assertStream(input, OBJECT_START, KEY, VALUE, KEY, VALUE, OBJECT_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "key1", "value1", "key2", "value2");
 	}
-	
+
 	@Test
 	public void testComplexObject()
 		throws Exception
@@ -157,11 +157,11 @@ public class JsonInputTest
 		String v = "{ \"key1\": \"value1\", \"key2\": [ \"value2\" ] }";
 		StreamingInput input = createInput(v);
 		assertStream(input, OBJECT_START, KEY, VALUE, KEY, LIST_START, VALUE, LIST_END, OBJECT_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "key1", "value1", "key2", "value2");
 	}
-	
+
 	@Test
 	public void testComplexObject2()
 		throws Exception
@@ -169,73 +169,73 @@ public class JsonInputTest
 		String v = "{\"languages\": [],\"fields\": {\"test\": {}}}";
 		StreamingInput input = createInput(v);
 		assertStream(input, OBJECT_START, KEY, LIST_START, LIST_END, KEY, OBJECT_START, KEY, OBJECT_START, OBJECT_END, OBJECT_END, OBJECT_END);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "languages", "fields", "test");
 	}
-	
+
 	@Test
 	public void testComplexObject3()
 		throws Exception
 	{
 		String v = "{\"languages\": [],\"fields\": {\"test\": {\"type\": \"token\",\"primary\": true}}}";
 		StreamingInput input = createInput(v);
-		assertStream(input, OBJECT_START, KEY, LIST_START, LIST_END, KEY, OBJECT_START, KEY, 
+		assertStream(input, OBJECT_START, KEY, LIST_START, LIST_END, KEY, OBJECT_START, KEY,
 			OBJECT_START,
 				KEY, VALUE, // type = token
 				KEY, VALUE, // primary = true
 			OBJECT_END, OBJECT_END, OBJECT_END
 		);
-		
+
 		input = createInput(v);
 		assertStreamValues(input, "languages", "fields", "test", "type", "token", "primary", true);
 	}
-	
+
 	@Test
 	public void testKeyAfterBoolean()
 		throws Exception
 	{
 		String v = "{\"languages\": false,\"fields\": \"value\"}";
 		StreamingInput input = createInput(v);
-		assertStream(input, OBJECT_START, KEY, VALUE, KEY, VALUE, OBJECT_END); 
-		
+		assertStream(input, OBJECT_START, KEY, VALUE, KEY, VALUE, OBJECT_END);
+
 		input = createInput(v);
 		assertStreamValues(input, "languages", false, "fields", "value");
 	}
-	
+
 	@Test
 	public void testComplexSkip()
 		throws Exception
 	{
 		String v = "{\"languages\": false,\"fields\": {\"test\": {\"type\": \"token\",\"primary\": true}}}";
 		StreamingInput input = createInput(v);
-		
+
 		// Fast forward
 		input.next(OBJECT_START);
 		input.next(KEY);
 		input.next(VALUE);
-		
+
 		// Read fields key
 		input.next(KEY);
 		input.skipValue();
-		
+
 		// Read Object end
 		input.next(OBJECT_END);
-		
+
 		if(input.peek() != null)
 		{
 			fail("Found " + input.peek() + " in the stream, stream should be empty");
 		}
 	}
-	
-	
+
+
 	@Test
 	public void testComplexReading()
 		throws Exception
 	{
 		String v = "{ \"key1\": \"value1\", \"key2\": [ \"value2\" ], \"key3\": \"value3\" }";
 		StreamingInput input = createInput(v);
-		
+
 		boolean ended = false;
 		input.next(OBJECT_START);
 		while(input.peek() != null)
@@ -263,10 +263,10 @@ public class JsonInputTest
 					}
 			}
 		}
-		
+
 		if(! ended) fail("Did not read of the object");
 	}
-	
+
 	@Test
 	public void testBinary()
 		throws Exception
@@ -274,10 +274,10 @@ public class JsonInputTest
 		String v = "\"a2FrYQ==\"";
 		StreamingInput input = createInput(v);
 		input.next(Token.VALUE);
-		
+
 		assertThat(input.getByteArray(), is("kaka".getBytes(Charsets.UTF_8)));
 	}
-	
+
 	@Test
 	public void testLonger()
 		throws Exception
@@ -294,10 +294,10 @@ public class JsonInputTest
 			}
 		}
 	}
-	
+
 	/**
 	 * Assert that the stream contains the specified tokens.
-	 * 
+	 *
 	 * @param in
 	 * @param tokens
 	 * @throws IOException
@@ -318,16 +318,16 @@ public class JsonInputTest
 				fail("Token at " + (i-1) + " was expected to be " + tokens[i-1] + ", but found " + t);
 			}
 		}
-		
+
 		if(i < tokens.length)
 		{
 			fail("Did not read all tokens, expected " + tokens.length + " but only read " + i);
 		}
 	}
-	
+
 	/**
 	 * Assert that KEY and VALUE tokens contain the specified values.
-	 * 
+	 *
 	 * @param in
 	 * @param values
 	 * @throws IOException
@@ -348,12 +348,12 @@ public class JsonInputTest
 					{
 						fail("Did not expect more values, but got " + in.getValue());
 					}
-					
+
 					assertEquals(values[i++], in.getValue());
 					break;
 			}
 		}
-		
+
 		if(i < values.length)
 		{
 			fail("Did not read all values, expected " + values.length + " but only read " + i);

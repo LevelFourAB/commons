@@ -17,7 +17,7 @@ public class ValueInput
 		this.key = key;
 		this.value = value;
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException
@@ -56,7 +56,7 @@ public class ValueInput
 		{
 			throw new IOException(key + ": Expected "+ expected + " but got " + token);
 		}
-		
+
 		return token;
 	}
 
@@ -91,8 +91,8 @@ public class ValueInput
 	@Override
 	public boolean getBoolean()
 	{
-		return value instanceof Boolean 
-			? (Boolean) value 
+		return value instanceof Boolean
+			? (Boolean) value
 			: Boolean.parseBoolean(getString());
 	}
 
@@ -101,25 +101,25 @@ public class ValueInput
 	{
 		return ((Number) value).doubleValue();
 	}
-	
+
 	@Override
 	public float getFloat()
 	{
 		return ((Number) value).floatValue();
 	}
-	
+
 	@Override
 	public long getLong()
 	{
 		return ((Number) value).longValue();
 	}
-	
+
 	@Override
 	public int getInt()
 	{
 		return ((Number) value).intValue();
 	}
-	
+
 	@Override
 	public short getShort()
 	{

@@ -9,13 +9,13 @@ public interface ExtendedDataOutput
 {
 	void writeVInt(int i)
 		throws IOException;
-	
+
 	void writeVLong(long l)
 		throws IOException;
-	
+
 	void writeString(String string)
 		throws IOException;
-	
+
 	void writeBytes(Bytes bytes)
 		throws IOException;
 }

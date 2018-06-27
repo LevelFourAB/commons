@@ -13,7 +13,7 @@ import se.l4.commons.serialization.spi.Type;
 /**
  * Serializer that is delayed in that it will not be assigned until the entire
  * serializer chain is resolved. Used to solve recursive serialization.
- * 
+ *
  * @author Andreas Holstenson
  *
  * @param <T>
@@ -24,16 +24,16 @@ public class DelayedSerializer<T>
 	private final SerializerCollection collection;
 	private final Type type;
 	private final Annotation[] hints;
-	
+
 	private volatile Serializer<T> instance;
-	
+
 	public DelayedSerializer(SerializerCollection collection, Type type, Annotation[] hints)
 	{
 		this.collection = collection;
 		this.type = type;
 		this.hints = hints;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void ensureSerializer()
 	{
@@ -46,32 +46,32 @@ public class DelayedSerializer<T>
 			}
 		}
 	}
-	
+
 	@Override
 	public T read(StreamingInput in) throws IOException
 	{
 		ensureSerializer();
-		
+
 		return instance.read(in);
 	}
-	
-	
+
+
 	@Override
 	public void write(T object, String name, StreamingOutput stream)
 		throws IOException
 	{
 		ensureSerializer();
-		
+
 		instance.write(object, name, stream);
 	}
-	
+
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{
 		ensureSerializer();
-		
+
 		if(instance == null) return null;
-		
+
 		return instance.getFormatDefinition();
 	}
 }

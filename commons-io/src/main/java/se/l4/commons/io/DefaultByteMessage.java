@@ -5,25 +5,25 @@ public class DefaultByteMessage
 {
 	private final long tag;
 	private final Bytes data;
-	
+
 	public DefaultByteMessage(long tag, Bytes data)
 	{
 		this.tag = tag;
 		this.data = data;
 	}
-	
+
 	@Override
 	public long getTag()
 	{
 		return tag;
 	}
-	
+
 	@Override
 	public Bytes getData()
 	{
 		return data;
 	}
-	
+
 	@Override
 	public String toString()
 	{

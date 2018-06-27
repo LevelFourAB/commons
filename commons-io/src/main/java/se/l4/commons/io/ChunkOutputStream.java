@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 /**
  * A @{link OutputStream} that will send chunks of the written data to the given @{link ByteArrayConsumer}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -21,7 +21,7 @@ public class ChunkOutputStream
 		this.out = out;
 		buffer = new byte[size];
 	}
-	
+
 	@Override
 	public void write(int b)
 		throws IOException
@@ -33,7 +33,7 @@ public class ChunkOutputStream
 			len = 0;
 		}
 	}
-	
+
 	@Override
 	public void close()
 		throws IOException

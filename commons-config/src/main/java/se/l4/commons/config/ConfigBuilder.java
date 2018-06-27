@@ -13,7 +13,7 @@ import se.l4.commons.serialization.SerializerCollection;
  * configuration over several files. When creating a configuration one can opt
  * to use a {@link #withSerializerCollection(SerializerCollection) custom serializer collection}
  * and its possible to activate validation via {@link #withValidatorFactory(ValidatorFactory)}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -22,7 +22,7 @@ public interface ConfigBuilder
 	/**
 	 * Set the the {@link SerializerCollection} to use when reading the
 	 * configuration files.
-	 * 
+	 *
 	 * @param serializers
 	 * @return
 	 */
@@ -31,7 +31,7 @@ public interface ConfigBuilder
 	/**
 	 * Set the {@link ValidatorFactory} to use when validating loaded
 	 * configuration objects.
-	 * 
+	 *
 	 * @param validation
 	 * @return
 	 */
@@ -39,15 +39,15 @@ public interface ConfigBuilder
 
 	/**
 	 * Set the root folder of the configuration.
-	 * 
+	 *
 	 * @param root
 	 * @return
 	 */
 	ConfigBuilder withRoot(String root);
-	
+
 	/**
 	 * Set the root folder of the configuration.
-	 * 
+	 *
 	 * @param path
 	 * @return
 	 */
@@ -55,7 +55,7 @@ public interface ConfigBuilder
 
 	/**
 	 * Set the root folder of the configuration.
-	 * 
+	 *
 	 * @param root
 	 * @return
 	 */
@@ -63,15 +63,15 @@ public interface ConfigBuilder
 
 	/**
 	 * Add a file that should be loaded.
-	 * 
+	 *
 	 * @param path
 	 * @return
 	 */
 	ConfigBuilder addFile(String path);
-	
+
 	/**
 	 * Add a file that should be loaded.
-	 * 
+	 *
 	 * @param path
 	 * @return
 	 */
@@ -79,7 +79,7 @@ public interface ConfigBuilder
 
 	/**
 	 * Add a file that should be loaded.
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 */
@@ -87,7 +87,7 @@ public interface ConfigBuilder
 
 	/**
 	 * Add a stream that should be read.
-	 * 
+	 *
 	 * @param stream
 	 * @return
 	 */
@@ -96,7 +96,7 @@ public interface ConfigBuilder
 	/**
 	 * Create the configuration object. This will load any declared input
 	 * files.
-	 * 
+	 *
 	 * @return
 	 */
 	Config build();

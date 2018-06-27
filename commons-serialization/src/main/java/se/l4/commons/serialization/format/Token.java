@@ -2,7 +2,7 @@ package se.l4.commons.serialization.format;
 
 /**
  * Tokens that the input can return.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -17,7 +17,7 @@ public enum Token
 	 */
 	LIST_END,
 	/**
-	 * Start of an object. 
+	 * Start of an object.
 	 */
 	OBJECT_START,
 	/**

@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 /**
  * Implementation of {@link Bytes} over a {@link InputStream}.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -19,14 +19,14 @@ public class InputStreamBytes
 	{
 		this.in = in;
 	}
-	
+
 	@Override
 	public InputStream asInputStream()
 		throws IOException
 	{
 		return in.get();
 	}
-	
+
 	@Override
 	public byte[] toByteArray()
 		throws IOException

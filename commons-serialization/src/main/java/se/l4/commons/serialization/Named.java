@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation that can be placed on a class that should be serialized to
  * control under which name it is exposed.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
@@ -20,14 +20,14 @@ public @interface Named
 {
 	/**
 	 * Optional namespace of the class.
-	 * 
+	 *
 	 * @return
 	 */
 	String namespace() default "";
-	
+
 	/**
 	 * Name of the class.
-	 * 
+	 *
 	 * @return
 	 */
 	String name();

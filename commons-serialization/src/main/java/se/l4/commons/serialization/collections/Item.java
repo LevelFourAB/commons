@@ -15,7 +15,7 @@ public @interface Item
 {
 	/**
 	 * The class to use for serialization.
-	 * 
+	 *
 	 * @return
 	 */
 	Class<? extends SerializerOrResolver> value();

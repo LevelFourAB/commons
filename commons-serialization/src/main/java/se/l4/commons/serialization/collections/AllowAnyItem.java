@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Annotation that indicates that a collect can contain any type. This
  * will cause the serialization library to use dynamic resolution based on
  * names instead of relying on the reflected item type.
- * 
+ *
  * @author Andreas Holstenson
  *
  */
