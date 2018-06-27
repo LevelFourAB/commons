@@ -2,6 +2,7 @@ package se.l4.commons.serialization;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import se.l4.commons.serialization.standard.DoubleSerializer;
 import se.l4.commons.serialization.standard.FloatSerializer;
 import se.l4.commons.serialization.standard.IntSerializer;
 import se.l4.commons.serialization.standard.LongSerializer;
+import se.l4.commons.serialization.standard.OptionalSerializerResolver;
 import se.l4.commons.serialization.standard.ShortSerializer;
 import se.l4.commons.serialization.standard.StringSerializer;
 import se.l4.commons.serialization.standard.UuidSerializer;
@@ -75,6 +77,9 @@ public class DefaultSerializerCollection
 		
 		// Enums
 		bind(Enum.class, new EnumSerializerResolver());
+
+		// Optional<T>
+		bind(Optional.class, new OptionalSerializerResolver());
 	}
 	
 	@Override

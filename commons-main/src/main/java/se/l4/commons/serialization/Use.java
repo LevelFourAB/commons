@@ -22,5 +22,6 @@ public @interface Use
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	Class<? extends SerializerOrResolver> value();
 }

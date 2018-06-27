@@ -30,6 +30,7 @@ public class FieldDefinition
 	private final Class<?> type;
 	private final boolean readOnly;
 	private final boolean skipIfDefault;
+	private final boolean nullHandling;
 
 	public FieldDefinition(Field field, String name, Serializer serializer, Class type, boolean skipIfDefault)
 	{
@@ -38,6 +39,7 @@ public class FieldDefinition
 		this.serializer = serializer;
 		this.type = type;
 		this.skipIfDefault = skipIfDefault;
+		this.nullHandling = serializer instanceof Serializer.NullHandling;
 		readOnly = Modifier.isFinal(field.getModifiers());
 	}
 	
@@ -71,6 +73,12 @@ public class FieldDefinition
 	{
 		if(in.peek() == Token.NULL)
 		{
+			if(nullHandling)
+			{
+				// Let the serializer handle the null value
+				return serializer.read(in);
+			}
+
 			// Consume and return null
 			in.next();
 			return Defaults.defaultValue(type);
@@ -140,7 +148,14 @@ public class FieldDefinition
 		
 		if(value == null)
 		{
-			stream.writeNull(name);
+			if(nullHandling)
+			{
+				serializer.write(value, name, stream);
+			}
+			else
+			{
+				stream.writeNull(name);
+			}
 		}
 		else
 		{

@@ -5,8 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.function.Function;
 
-import com.google.common.base.Throwables;
-
 import se.l4.commons.serialization.format.BinaryInput;
 import se.l4.commons.serialization.format.BinaryOutput;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -67,7 +65,11 @@ public interface Serializer<T>
 	 */
 	default byte[] toBytes(T instance)
 	{
-		if(instance == null) return null;
+		/*
+		 * If the value being serialized is null and we do not handle null
+		 * return null data.
+		 */
+		if(instance == null && ! (this instanceof NullHandling)) return null;
 		
 		try
 		{
@@ -79,7 +81,7 @@ public interface Serializer<T>
 		}
 		catch(IOException e)
 		{
-			throw Throwables.propagate(e);
+			throw new SerializationException(e);
 		}
 	}
 	
@@ -111,7 +113,7 @@ public interface Serializer<T>
 		}
 		catch(IOException e)
 		{
-			throw Throwables.propagate(e);
+			throw new SerializationException(e);
 		}
 	}
 	
@@ -123,5 +125,15 @@ public interface Serializer<T>
 	default Function<byte[], T> fromBytes()
 	{
 		return this::fromBytes;
+	}
+
+	/**
+	 * Marker interface used when a serializer wants to handle an incoming
+	 * {@code null} value. If a serializer does not implement this interface
+	 * {@code null} values are mapped to default values automatically by
+	 * the reflection serializer.
+	 */
+	interface NullHandling
+	{
 	}
 }
