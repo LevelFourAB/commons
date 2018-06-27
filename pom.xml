@@ -1,22 +1,22 @@
-<project 
+<project
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>se.l4.commons</groupId>
 	<artifactId>commons-base</artifactId>
 	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>L4 Commons</name>
-	
+
 	<url>https://github.com/LevelFourAB/commons</url>
-	
+
 	<description>
 		Toolbelt with utilities that are useful for many projects.
 	</description>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -28,8 +28,10 @@
 
 		<module>commons-serialization</module>
 		<module>commons-config</module>
+
+		<module>commons-guice</module>
 	</modules>
-	
+
 	<!-- License -->
 	<licenses>
 		<license>
@@ -47,14 +49,14 @@
 			<version>4.9</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 		    <groupId>org.mockito</groupId>
 		    <artifactId>mockito-core</artifactId>
 		    <version>2.0.44-beta</version>
 		    <scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 		    <groupId>org.apache.bval</groupId>
 		    <artifactId>bval-jsr</artifactId>
@@ -62,7 +64,7 @@
 		    <scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<!-- Managed dependencies used by several projects -->
 	<dependencyManagement>
 		<dependencies>
@@ -79,7 +81,7 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -94,7 +96,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -113,7 +115,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
@@ -130,7 +132,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
@@ -145,7 +147,7 @@
 							</execution>
 						</executions>
 		    		</plugin>
-		
+
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -161,13 +163,13 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 	<scm>
 		<connection>scm:git:git@github.com:LevelFourAB/commons.git</connection>
 		<url>git@github.com:LevelFourAB/commons.git</url>
 		<developerConnection>scm:git:git@github.com:LevelFourAB/commons.git</developerConnection>
 	</scm>
-	
+
 	<developers>
 		<developer>
 			<id>aholstenson</id>
