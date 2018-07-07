@@ -150,7 +150,7 @@ public class ReflectionSerializer<T>
 
 		// Create field map and cache
 		ImmutableMap<String, FieldDefinition> fields = builder.build();
-		ImmutableMap<String, FieldDefinition> nonRenamed = builder.build();
+		ImmutableMap<String, FieldDefinition> nonRenamed = nonRenamedFields.build();
 		FieldDefinition[] fieldsCache = fields.values().toArray(new FieldDefinition[0]);
 
 		// Get all of the factories
@@ -159,13 +159,11 @@ public class ReflectionSerializer<T>
 
 		for(ResolvedConstructor constructor : typeWithMembers.getConstructors())
 		{
-			FactoryDefinition<T> def = new FactoryDefinition<>(collection, fields, nonRenamed, constructor);
-			hasSerializerInFactory |= def.hasSerializedFields();
+			FactoryDefinition<T> def = FactoryDefinition.resolve(collection, type, fields, nonRenamed, constructor);
+			if(def == null) continue;
 
-			if(def.hasSerializedFields() || def.isInjectable())
-			{
-				factories.add(def);
-			}
+			hasSerializerInFactory |= def.hasSerializedFields();
+			factories.add(def);
 		}
 
 		if(factories.isEmpty())

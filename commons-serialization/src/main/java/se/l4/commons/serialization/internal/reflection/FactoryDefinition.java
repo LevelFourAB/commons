@@ -31,28 +31,90 @@ import se.l4.commons.types.InstanceException;
 public class FactoryDefinition<T>
 {
 	private final SerializerCollection collection;
+	private final Constructor<?> raw;
 	final Argument[] arguments;
+
 	private final boolean hasSerializedFields;
 	private final boolean isInjectable;
-	private final Constructor<?> raw;
 
-	public FactoryDefinition(SerializerCollection collection,
-			Map<String, FieldDefinition> fields,
-			Map<String, FieldDefinition> nonRenamed,
-			ResolvedConstructor constructor)
+	public FactoryDefinition(
+		SerializerCollection collection,
+		Constructor<?> raw,
+		Argument[] arguments,
+		boolean hasSerializedFields,
+		boolean isInjectable
+	)
 	{
 		this.collection = collection;
+		this.raw = raw;
+		this.arguments = arguments;
+		this.hasSerializedFields = hasSerializedFields;
+		this.isInjectable = isInjectable;
+	}
 
+	public static <T> FactoryDefinition<T> resolve(
+		SerializerCollection collection,
+		se.l4.commons.serialization.spi.Type parentType,
+		Map<String, FieldDefinition> fields,
+		Map<String, FieldDefinition> nonRenamed,
+		ResolvedConstructor constructor
+	)
+	{
 		List<Argument> args = new ArrayList<>();
 
-		raw = constructor.getRawMember();
+		Constructor<?> raw = constructor.getRawMember();
 
 		ConstructorProperties cp = raw.getAnnotation(ConstructorProperties.class);
 		String[] names = cp == null ? null : cp.value();
 
 		Annotation[][] annotations = raw.getParameterAnnotations();
 
+		// Figure out if we are injectable
+		boolean isInjectable = constructor.getArgumentCount() == 0;
+		for(Annotation a : constructor.getRawMember().getAnnotations())
+		{
+			if(a.annotationType() == Factory.class)
+			{
+				isInjectable = true;
+			}
+			else if(a.annotationType().getSimpleName().equals("Inject"))
+			{
+				isInjectable = true;
+			}
+		}
+
+		// Get if any fields are going to be serialized
 		boolean hasSerializedFields = false;
+		for(int i=0, n=constructor.getArgumentCount(); i<n; i++)
+		{
+			Expose expose = findExpose(annotations[i]);
+			if(expose != null)
+			{
+				// An expose annotation is present - this definition has serializable fields
+				hasSerializedFields = true;
+				break;
+			}
+			else
+			{
+				// Check in the ConstructorProperties array if we have serialized fields
+				if(names != null && i < names.length)
+				{
+					String name = names[i];
+					FieldDefinition def = nonRenamed.get(name);
+					if(def != null)
+					{
+						hasSerializedFields = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if(! isInjectable && ! hasSerializedFields)
+		{
+			// Neither injectable nor any serialized fields - skip this definition
+			return null;
+		}
 
 		for(int i=0, n=constructor.getArgumentCount(); i<n; i++)
 		{
@@ -88,7 +150,6 @@ public class FactoryDefinition<T>
 				}
 
 				args.add(new SerializedArgument(def.getType(), expose.value()));
-				hasSerializedFields = true;
 			}
 			else
 			{
@@ -99,32 +160,31 @@ public class FactoryDefinition<T>
 					if(def != null)
 					{
 						args.add(new SerializedArgument(def.getType(), def.getName()));
-						hasSerializedFields = true;
 						continue;
 					}
 				}
 
 				Type javaType = constructor.getRawMember().getParameters()[i].getParameterizedType();
-				args.add(new InjectedArgument(javaType, annotations[i]));
+
+				try
+				{
+					args.add(new InjectedArgument(collection, javaType, annotations[i]));
+				}
+				catch(Exception e)
+				{
+					throw new SerializationException("Error in constructor for " + raw + " while processing argument " + i + "; " + e.getMessage(), e);
+				}
 			}
 		}
 
-		boolean isInjectable = args.isEmpty();
-		for(Annotation a : constructor.getRawMember().getAnnotations())
-		{
-			if(a.annotationType() == Factory.class)
-			{
-				isInjectable = true;
-			}
-			else if(a.annotationType().getSimpleName().equals("Inject"))
-			{
-				isInjectable = true;
-			}
-		}
-
-		arguments = args.toArray(new Argument[args.size()]);
-		this.hasSerializedFields = hasSerializedFields;
-		this.isInjectable = isInjectable;
+		Argument[] arguments = args.toArray(new Argument[args.size()]);
+		return new FactoryDefinition<>(
+			collection,
+			raw,
+			arguments,
+			hasSerializedFields,
+			isInjectable
+		);
 	}
 
 	private static Expose findExpose(Annotation[] annotations)
@@ -291,7 +351,7 @@ public class FactoryDefinition<T>
 		Object getValue(Map<String, Object> data);
 	}
 
-	class SerializedArgument
+	static class SerializedArgument
 		implements Argument
 	{
 		final Class<?> type;
@@ -316,12 +376,12 @@ public class FactoryDefinition<T>
 		}
 	}
 
-	private class InjectedArgument
+	private static class InjectedArgument
 		implements Argument
 	{
 		private final Supplier<?> supplier;
 
-		public InjectedArgument(Type type, Annotation[] annotations)
+		public InjectedArgument(SerializerCollection collection, Type type, Annotation[] annotations)
 		{
 			supplier = collection.getInstanceFactory().supplier(type, annotations);
 		}
