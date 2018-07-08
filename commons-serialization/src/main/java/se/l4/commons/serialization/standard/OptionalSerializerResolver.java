@@ -7,7 +7,9 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 
 import se.l4.commons.serialization.Serializer;
+import se.l4.commons.serialization.collections.AllowAnyItem;
 import se.l4.commons.serialization.collections.CollectionSerializers;
+import se.l4.commons.serialization.collections.Item;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
@@ -22,7 +24,7 @@ public class OptionalSerializerResolver
 {
 
 	private static final Set<Class<? extends Annotation>> HINTS =
-			ImmutableSet.<Class<? extends Annotation>>of();
+			ImmutableSet.<Class<? extends Annotation>>of(AllowAnyItem.class, Item.class);
 
 	@Override
 	public Serializer<Optional<?>> find(TypeEncounter encounter)
