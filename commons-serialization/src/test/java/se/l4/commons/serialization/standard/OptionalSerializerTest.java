@@ -54,6 +54,7 @@ public class OptionalSerializerTest
 	}
 
 	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void testViaCollection()
 	{
 		SerializerCollection collection = new DefaultSerializerCollection();

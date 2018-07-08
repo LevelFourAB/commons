@@ -57,4 +57,9 @@ public class OptionalSerializer<T>
 		}
 	}
 
+	@Override
+	public SerializerFormatDefinition getFormatDefinition()
+	{
+		return formatDefinition;
+	}
 }

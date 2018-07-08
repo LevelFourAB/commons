@@ -15,10 +15,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import com.google.common.base.Charsets;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.base.Charsets;
 
 /**
  * Tests for the binary format. Tests by first writing some values and then
@@ -294,6 +294,8 @@ public class BinaryTest
 
 					assertThat(values[i++], is(in.getValue()));
 					break;
+				default:
+					// Do nothing
 			}
 		}
 

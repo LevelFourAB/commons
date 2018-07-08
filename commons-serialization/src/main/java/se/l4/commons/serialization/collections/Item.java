@@ -18,5 +18,6 @@ public @interface Item
 	 *
 	 * @return
 	 */
+	@SuppressWarnings({ "rawtypes" })
 	Class<? extends SerializerOrResolver> value();
 }

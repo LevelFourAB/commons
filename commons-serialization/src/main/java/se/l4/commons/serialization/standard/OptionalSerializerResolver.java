@@ -27,6 +27,7 @@ public class OptionalSerializerResolver
 			ImmutableSet.<Class<? extends Annotation>>of(AllowAnyItem.class, Item.class);
 
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Serializer<Optional<?>> find(TypeEncounter encounter)
 	{
 		Type[] params = encounter.getType().getParameters();

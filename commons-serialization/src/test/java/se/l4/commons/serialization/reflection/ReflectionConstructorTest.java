@@ -12,8 +12,6 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Throwables;
-
 import se.l4.commons.serialization.DefaultSerializerCollection;
 import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.ReflectionSerializer;
@@ -273,7 +271,7 @@ public class ReflectionConstructorTest
 		}
 		catch(IOException e)
 		{
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

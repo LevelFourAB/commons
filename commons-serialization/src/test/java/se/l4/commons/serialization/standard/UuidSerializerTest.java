@@ -9,8 +9,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.google.common.base.Throwables;
-
 import se.l4.commons.serialization.format.BinaryInput;
 import se.l4.commons.serialization.format.BinaryOutput;
 
@@ -38,7 +36,7 @@ public class UuidSerializerTest
 		}
 		catch(Exception e)
 		{
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -30,7 +30,6 @@ import se.l4.commons.types.InstanceException;
  */
 public class FactoryDefinition<T>
 {
-	private final SerializerCollection collection;
 	private final Constructor<?> raw;
 	final Argument[] arguments;
 
@@ -38,14 +37,12 @@ public class FactoryDefinition<T>
 	private final boolean isInjectable;
 
 	public FactoryDefinition(
-		SerializerCollection collection,
 		Constructor<?> raw,
 		Argument[] arguments,
 		boolean hasSerializedFields,
 		boolean isInjectable
 	)
 	{
-		this.collection = collection;
 		this.raw = raw;
 		this.arguments = arguments;
 		this.hasSerializedFields = hasSerializedFields;
@@ -179,7 +176,6 @@ public class FactoryDefinition<T>
 
 		Argument[] arguments = args.toArray(new Argument[args.size()]);
 		return new FactoryDefinition<>(
-			collection,
 			raw,
 			arguments,
 			hasSerializedFields,
@@ -245,7 +241,6 @@ public class FactoryDefinition<T>
 	 * @param data
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public int getScore(Map<String, Object> data)
 	{
 		if(! hasSerializedFields)

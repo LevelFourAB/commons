@@ -31,7 +31,6 @@ public class ReflectionOnlySingleFactorySerializer<T>
 	private final FieldDefinition[] fields;
 	private final int[] mapping;
 
-	@SuppressWarnings("unchecked")
 	public ReflectionOnlySingleFactorySerializer(TypeInfo<T> type, FactoryDefinition<T> factory)
 	{
 		this.type = type;

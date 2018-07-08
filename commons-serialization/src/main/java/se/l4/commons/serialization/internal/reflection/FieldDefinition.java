@@ -107,7 +107,7 @@ public class FieldDefinition
 		}
 		catch(Exception e)
 		{
-			Throwables.propagateIfPossible(e);
+			Throwables.throwIfUnchecked(e);
 
 			throw new SerializationException("Unable to read object; " + e.getMessage(), e);
 		}

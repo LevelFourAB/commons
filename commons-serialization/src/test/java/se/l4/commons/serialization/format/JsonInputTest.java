@@ -261,6 +261,8 @@ public class JsonInputTest
 					{
 						input.skipValue();
 					}
+				default:
+					// Do nothing
 			}
 		}
 
@@ -291,6 +293,8 @@ public class JsonInputTest
 			{
 				case KEY:
 					input.skipValue();
+				default:
+					// Do nothing
 			}
 		}
 	}
@@ -351,6 +355,8 @@ public class JsonInputTest
 
 					assertEquals(values[i++], in.getValue());
 					break;
+				default:
+					// Do nothing
 			}
 		}
 

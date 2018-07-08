@@ -10,8 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.function.Function;
 
-import com.google.common.base.Throwables;
-
 import se.l4.commons.serialization.format.BinaryInput;
 import se.l4.commons.serialization.format.BinaryOutput;
 import se.l4.commons.serialization.format.JsonInput;
@@ -42,7 +40,7 @@ public class SerializationTestHelper
 		}
 		catch(IOException e)
 		{
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 
 		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
@@ -55,7 +53,7 @@ public class SerializationTestHelper
 		}
 		catch(IOException e)
 		{
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

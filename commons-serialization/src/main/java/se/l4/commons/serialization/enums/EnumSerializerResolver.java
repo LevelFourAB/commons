@@ -68,7 +68,8 @@ public class EnumSerializerResolver
 				}
 				catch(InstantiationException e)
 				{
-					Throwables.propagateIfInstanceOf(e.getCause(), SerializationException.class);
+					Throwables.throwIfInstanceOf(e.getCause(), SerializationException.class);
+
 					throw new SerializationException("Unable to create; " + e.getCause().getMessage(), e.getCause());
 				}
 				catch(Exception e)
