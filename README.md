@@ -15,8 +15,8 @@ The indiviudal parts of this library are available from Maven central:
 ```xml
 <dependency>
   <groupId>se.l4.commons</groupId>
-  <artifactId>commons-main</artifactId>
-  <version>0.4.2</version>
+  <artifactId>commons-projectHere</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
