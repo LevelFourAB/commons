@@ -5,6 +5,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * {@link ExtendedDataInput} implemented on top of a {@link InputStream}.
+ */
 public class ExtendedDataInputStream
 	extends DataInputStream
 	implements ExtendedDataInput
@@ -19,6 +22,9 @@ public class ExtendedDataInputStream
 		}
 	};
 
+	/**
+	 * Create a new instance over the given input stream.
+	 */
 	public ExtendedDataInputStream(InputStream in)
 	{
 		super(in);
