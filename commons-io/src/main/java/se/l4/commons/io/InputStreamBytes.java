@@ -13,9 +13,9 @@ import java.io.InputStream;
 public class InputStreamBytes
 	implements Bytes
 {
-	private final IoSupplier<InputStream> in;
+	private final IOSupplier<InputStream> in;
 
-	public InputStreamBytes(IoSupplier<InputStream> in)
+	public InputStreamBytes(IOSupplier<InputStream> in)
 	{
 		this.in = in;
 	}

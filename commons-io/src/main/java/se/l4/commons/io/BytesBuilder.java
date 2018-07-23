@@ -5,6 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Builder for instances of {@link Bytes}.
+ */
 public class BytesBuilder
 {
 	private final ByteArrayOutputStream out;
@@ -30,23 +33,23 @@ public class BytesBuilder
 		return Bytes.create(out.toByteArray());
 	}
 
-	static Bytes createViaLazyDataOutput(IoConsumer<ExtendedDataOutput> creator)
+	static Bytes createViaLazyDataOutput(IOConsumer<ExtendedDataOutput> creator)
 	{
 		return createViaLazyDataOutput(creator, 8192);
 	}
 
-	static Bytes createViaLazyDataOutput(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
+	static Bytes createViaLazyDataOutput(IOConsumer<ExtendedDataOutput> creator, int expectedSize)
 	{
 		return new DataOutputBytes(creator, expectedSize);
 	}
 
-	static Bytes createViaDataOutput(IoConsumer<ExtendedDataOutput> creator)
+	static Bytes createViaDataOutput(IOConsumer<ExtendedDataOutput> creator)
 			throws IOException
 	{
 		return createViaDataOutput(creator, 8192);
 	}
 
-	static Bytes createViaDataOutput(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
+	static Bytes createViaDataOutput(IOConsumer<ExtendedDataOutput> creator, int expectedSize)
 		throws IOException
 	{
 		ByteArrayOutputStream out = new ByteArrayOutputStream(expectedSize);
@@ -60,10 +63,10 @@ public class BytesBuilder
 	private static class DataOutputBytes
 		implements Bytes
 	{
-		private final IoConsumer<ExtendedDataOutput> creator;
+		private final IOConsumer<ExtendedDataOutput> creator;
 		private final int expectedSize;
 
-		public DataOutputBytes(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
+		public DataOutputBytes(IOConsumer<ExtendedDataOutput> creator, int expectedSize)
 		{
 			this.creator = creator;
 			this.expectedSize = expectedSize;

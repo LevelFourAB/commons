@@ -101,7 +101,7 @@ public interface Bytes
 	 * @param stream
 	 * @return
 	 */
-	static Bytes create(IoSupplier<InputStream> stream)
+	static Bytes create(IOSupplier<InputStream> stream)
 	{
 		return new InputStreamBytes(stream);
 	}
@@ -113,7 +113,7 @@ public interface Bytes
 	 * @param creator
 	 * @return
 	 */
-	static Bytes lazyViaDataOutput(IoConsumer<ExtendedDataOutput> creator)
+	static Bytes lazyViaDataOutput(IOConsumer<ExtendedDataOutput> creator)
 	{
 		return BytesBuilder.createViaLazyDataOutput(creator);
 	}
@@ -126,7 +126,7 @@ public interface Bytes
 	 * @param expectedSize
 	 * @return
 	 */
-	static Bytes lazyViaDataOutput(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
+	static Bytes lazyViaDataOutput(IOConsumer<ExtendedDataOutput> creator, int expectedSize)
 	{
 		return BytesBuilder.createViaLazyDataOutput(creator, expectedSize);
 	}
@@ -138,7 +138,7 @@ public interface Bytes
 	 * @return
 	 * @throws IOException
 	 */
-	static Bytes viaDataOutput(IoConsumer<ExtendedDataOutput> creator)
+	static Bytes viaDataOutput(IOConsumer<ExtendedDataOutput> creator)
 		throws IOException
 	{
 		return BytesBuilder.createViaDataOutput(creator);
@@ -152,7 +152,7 @@ public interface Bytes
 	 * @return
 	 * @throws IOException
 	 */
-	static Bytes viaDataOutput(IoConsumer<ExtendedDataOutput> creator, int expectedSize)
+	static Bytes viaDataOutput(IOConsumer<ExtendedDataOutput> creator, int expectedSize)
 		throws IOException
 	{
 		return BytesBuilder.createViaDataOutput(creator, expectedSize);
