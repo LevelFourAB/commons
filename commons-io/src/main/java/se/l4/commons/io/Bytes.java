@@ -92,7 +92,18 @@ public interface Bytes
 	 */
 	static Bytes create(byte[] byteArray)
 	{
-		return new BytesOverByteArray(byteArray);
+		return create(byteArray, 0, byteArray.length);
+	}
+
+	/**
+	 * Create an instance for the given array of bytes.
+	 *
+	 * @param byteArray
+	 * @return
+	 */
+	static Bytes create(byte[] byteArray, int offset, int length)
+	{
+		return new BytesOverByteArray(byteArray, offset, length);
 	}
 
 	/**
