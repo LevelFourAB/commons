@@ -3,8 +3,8 @@ package se.l4.commons.types.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.reflections.Reflections;
-
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.ScanResult;
 import se.l4.commons.types.DefaultInstanceFactory;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
@@ -16,13 +16,13 @@ import se.l4.commons.types.TypeFinderBuilder;
  * @author Andreas Holstenson
  *
  */
-public class TypeFinderOverReflectionsBuilder
+public class TypeFinderOverScanResultBuilder
 	implements TypeFinderBuilder
 {
 	private InstanceFactory factory;
 	private Set<String> packages;
 
-	public TypeFinderOverReflectionsBuilder()
+	public TypeFinderOverScanResultBuilder()
 	{
 		factory = new DefaultInstanceFactory();
 		packages = new HashSet<>();
@@ -55,8 +55,14 @@ public class TypeFinderOverReflectionsBuilder
 	@Override
 	public TypeFinder build()
 	{
-		Reflections reflections = new Reflections(packages.toArray());
-		return new TypeFinderOverReflections(factory, reflections);
+		ScanResult result = new FastClasspathScanner()
+			.enableAnnotationInfo()
+			.enableClassInfo()
+			.enableAllInfo()
+			.whitelistPackages(packages.toArray(new String[packages.size()]))
+			.scan();
+
+		return new TypeFinderOverScanResult(factory, result);
 	}
 
 }

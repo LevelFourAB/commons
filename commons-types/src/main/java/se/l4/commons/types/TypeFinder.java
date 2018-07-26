@@ -3,6 +3,8 @@ package se.l4.commons.types;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
+import se.l4.commons.types.internal.TypeFinderOverScanResultBuilder;
+
 /**
  * Interface to help discover and load types on the classpath.
  *
@@ -42,4 +44,15 @@ public interface TypeFinder
 	 * @return
 	 */
 	<T> Set<? extends T> getSubTypesAsInstances(Class<T> type);
+
+	/**
+	 * Return a builder to create an instance of {@link TypeFinder}.
+	 *
+	 * @return
+	 *   builder that can be used to configure the finder
+	 */
+	static TypeFinderBuilder builder()
+	{
+		return new TypeFinderOverScanResultBuilder();
+	}
 }

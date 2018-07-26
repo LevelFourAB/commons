@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,9 +17,6 @@ import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.ResolvedMethod;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -93,7 +92,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		ResolvedType rt = typeResolver.resolve(typeToExtend);
 		ResolvedTypeWithMembers withMembers = members.resolve(rt, null, null);
 
-		ImmutableMap.Builder<Method, MethodInvocationHandler<CT>> handlers = ImmutableMap.builder();
+		Map<Method, MethodInvocationHandler<CT>> handlers = new HashMap<>();
 		try
 		{
 			// Go through methods and create invokers for each of them
@@ -133,8 +132,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 			throw new ProxyException(typeToExtend.getName() + ":\n" + e.getMessage(), e);
 		}
 
-		ImmutableMap<Method, MethodInvocationHandler<CT>> invokerMap = handlers.build();
-		return createFunction(contextType, typeToExtend, invokerMap);
+		return createFunction(contextType, typeToExtend, Collections.unmodifiableMap(handlers));
 	}
 
 	/**
@@ -205,7 +203,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		}
 		catch(Throwable e)
 		{
-			Throwables.throwIfUnchecked(e);
+			if(e instanceof RuntimeException) throw (RuntimeException) e;
 			throw new RuntimeException(e);
 		}
 	}
@@ -225,7 +223,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 				}
 				catch(Exception e)
 				{
-					Throwables.throwIfUnchecked(e);
+					if(e instanceof RuntimeException) throw (RuntimeException) e;
 					throw new RuntimeException(e);
 				}
 			}
@@ -241,7 +239,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		public CreatorImpl(Class<CT> contextType, List<MethodResolver<CT>> resolvers)
 		{
 			this.contextType = contextType;
-			this.resolvers = ImmutableList.copyOf(resolvers);
+			this.resolvers = Collections.unmodifiableList(resolvers);
 		}
 
 		@Override
