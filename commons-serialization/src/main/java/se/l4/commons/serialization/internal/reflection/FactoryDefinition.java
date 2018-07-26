@@ -1,9 +1,9 @@
 package se.l4.commons.serialization.internal.reflection;
 
-import java.beans.ConstructorProperties;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +61,7 @@ public class FactoryDefinition<T>
 
 		Constructor<?> raw = constructor.getRawMember();
 
-		ConstructorProperties cp = raw.getAnnotation(ConstructorProperties.class);
-		String[] names = cp == null ? null : cp.value();
+		String[] names = findNames(raw);
 
 		Annotation[][] annotations = raw.getParameterAnnotations();
 
@@ -181,6 +180,34 @@ public class FactoryDefinition<T>
 			hasSerializedFields,
 			isInjectable
 		);
+	}
+
+	private static String[]findNames(Constructor<?> c)
+	{
+		return findNamesViaConstructorProperties(c);
+	}
+
+	private static String[] findNamesViaConstructorProperties(Constructor<?> c)
+	{
+		for(Annotation a : c.getAnnotations())
+		{
+			if("java.beans.ConstructorProperties".equals(a.getClass().getName()))
+			{
+				// This is the annotation we are looking for
+				try
+				{
+					Method method = a.getClass().getMethod("value");
+					return (String[]) method.invoke(a);
+				}
+				catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					// Ignore that we can't accerss this
+					return null;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static Expose findExpose(Annotation[] annotations)

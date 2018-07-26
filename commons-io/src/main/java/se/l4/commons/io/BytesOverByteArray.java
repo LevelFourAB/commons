@@ -38,6 +38,8 @@ public class BytesOverByteArray
 		return Arrays.copyOfRange(data, offset, offset + length);
 	}
 
+
+
 	@Override
 	public String toString()
 	{
