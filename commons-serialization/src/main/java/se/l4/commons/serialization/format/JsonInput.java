@@ -6,8 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 /**
  * Input for JSON. Please note that this class is not intended for general use
@@ -460,6 +459,6 @@ public class JsonInput
 		 * JSON uses Base64 strings, so we need to decode on demand.
 		 */
 		String value = getString();
-		return DatatypeConverter.parseBase64Binary(value);
+		return Base64.getDecoder().decode(value);
 	}
 }

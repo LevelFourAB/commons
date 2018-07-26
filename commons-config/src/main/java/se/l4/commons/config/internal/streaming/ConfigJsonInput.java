@@ -3,8 +3,7 @@ package se.l4.commons.config.internal.streaming;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
-
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 import se.l4.commons.serialization.format.JsonInput;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -666,6 +665,6 @@ public class ConfigJsonInput
 		 * JSON uses Base64 strings, so we need to decode on demand.
 		 */
 		String value = getString();
-		return DatatypeConverter.parseBase64Binary(value);
+		return Base64.getDecoder().decode(value);
 	}
 }
