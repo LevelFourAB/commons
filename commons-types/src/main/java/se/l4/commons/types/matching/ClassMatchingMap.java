@@ -50,18 +50,5 @@ public interface ClassMatchingMap<T, D>
 	 *   list of matching entries. The list will be empty if no matches are
 	 *   available.
 	 */
-	List<Entry<T, D>> getAll(Class<? extends T> type);
-
-	interface Entry<T, D>
-	{
-		/**
-		 * Get the class that matched.
-		 */
-		Class<? extends T> getType();
-
-		/**
-		 * Get the data.
-		 */
-		D getData();
-	}
+	List<MatchedType<T, D>> getAll(Class<? extends T> type);
 }

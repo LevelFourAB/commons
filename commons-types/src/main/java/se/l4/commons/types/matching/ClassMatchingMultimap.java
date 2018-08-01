@@ -3,8 +3,6 @@ package se.l4.commons.types.matching;
 import java.util.List;
 import java.util.Set;
 
-import se.l4.commons.types.matching.ClassMatchingMap.Entry;
-
 /**
  * Specialized map to associated classes and interfaces with data. This map
  * supports matching against the type hierarchy to fetch data. It also supports
@@ -53,5 +51,5 @@ public interface ClassMatchingMultimap<T, D>
 	 *   list of matching entries. The list will be empty if no matches are
 	 *   available.
 	 */
-	List<Entry<T, D>> getAll(Class<? extends T> type);
+	List<MatchedType<T, D>> getAll(Class<? extends T> type);
 }

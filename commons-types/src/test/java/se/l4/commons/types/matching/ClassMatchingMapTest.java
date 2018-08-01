@@ -68,7 +68,7 @@ public class ClassMatchingMapTest
 		map.put(ClassMatchingMap.class, "map");
 		map.put(AbstractClassMatchingMap.class, "abstract");
 
-		List<ClassMatchingMap.Entry<Object, String>> all = map.getAll(ClassMatchingHashMap.class);
+		List<MatchedType<Object, String>> all = map.getAll(ClassMatchingHashMap.class);
 		assertThat(all, notNullValue());
 		assertThat(all.size(), is(2));
 

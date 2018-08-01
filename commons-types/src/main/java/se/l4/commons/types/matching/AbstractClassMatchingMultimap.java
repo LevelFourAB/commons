@@ -9,8 +9,6 @@ import java.util.function.BiPredicate;
 
 import com.google.common.collect.SetMultimap;
 
-import se.l4.commons.types.matching.ClassMatchingMap.Entry;
-
 /**
  * Abstract implementation of {@link ClassMatchingMap} that implements all of
  * the matching methods on top any {@link Map} implementation.
@@ -51,13 +49,13 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	}
 
 	@Override
-	public List<Entry<T, D>> getAll(Class<? extends T> type)
+	public List<MatchedType<T, D>> getAll(Class<? extends T> type)
 	{
-		List<Entry<T, D>> result = new ArrayList<>();
+		List<MatchedType<T, D>> result = new ArrayList<>();
 		findMatching(type, (t, all) -> {
 			for(D d : all)
 			{
-				result.add(new EntryImpl<>(t, d));
+				result.add(new DefaultMatchedType<>(t, d));
 			}
 
 			// Always continue
@@ -132,36 +130,5 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	private static class MutableHolder
 	{
 		private Object data;
-	}
-
-	private static class EntryImpl<T, D>
-		implements Entry<T, D>
-	{
-		private final Class<? extends T> type;
-		private final D data;
-
-		public EntryImpl(Class<? extends T> type, D data)
-		{
-			this.type = type;
-			this.data = data;
-		}
-
-		@Override
-		public Class<? extends T> getType()
-		{
-			return type;
-		}
-
-		@Override
-		public D getData()
-		{
-			return data;
-		}
-
-		@Override
-		public String toString()
-		{
-			return "Entry{" + type + " => " + data + "}";
-		}
 	}
 }
