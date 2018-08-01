@@ -1,7 +1,7 @@
 module se.l4.commons.types {
 	requires io.github.lukehutch.fastclasspathscanner;
 
-	requires com.fasterxml.classmate;
+	requires transitive com.fasterxml.classmate;
 
 	requires javassist;
 

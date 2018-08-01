@@ -3,10 +3,8 @@ package se.l4.commons.serialization;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import com.fasterxml.classmate.MemberResolver;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.ResolvedConstructor;
 import com.fasterxml.classmate.members.ResolvedField;
 import com.google.common.collect.ImmutableMap;
@@ -26,6 +24,7 @@ import se.l4.commons.serialization.spi.TypeEncounter;
 import se.l4.commons.serialization.standard.CompactDynamicSerializer;
 import se.l4.commons.serialization.standard.DynamicSerializer;
 import se.l4.commons.serialization.standard.SimpleTypeSerializer;
+import se.l4.commons.types.Types;
 
 /**
  * Serializer that will use reflection to access fields and methods in a
@@ -60,15 +59,12 @@ public class ReflectionSerializer<T>
 		ImmutableMap.Builder<String, FieldDefinition> builder = ImmutableMap.builder();
 		ImmutableMap.Builder<String, FieldDefinition> nonRenamedFields = ImmutableMap.builder();
 
-		TypeResolver typeResolver = new TypeResolver();
-		MemberResolver memberResolver = new MemberResolver(typeResolver);
-
 		Type[] params = type.getParameters();
 		ResolvedType rt = params.length == 0
-			? typeResolver.resolve(type.getErasedType())
-			: resolveWithParams(typeResolver, type);
+			? Types.resolve(type.getErasedType())
+			: resolveWithParams(type, params);
 
-		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(rt, null, null);
+		ResolvedTypeWithMembers typeWithMembers = Types.resolveMembers(rt);
 
 		for(ResolvedField field : typeWithMembers.getMemberFields())
 		{
@@ -195,13 +191,14 @@ public class ReflectionSerializer<T>
 		}
 	}
 
-	private static ResolvedType resolveWithParams(TypeResolver typeResolver, Type type)
+	private static ResolvedType resolveWithParams(Type type, Type[] params)
 	{
 		if(type instanceof TypeViaResolvedType)
 		{
 			return ((TypeViaResolvedType) type).getResolvedType();
 		}
 
+		//return Types.resolve(type, params);
 		return null;
 	}
 

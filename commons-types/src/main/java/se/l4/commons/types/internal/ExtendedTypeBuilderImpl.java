@@ -12,10 +12,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import com.fasterxml.classmate.MemberResolver;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
 import javassist.ClassPool;
@@ -26,6 +24,7 @@ import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.util.proxy.RuntimeSupport;
+import se.l4.commons.types.Types;
 import se.l4.commons.types.proxies.ExtendedTypeBuilder;
 import se.l4.commons.types.proxies.ExtendedTypeCreator;
 import se.l4.commons.types.proxies.MethodEncounter;
@@ -86,11 +85,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		Class<I> typeToExtend)
 	{
 		// Resolve generics
-		TypeResolver typeResolver = new TypeResolver();
-		MemberResolver members = new MemberResolver(typeResolver);
-
-		ResolvedType rt = typeResolver.resolve(typeToExtend);
-		ResolvedTypeWithMembers withMembers = members.resolve(rt, null, null);
+		ResolvedTypeWithMembers withMembers = Types.resolveMembers(typeToExtend);
 
 		Map<Method, MethodInvocationHandler<CT>> handlers = new HashMap<>();
 		try
