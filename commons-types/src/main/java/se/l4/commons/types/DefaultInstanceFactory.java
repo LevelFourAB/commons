@@ -1,5 +1,7 @@
 package se.l4.commons.types;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Default implementation of {@link InstanceFactory}.
  *
@@ -15,13 +17,13 @@ public class DefaultInstanceFactory
 	{
 		try
 		{
-			return type.newInstance();
+			return type.getDeclaredConstructor().newInstance();
 		}
 		catch(InstantiationException e)
 		{
 			throw new InstanceException("Unable to create; " + e.getCause().getMessage(), e.getCause());
 		}
-		catch(IllegalAccessException e)
+		catch(IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
 		{
 			throw new InstanceException("Unable to create; " + e.getMessage(), e);
 		}
