@@ -140,6 +140,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 	 * @param invokers
 	 *	 the resolved invokers
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static <CT, I> Function<CT, I> createFunction(
 		Class<CT> contextType,
 		Class<I> typeToExtend,
@@ -300,6 +301,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public <T extends Annotation> T findArgumentAnnotation(int argument, Class<T> type)
 		{
 			for(Annotation a : parameterAnnotations[argument])
