@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.github.lukehutch.fastclasspathscanner.ClassInfo;
-import io.github.lukehutch.fastclasspathscanner.ClassInfoList;
-import io.github.lukehutch.fastclasspathscanner.ScanResult;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
 
@@ -39,9 +39,7 @@ public class TypeFinderOverScanResult
 		Set<Class> result = new HashSet<Class>();
 		for(ClassInfo s : list)
 		{
-			result.add(
-				scanResult.loadClass(s.getName(), false)
-			);
+			result.add(s.loadClass(false));
 		}
 
 		return Collections.unmodifiableSet((Set) result);

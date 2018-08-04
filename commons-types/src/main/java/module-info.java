@@ -1,5 +1,5 @@
 module se.l4.commons.types {
-	requires io.github.lukehutch.fastclasspathscanner;
+	requires io.github.classgraph;
 
 	requires transitive com.fasterxml.classmate;
 

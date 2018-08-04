@@ -11,7 +11,7 @@ import org.junit.Test;
 public class TypeFinderTest
 {
 	@Test
-	public void testScanning()
+	public void testScanningSubTypes()
 	{
 		TypeFinder finder = TypeFinder.builder()
 			.addPackage("se.l4.commons.types")

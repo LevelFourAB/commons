@@ -3,8 +3,8 @@ package se.l4.commons.types.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.ScanResult;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import se.l4.commons.types.DefaultInstanceFactory;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.TypeFinder;
@@ -55,10 +55,9 @@ public class TypeFinderOverScanResultBuilder
 	@Override
 	public TypeFinder build()
 	{
-		ScanResult result = new FastClasspathScanner()
+		ScanResult result = new ClassGraph()
 			.enableAnnotationInfo()
 			.enableClassInfo()
-			.enableAllInfo()
 			.whitelistPackages(packages.toArray(new String[packages.size()]))
 			.scan();
 
