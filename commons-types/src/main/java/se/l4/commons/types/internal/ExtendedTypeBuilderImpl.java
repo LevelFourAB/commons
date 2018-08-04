@@ -16,14 +16,15 @@ import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.CtNewConstructor;
-import javassist.CtNewMethod;
-import javassist.util.proxy.RuntimeSupport;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.FieldAccessor;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.FieldValue;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import se.l4.commons.types.Types;
 import se.l4.commons.types.proxies.ExtendedTypeBuilder;
 import se.l4.commons.types.proxies.ExtendedTypeCreator;
@@ -147,83 +148,83 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		Map<Method, MethodInvocationHandler<CT>> invokers
 	)
 	{
-		ClassPool pool = ClassPool.getDefault();
 		try
 		{
-			CtClass exprIf = pool.get(typeToExtend.getName());
+			DynamicType.Builder builder = new ByteBuddy()
+				.subclass(typeToExtend);
 
-			CtClass type = pool.makeClass(typeToExtend.getName() + "$$Proxy$$" + compiled.incrementAndGet());
-			type.addInterface(exprIf);
+			// Add the context field
+			builder = builder.defineField("context", contextType, Visibility.PRIVATE);
 
-			CtClass object = pool.get("java.lang.Object");
-			CtClass invokerArrayType = pool.get(MethodInvocationHandler.class.getName() + "[]");
+			// Add the constructor
+			builder = builder.defineConstructor(Visibility.PUBLIC)
+				.withParameter(contextType)
+				.intercept(
+					MethodCall.invoke(Object.class.getDeclaredConstructor())
+						.onSuper()
+						.andThen(FieldAccessor.ofField("context").setsArgumentAt(0))
+				);
 
-			CtField field = new CtField(invokerArrayType, "invokers", type);
-			type.addField(field);
+			// TODO: The constructor needs to support abstract base classes and injection via InstanceFactory
 
-			field = new CtField(object, "ctx", type);
-			type.addField(field);
-
-			CtConstructor constructor = CtNewConstructor.make(new CtClass[] { invokerArrayType, object }, new CtClass[0], type);
-			if(typeToExtend.isInterface())
+			for(Map.Entry<Method, MethodInvocationHandler<CT>> e : invokers.entrySet())
 			{
-				constructor.setBody("{ this.invokers = $1; this.ctx = $2; }");
-			}
-			else
-			{
-				// TODO: This needs to check that the abstract class has a compatible constructor
-				constructor.setBody("{ super($2); this.invokers = $1; this.ctx = $2; }");
-			}
-			type.addConstructor(constructor);
-
-			// Create the invoker methods
-			MethodInvocationHandler<CT>[] invokerArray = new MethodInvocationHandler[invokers.size()];
-			int current = 0;
-			for(CtMethod method : exprIf.getMethods())
-			{
-				if(method.getDeclaringClass() != exprIf) continue;
-				Method reflectMethod = RuntimeSupport.findMethod(typeToExtend, method.getName(), method.getSignature());
-
-				invokerArray[current] = invokers.get(reflectMethod);
-
-				CtMethod invokingMethod = CtNewMethod.copy(method, type, null);
-				invokingMethod.setBody("{ " + (reflectMethod.getReturnType() == void.class ? "" : "return ($r)")
-					+ " this.invokers[" + current + "].handle(this.ctx, $args); }");
-
-				type.addMethod(invokingMethod);
-				current++;
+				builder = builder.define(e.getKey())
+					.intercept(
+						MethodDelegation.to(new Runner(e.getValue()))
+					);
 			}
 
-			Class createdClass = type.toClass();
-			return createFactory(pool, createdClass, invokerArray);
+			Class createdClass = builder.make()
+				.load(typeToExtend.getClassLoader())
+				.getLoaded();
+
+			return createFactory(createdClass, contextType);
 		}
 		catch(Throwable e)
 		{
-			if(e instanceof RuntimeException) throw (RuntimeException) e;
-			throw new RuntimeException(e);
+			if(e instanceof ProxyException) throw (ProxyException) e;
+			throw new ProxyException(e);
 		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static <CT, I> Function<CT, I> createFactory(ClassPool pool, Class createdClass, MethodInvocationHandler<CT>[] invokerArray)
+	private static <CT, I> Function<CT, I> createFactory(Class<I> createdClass, Class<CT> contextClass)
 		throws NoSuchMethodException, SecurityException
 	{
-		Constructor ctr = createdClass.getConstructor(MethodInvocationHandler[].class, Object.class);
+		Constructor ctr = createdClass.getConstructor(contextClass);
 		return new Function<CT, I>() {
 			@Override
 			public I apply(CT input)
 			{
 				try
 				{
-					return (I) ctr.newInstance(invokerArray, input);
+					return (I) ctr.newInstance(input);
 				}
 				catch(Exception e)
 				{
-					if(e instanceof RuntimeException) throw (RuntimeException) e;
-					throw new RuntimeException(e);
+					if(e instanceof ProxyException) throw (ProxyException) e;
+					throw new ProxyException(e);
 				}
 			}
 		};
+	}
+
+	public static class Runner
+	{
+		private final MethodInvocationHandler handler;
+
+		public Runner(MethodInvocationHandler handler)
+		{
+			this.handler = handler;
+		}
+
+		@RuntimeType
+		public Object run(@FieldValue("context") Object context, @AllArguments Object[] arguments)
+			throws Exception
+		{
+			return handler.handle(context, arguments);
+		}
 	}
 
 	private static class CreatorImpl<CT>

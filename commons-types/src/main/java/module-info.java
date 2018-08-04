@@ -3,7 +3,7 @@ module se.l4.commons.types {
 
 	requires transitive com.fasterxml.classmate;
 
-	requires javassist;
+	requires net.bytebuddy;
 	requires com.google.common;
 
 	exports se.l4.commons.types;

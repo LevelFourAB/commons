@@ -22,19 +22,18 @@ public class ExtendedTypeBuilderTest
 	@Test
 	public void testPrivateInterface()
 	{
-		Function<String, PrivateInterface> c = createBuilder(String.class)
-			.with(encounter -> Optional.of((ctx, args) -> ctx))
-			.create(PrivateInterface.class);
+		try
+		{
+			Function<String, PrivateInterface> c = createBuilder(String.class)
+				.with(encounter -> Optional.of((ctx, args) -> ctx))
+				.create(PrivateInterface.class);
+		}
+		catch(ProxyException e)
+		{
+			return;
+		}
 
-		assertThat("function is created", c, notNullValue());
-
-		String contextIn = "Hello World";
-
-		PrivateInterface obj = c.apply(contextIn);
-		assertThat("object is created", obj, notNullValue());
-
-		String contextOut = obj.returnContext();
-		assertThat("returnContext echoes context", contextOut, is(contextIn));
+		fail("Possible to implement private interface");
 	}
 
 	@Test
