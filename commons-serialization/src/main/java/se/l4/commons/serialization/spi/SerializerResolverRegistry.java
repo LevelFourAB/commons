@@ -90,7 +90,7 @@ public class SerializerResolverRegistry
 		}
 		catch (ExecutionException e)
 		{
-			Throwables.propagateIfInstanceOf(e.getCause(), SerializationException.class);
+			Throwables.throwIfInstanceOf(e.getCause(), SerializationException.class);
 
 			throw new SerializationException("Unable to retrieve serializer for " + type + "; " + e.getCause().getMessage(), e.getCause());
 		}
