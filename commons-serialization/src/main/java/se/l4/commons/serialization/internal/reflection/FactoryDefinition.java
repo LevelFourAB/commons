@@ -191,12 +191,12 @@ public class FactoryDefinition<T>
 	{
 		for(Annotation a : c.getAnnotations())
 		{
-			if("java.beans.ConstructorProperties".equals(a.getClass().getName()))
+			if("java.beans.ConstructorProperties".equals(a.annotationType().getName()))
 			{
 				// This is the annotation we are looking for
 				try
 				{
-					Method method = a.getClass().getMethod("value");
+					Method method = a.annotationType().getMethod("value");
 					return (String[]) method.invoke(a);
 				}
 				catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)

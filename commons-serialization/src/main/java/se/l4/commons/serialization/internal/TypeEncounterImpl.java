@@ -43,7 +43,7 @@ public class TypeEncounterImpl
 
 		for(Annotation a : annotations)
 		{
-			if(type.isAssignableFrom(a.getClass()))
+			if(type.isAssignableFrom(a.annotationType()))
 			{
 				return (T) a;
 			}
