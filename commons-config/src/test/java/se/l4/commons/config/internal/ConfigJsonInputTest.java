@@ -90,23 +90,6 @@ public class ConfigJsonInputTest
 	}
 
 	/**
-	 * Test reading where keys don't use quotes.
-	 *
-	 * @throws Exception
-	 */
-//	@Test
-	public void testKeysWithoutQuotes()
-		throws Exception
-	{
-		String v = "{ key1: \"value1\", key with spaces: \"value2\" }";
-		StreamingInput input = createInput(v);
-		assertStream(input, OBJECT_START, KEY, VALUE, KEY, VALUE, OBJECT_END);
-
-		input = createInput(v);
-		assertStreamValues(input, "key1", "value1", "key with spaces", "value2");
-	}
-
-	/**
 	 * Test reading a string value that does not use quotes.
 	 *
 	 * @throws Exception
