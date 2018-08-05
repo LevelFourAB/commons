@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +150,7 @@ public class FactoryDefinition<T>
 			}
 			else
 			{
-				if(names != null && i < names.length)
+				if(i < names.length && names[i] != null)
 				{
 					String name = names[i];
 					FieldDefinition def = nonRenamed.get(name);
@@ -182,9 +183,12 @@ public class FactoryDefinition<T>
 		);
 	}
 
-	private static String[]findNames(Constructor<?> c)
+	private static String[] findNames(Constructor<?> c)
 	{
-		return findNamesViaConstructorProperties(c);
+		String[] names = findNamesViaConstructorProperties(c);
+		if(names != null) return names;
+
+		return findNamesViaReflection(c);
 	}
 
 	private static String[] findNamesViaConstructorProperties(Constructor<?> c)
@@ -208,6 +212,18 @@ public class FactoryDefinition<T>
 		}
 
 		return null;
+	}
+
+	private static String[] findNamesViaReflection(Constructor<?> c)
+	{
+		Parameter[] params = c.getParameters();
+		String[] result = new String[params.length];
+		for(int i=0, n=params.length; i<n; i++)
+		{
+			Parameter param = params[i];
+			result[i] = param.isNamePresent() ? param.getName() : null;
+		}
+		return result;
 	}
 
 	private static Expose findExpose(Annotation[] annotations)
