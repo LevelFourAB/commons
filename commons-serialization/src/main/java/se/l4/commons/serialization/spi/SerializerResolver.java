@@ -1,6 +1,7 @@
 package se.l4.commons.serialization.spi;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.Set;
 
 import se.l4.commons.serialization.Serializer;
@@ -35,5 +36,8 @@ public interface SerializerResolver<T>
 	 *
 	 * @return
 	 */
-	Set<Class<? extends Annotation>> getHints();
+	default Set<Class<? extends Annotation>> getHints()
+	{
+		return Collections.emptySet();
+	}
 }
