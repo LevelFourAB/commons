@@ -31,7 +31,7 @@ public class DelayedSerializer<T>
 	{
 		this.collection = collection;
 		this.type = type;
-		this.hints = hints;
+		this.hints = hints.clone();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -39,10 +39,10 @@ public class DelayedSerializer<T>
 	{
 		if(instance == null)
 		{
-			instance = (Serializer<T>) collection.find(type, hints);
-			if(instance instanceof DelayedSerializer)
+			Serializer<T> instance = (Serializer<T>) collection.find(type, hints);
+			if(! (instance instanceof DelayedSerializer))
 			{
-				instance = null;
+				this.instance = instance;
 			}
 		}
 	}
