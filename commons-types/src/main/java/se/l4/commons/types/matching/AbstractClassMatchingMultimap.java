@@ -126,9 +126,4 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 		// Traverse up to the superclass
 		return traverseType(type.getSuperclass(), predicate, checked);
 	}
-
-	private static class MutableHolder
-	{
-		private Object data;
-	}
 }
