@@ -3,6 +3,7 @@ package se.l4.commons.config.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public class RawFormatReader
 	public static Map<String, Object> read(InputStream stream)
 		throws IOException
 	{
-		ConfigJsonInput input = new ConfigJsonInput(new InputStreamReader(stream));
+		ConfigJsonInput input = new ConfigJsonInput(new InputStreamReader(stream, StandardCharsets.UTF_8));
 		return read(input);
 	}
 
