@@ -1,8 +1,11 @@
 package se.l4.commons.id;
 
 import java.time.Clock;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * {@link LongIdGenerator} that uses the current time and a local sequence
@@ -28,10 +31,15 @@ public class SequenceLongIdGenerator
 		this(Clock.systemUTC());
 	}
 
-	public SequenceLongIdGenerator(Clock clock)
+	public SequenceLongIdGenerator(@NonNull Clock clock)
 	{
-		this.clock = clock;
-		lock = new ReentrantLock();
+		this(clock, new ReentrantLock());
+	}
+
+	public SequenceLongIdGenerator(@NonNull Clock clock, @NonNull Lock lock)
+	{
+		this.clock = Objects.requireNonNull(clock);
+		this.lock = Objects.requireNonNull(lock);
 	}
 
 	@Override
