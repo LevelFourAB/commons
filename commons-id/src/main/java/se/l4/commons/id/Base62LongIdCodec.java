@@ -1,5 +1,7 @@
 package se.l4.commons.id;
 
+import java.util.Objects;
+
 /**
  * Implementation of {@link LongIdCodec} that encodes and decodes a long
  * as a Base-62 encoded string.
@@ -50,6 +52,8 @@ public class Base62LongIdCodec
 	@Override
 	public long decode(String in)
 	{
+		Objects.requireNonNull(in);
+
 		long result = 0;
 		long limit = -Long.MAX_VALUE;
 		int radix = MAX;
