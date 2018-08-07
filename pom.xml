@@ -163,6 +163,84 @@
 					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.revapi</groupId>
+				<artifactId>revapi-maven-plugin</artifactId>
+				<version>0.10.4</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.revapi</groupId>
+						<artifactId>revapi-java</artifactId>
+						<version>0.18.0</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<reportSeverity>nonBreaking</reportSeverity>
+					<failSeverity>breaking</failSeverity>
+
+					<analysisConfiguration>
+						<revapi.java>
+							<filter>
+								<packages>
+									<regex>true</regex>
+									<include>
+										<item>se\.l4\..*</item>
+									</include>
+									<exclude>
+										<item>.*\.impl(\..+)?</item>
+										<item>.*\.internal(\..+)?</item>
+									</exclude>
+								</packages>
+							</filter>
+						</revapi.java>
+
+						<revapi.semver.ignore>
+							<enabled>true</enabled>
+							<versionIncreaseAllows>
+								<major>breaking</major>
+								<minor>nonBreaking</minor>
+								<patch>equivalent</patch>
+							</versionIncreaseAllows>
+							<passThroughDifferences>
+								<item>java.class.nonPublicPartOfAPI</item>
+							</passThroughDifferences>
+						</revapi.semver.ignore>>
+
+						<revapi.ignore>
+							<item>
+								<code>java.annotation.added</code>
+								<annotationType>edu.umd.cs.findbugs.annotations.NonNull</annotationType>
+								<justification>SpotBugs annotations are for bug finding and not code generation</justification>
+							</item>
+
+							<item>
+								<code>java.annotation.added</code>
+								<annotationType>edu.umd.cs.findbugs.annotations.Nullable</annotationType>
+								<justification>SpotBugs annotations are for bug finding and not code generation</justification>
+							</item>
+
+							<item>
+								<code>java.annotation.added</code>
+								<annotationType>edu.umd.cs.findbugs.annotations.CheckReturnValue</annotationType>
+								<justification>SpotBugs annotations are for bug finding and not code generation</justification>
+							</item>
+
+							<item>
+								<code>java.annotation.added</code>
+								<annotationType>edu.umd.cs.findbugs.annotations.SuppressFBWarnings</annotationType>
+								<justification>SpotBugs annotations are for bug finding and not code generation</justification>
+							</item>
+						</revapi.ignore>
+					</analysisConfiguration>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
