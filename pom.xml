@@ -43,8 +43,15 @@
 		</license>
 	</licenses>
 
-	<!-- Common test dependencies -->
+	<!-- Common dependencies for shared annotations and tests -->
 	<dependencies>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
+			<version>3.1.6</version>
+			<optional>true</optional>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -130,6 +137,32 @@
 						<version>2.8.3</version>
 					</dependency>
 				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>3.1.6</version>
+
+				<dependencies>
+					<dependency>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs</artifactId>
+						<version>3.1.6</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<effort>max</effort>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
 			</plugin>
 		</plugins>
 	</build>
