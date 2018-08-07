@@ -2,6 +2,7 @@ package se.l4.commons.config;
 
 import java.io.IOException;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.ReflectionSerializer;
 import se.l4.commons.serialization.Serializer;
@@ -48,7 +49,8 @@ public class ConfigKey
 	 * @param type
 	 * @return
 	 */
-	public <T> Value<T> get(String subPath, Class<T> type)
+	@NonNull
+	public <T> Value<T> get(@NonNull String subPath, @NonNull Class<T> type)
 	{
 		return config.get(key + '.' + subPath, type);
 	}
@@ -60,6 +62,7 @@ public class ConfigKey
 	 * @param type
 	 * @return
 	 */
+	@NonNull
 	public <T> T asObject(String subPath, Class<T> type)
 	{
 		return config.asObject(key + '.' + subPath, type);

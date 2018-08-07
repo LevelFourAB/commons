@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import javax.validation.ValidatorFactory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.serialization.SerializerCollection;
 
 /**
@@ -26,7 +27,8 @@ public interface ConfigBuilder
 	 * @param serializers
 	 * @return
 	 */
-	ConfigBuilder withSerializerCollection(SerializerCollection serializers);
+	@NonNull
+	ConfigBuilder withSerializerCollection(@NonNull SerializerCollection serializers);
 
 	/**
 	 * Set the {@link ValidatorFactory} to use when validating loaded
@@ -35,7 +37,8 @@ public interface ConfigBuilder
 	 * @param validation
 	 * @return
 	 */
-	ConfigBuilder withValidatorFactory(ValidatorFactory validation);
+	@NonNull
+	ConfigBuilder withValidatorFactory(@NonNull ValidatorFactory validation);
 
 	/**
 	 * Set the root folder of the configuration.
@@ -43,7 +46,8 @@ public interface ConfigBuilder
 	 * @param root
 	 * @return
 	 */
-	ConfigBuilder withRoot(String root);
+	@NonNull
+	ConfigBuilder withRoot(@NonNull String root);
 
 	/**
 	 * Set the root folder of the configuration.
@@ -51,7 +55,8 @@ public interface ConfigBuilder
 	 * @param path
 	 * @return
 	 */
-	ConfigBuilder withRoot(Path path);
+	@NonNull
+	ConfigBuilder withRoot(@NonNull Path path);
 
 	/**
 	 * Set the root folder of the configuration.
@@ -59,7 +64,8 @@ public interface ConfigBuilder
 	 * @param root
 	 * @return
 	 */
-	ConfigBuilder withRoot(File root);
+	@NonNull
+	ConfigBuilder withRoot(@NonNull File root);
 
 	/**
 	 * Add a file that should be loaded.
@@ -67,7 +73,8 @@ public interface ConfigBuilder
 	 * @param path
 	 * @return
 	 */
-	ConfigBuilder addFile(String path);
+	@NonNull
+	ConfigBuilder addFile(@NonNull String path);
 
 	/**
 	 * Add a file that should be loaded.
@@ -75,7 +82,8 @@ public interface ConfigBuilder
 	 * @param path
 	 * @return
 	 */
-	ConfigBuilder addFile(Path path);
+	@NonNull
+	ConfigBuilder addFile(@NonNull Path path);
 
 	/**
 	 * Add a file that should be loaded.
@@ -83,7 +91,8 @@ public interface ConfigBuilder
 	 * @param file
 	 * @return
 	 */
-	ConfigBuilder addFile(File file);
+	@NonNull
+	ConfigBuilder addFile(@NonNull File file);
 
 	/**
 	 * Add a stream that should be read.
@@ -91,7 +100,8 @@ public interface ConfigBuilder
 	 * @param stream
 	 * @return
 	 */
-	ConfigBuilder addStream(InputStream stream);
+	@NonNull
+	ConfigBuilder addStream(@NonNull InputStream stream);
 
 	/**
 	 * Create the configuration object. This will load any declared input
@@ -99,6 +109,7 @@ public interface ConfigBuilder
 	 *
 	 * @return
 	 */
+	@NonNull
 	Config build();
 
 }

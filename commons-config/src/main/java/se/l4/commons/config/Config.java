@@ -2,6 +2,7 @@ package se.l4.commons.config;
 
 import java.util.Collection;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.config.internal.ConfigBuilderImpl;
 
 /**
@@ -50,6 +51,7 @@ public interface Config
 	 *
 	 * @return
 	 */
+	@NonNull
 	static ConfigBuilder builder()
 	{
 		return new ConfigBuilderImpl();
@@ -64,7 +66,8 @@ public interface Config
 	 * @param type
 	 * @return
 	 */
-	<T> T asObject(String path, Class<T> type);
+	@NonNull
+	<T> T asObject(@NonNull String path, @NonNull Class<T> type);
 
 	/**
 	 * Resolve configuration values as an object. The object will be created
@@ -74,7 +77,8 @@ public interface Config
 	 * @param type
 	 * @return
 	 */
-	<T> Value<T> get(String path, Class<T> type);
+	@NonNull
+	<T> Value<T> get(@NonNull String path, @NonNull Class<T> type);
 
 	/**
 	 * Get the direct subkeys of the given path.
@@ -82,5 +86,6 @@ public interface Config
 	 * @param path
 	 * @return
 	 */
-	Collection<String> keys(String path);
+	@NonNull
+	Collection<String> keys(@NonNull String path);
 }

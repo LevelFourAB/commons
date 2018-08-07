@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -189,13 +190,15 @@ public class DefaultConfig
 	@Override
 	public <T> T asObject(String path, Class<T> type)
 	{
-		return get(path, type).getOrDefault(null);
+		return get(path, type).get();
 	}
 
 	@Override
 	public Collection<String> keys(String path)
 	{
-		if(path == null || path.equals(""))
+		Objects.requireNonNull(path);
+
+		if(path.trim().equals(""))
 		{
 			return data.keySet();
 		}
@@ -276,6 +279,9 @@ public class DefaultConfig
 	@Override
 	public <T> Value<T> get(String path, Class<T> type)
 	{
+		Objects.requireNonNull(path);
+		Objects.requireNonNull(type);
+
 		Serializer<T> serializer = collection.find(type);
 		if(serializer == null)
 		{

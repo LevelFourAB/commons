@@ -52,6 +52,7 @@ public class MapInput
 		// Nothing to close
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static StreamingInput resolveInput(String key, Object data)
 	{
 		if(data instanceof Map)

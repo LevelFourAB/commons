@@ -1,5 +1,8 @@
 package se.l4.commons.config;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Value within a configuration.
  *
@@ -14,6 +17,7 @@ public interface Value<T>
 	 *
 	 * @return
 	 */
+	@NonNull
 	T get();
 
 	/**
@@ -22,7 +26,8 @@ public interface Value<T>
 	 * @param defaultInstance
 	 * @return
 	 */
-	T getOrDefault(T defaultInstance);
+	@Nullable
+	T getOrDefault(@Nullable T defaultInstance);
 
 	/**
 	 * Get if this value exists.
