@@ -229,6 +229,12 @@
 
 							<item>
 								<code>java.annotation.added</code>
+								<annotationType>edu.umd.cs.findbugs.annotations.UnknownNullness</annotationType>
+								<justification>SpotBugs annotations are for bug finding and not code generation</justification>
+							</item>
+
+							<item>
+								<code>java.annotation.added</code>
 								<annotationType>edu.umd.cs.findbugs.annotations.CheckReturnValue</annotationType>
 								<justification>SpotBugs annotations are for bug finding and not code generation</justification>
 							</item>
