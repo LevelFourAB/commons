@@ -1,5 +1,7 @@
 package se.l4.commons.types;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Builder for instances of {@link TypeFinder}.
  *
@@ -13,29 +15,36 @@ public interface TypeFinderBuilder
 	 *
 	 * @param factory
 	 * @return
+	 *   self
 	 */
-	TypeFinderBuilder setInstanceFactory(InstanceFactory factory);
+	@NonNull
+	TypeFinderBuilder setInstanceFactory(@NonNull InstanceFactory factory);
 
 	/**
 	 * Add a package to scan for types. This will activate scanning for
 	 * the package and any subpackages it has.
 	 *
 	 * @return
+	 *   self
 	 */
-	TypeFinderBuilder addPackage(String pkgName);
+	@NonNull
+	TypeFinderBuilder addPackage(@NonNull String pkgName);
 
 	/**
 	 * Add several packages to scan for types.
 	 *
 	 * @param pkgs
 	 * @return
+	 *   self
 	 */
-	TypeFinderBuilder addPackages(Iterable<String> pkgs);
+	@NonNull
+	TypeFinderBuilder addPackages(@NonNull Iterable<String> pkgs);
 
 	/**
 	 * Create the instance.
 	 *
 	 * @return
 	 */
+	@NonNull
 	TypeFinder build();
 }

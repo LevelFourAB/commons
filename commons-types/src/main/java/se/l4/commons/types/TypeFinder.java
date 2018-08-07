@@ -3,6 +3,7 @@ package se.l4.commons.types;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.types.internal.TypeFinderOverScanResultBuilder;
 
 /**
@@ -19,7 +20,8 @@ public interface TypeFinder
 	 * @param annotationType
 	 * @return
 	 */
-	Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotationType);
+	@NonNull
+	Set<Class<?>> getTypesAnnotatedWith(@NonNull Class<? extends Annotation> annotationType);
 
 	/**
 	 * Get classes that have the given annotation, automatically creating them.
@@ -27,7 +29,8 @@ public interface TypeFinder
 	 * @param annotationType
 	 * @return
 	 */
-	Set<? extends Object> getTypesAnnotatedWithAsInstances(Class<? extends Annotation> annotationType);
+	@NonNull
+	Set<? extends Object> getTypesAnnotatedWithAsInstances(@NonNull Class<? extends Annotation> annotationType);
 
 	/**
 	 * Get sub types of the given class.
@@ -35,7 +38,8 @@ public interface TypeFinder
 	 * @param type
 	 * @return
 	 */
-	<T> Set<Class<? extends T>> getSubTypesOf(Class<T> type);
+	@NonNull
+	<T> Set<Class<? extends T>> getSubTypesOf(@NonNull Class<T> type);
 
 	/**
 	 * Get sub types of the given class automatically creating them.
@@ -43,7 +47,8 @@ public interface TypeFinder
 	 * @param type
 	 * @return
 	 */
-	<T> Set<? extends T> getSubTypesAsInstances(Class<T> type);
+	@NonNull
+	<T> Set<? extends T> getSubTypesAsInstances(@NonNull Class<T> type);
 
 	/**
 	 * Return a builder to create an instance of {@link TypeFinder}.
@@ -51,6 +56,7 @@ public interface TypeFinder
 	 * @return
 	 *   builder that can be used to configure the finder
 	 */
+	@NonNull
 	static TypeFinderBuilder builder()
 	{
 		return new TypeFinderOverScanResultBuilder();

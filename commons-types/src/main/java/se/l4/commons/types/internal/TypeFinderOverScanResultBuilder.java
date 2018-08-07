@@ -1,6 +1,7 @@
 package se.l4.commons.types.internal;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import io.github.classgraph.ClassGraph;
@@ -31,6 +32,8 @@ public class TypeFinderOverScanResultBuilder
 	@Override
 	public TypeFinderBuilder setInstanceFactory(InstanceFactory factory)
 	{
+		Objects.requireNonNull(factory);
+
 		this.factory = factory;
 		return this;
 	}
@@ -38,6 +41,8 @@ public class TypeFinderOverScanResultBuilder
 	@Override
 	public TypeFinderBuilder addPackage(String pkgName)
 	{
+		Objects.requireNonNull(pkgName);
+
 		packages.add(pkgName);
 		return this;
 	}
@@ -45,6 +50,8 @@ public class TypeFinderOverScanResultBuilder
 	@Override
 	public TypeFinderBuilder addPackages(Iterable<String> pkgs)
 	{
+		Objects.requireNonNull(pkgs);
+
 		for(String pkg : pkgs)
 		{
 			packages.add(pkg);

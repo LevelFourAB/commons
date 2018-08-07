@@ -7,6 +7,8 @@ package se.l4.commons.types;
 public class InstanceException
 	extends RuntimeException
 {
+	private static final long serialVersionUID = 5490805858681960298L;
+
 	public InstanceException()
 	{
 		super();

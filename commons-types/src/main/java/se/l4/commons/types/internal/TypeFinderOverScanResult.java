@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import io.github.classgraph.ClassInfo;
@@ -49,6 +50,8 @@ public class TypeFinderOverScanResult
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotationType)
 	{
+		Objects.requireNonNull(annotationType);
+
 		return (Set) toClasses(scanResult.getClassesWithAnnotation(annotationType.getName()));
 	}
 
@@ -62,6 +65,8 @@ public class TypeFinderOverScanResult
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type)
 	{
+		Objects.requireNonNull(type);
+
 		ClassInfoList list;
 		if(type.isInterface())
 		{

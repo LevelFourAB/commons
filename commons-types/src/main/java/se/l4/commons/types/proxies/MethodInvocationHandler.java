@@ -1,5 +1,8 @@
 package se.l4.commons.types.proxies;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Handler for a method invocation in a proxied object as constructed via
  * {@link ExtendedTypeBuilder}.
@@ -20,6 +23,7 @@ public interface MethodInvocationHandler<ContextType>
 	 * @return
 	 *	 result that the method invocation should return
 	 */
-	Object handle(ContextType self, Object[] arguments)
+	@Nullable
+	Object handle(@NonNull ContextType self, @NonNull Object[] arguments)
 		throws Exception;
 }

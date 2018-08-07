@@ -2,6 +2,8 @@ package se.l4.commons.types.proxies;
 
 import java.util.function.Function;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Creator of functions that creates instances of a certain type. Instances
  * of this method can be created via a {@link ExtendedTypeBuilder}.
@@ -22,5 +24,6 @@ public interface ExtendedTypeCreator<ContextType>
 	 * @throws ProxyException
 	 *	 if the type is not an interface or not abstract
 	 */
-	<I> Function<ContextType, I> create(Class<I> interfaceOrAbstractClass);
+	@NonNull
+	<I> Function<ContextType, I> create(@NonNull Class<I> interfaceOrAbstractClass);
 }

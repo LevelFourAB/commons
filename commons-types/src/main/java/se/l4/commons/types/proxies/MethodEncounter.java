@@ -5,6 +5,9 @@ import java.lang.reflect.Method;
 
 import com.fasterxml.classmate.ResolvedType;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * An encounter with a method, contains methods to help with creating a
  * {@link MethodInvoker}.
@@ -19,6 +22,7 @@ public interface MethodEncounter
 	 *
 	 * @return
 	 */
+	@NonNull
 	String getName();
 
 	/**
@@ -26,6 +30,7 @@ public interface MethodEncounter
 	 *
 	 * @return
 	 */
+	@NonNull
 	Method getMethod();
 
 	/**
@@ -33,6 +38,7 @@ public interface MethodEncounter
 	 *
 	 * @return
 	 */
+	@NonNull
 	ResolvedType getReturnType();
 
 	/**
@@ -40,6 +46,7 @@ public interface MethodEncounter
 	 *
 	 * @return
 	 */
+	@NonNull
 	Annotation[] getAnnotations();
 
 	/**
@@ -51,7 +58,7 @@ public interface MethodEncounter
 	 *	 {@code true} if the annotation exists on the method, {@code false}
 	 *	 otherwise
 	 */
-	boolean hasAnnotation(Class<? extends Annotation> annotation);
+	boolean hasAnnotation(@NonNull Class<? extends Annotation> annotation);
 
 	/**
 	 * Get a specific annotation on the method.
@@ -60,7 +67,8 @@ public interface MethodEncounter
 	 * @return
 	 *	 The found annotation or {@code null}.
 	 */
-	<T extends Annotation> T getAnnotation(Class<T> annotation);
+	@Nullable
+	<T extends Annotation> T getAnnotation(@NonNull Class<T> annotation);
 
 	/**
 	 * Get the number of arguments this method has.
@@ -75,7 +83,10 @@ public interface MethodEncounter
 	 * @param argument
 	 *	 the argument index
 	 * @return
+	 * @throws IllegalArgumentException
+	 *   if the argument does not exist
 	 */
+	@NonNull
 	ResolvedType getArgumentType(int argument);
 
 	/**
@@ -87,7 +98,10 @@ public interface MethodEncounter
 	 *	 the annotation to look for
 	 * @return
 	 *	 The found annotation or {@code null}.
+	 * @throws IllegalArgumentException
+	 *   if the argument does not exist
 	 */
-	<T extends Annotation> T findArgumentAnnotation(int argument, Class<T> type);
+	@Nullable
+	<T extends Annotation> T findArgumentAnnotation(int argument, @NonNull Class<T> type);
 
 }

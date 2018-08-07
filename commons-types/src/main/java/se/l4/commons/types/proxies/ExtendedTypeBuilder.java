@@ -2,6 +2,8 @@ package se.l4.commons.types.proxies;
 
 import java.util.function.Function;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Builder for extending types with custom invocation handlers for methods.
  * This can be used to resolve
@@ -17,7 +19,8 @@ public interface ExtendedTypeBuilder<ContextType>
 	 * @return
 	 *	 self
 	 */
-	ExtendedTypeBuilder<ContextType> with(MethodResolver<ContextType> resolver);
+	@NonNull
+	ExtendedTypeBuilder<ContextType> with(@NonNull MethodResolver<ContextType> resolver);
 
 	/**
 	 * Create an instance of {@link ExtendedTypeCreator} that can be used to
@@ -26,6 +29,7 @@ public interface ExtendedTypeBuilder<ContextType>
 	 * @return
 	 *	 creator for the resolvers in this type
 	 */
+	@NonNull
 	ExtendedTypeCreator<ContextType> toCreator();
 
 	/**
@@ -39,5 +43,6 @@ public interface ExtendedTypeBuilder<ContextType>
 	 * @throws ProxyException
 	 *	 if the type is not an interface or not abstract
 	 */
-	<I> Function<ContextType, I> create(Class<I> interfaceOrAbstractClass);
+	@NonNull
+	<I> Function<ContextType, I> create(@NonNull Class<I> interfaceOrAbstractClass);
 }

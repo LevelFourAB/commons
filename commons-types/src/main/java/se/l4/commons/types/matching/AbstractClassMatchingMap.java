@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Abstract implementation of {@link ClassMatchingMap} that implements all of
@@ -19,18 +22,23 @@ public abstract class AbstractClassMatchingMap<T, D>
 
 	protected AbstractClassMatchingMap(Map<Class<? extends T>, D> backingMap)
 	{
-		this.backingMap = backingMap;
+		this.backingMap = Objects.requireNonNull(backingMap);
 	}
 
 	@Override
 	public void put(Class<? extends T> type, D data)
 	{
+		Objects.requireNonNull(type);
+		Objects.requireNonNull(data);
+
 		backingMap.put(type, data);
 	}
 
 	@Override
 	public Optional<D> get(Class<? extends T> type)
 	{
+		Objects.requireNonNull(type);
+
 		return Optional.ofNullable(backingMap.get(type));
 	}
 
@@ -38,6 +46,8 @@ public abstract class AbstractClassMatchingMap<T, D>
 	@SuppressWarnings("unchecked")
 	public Optional<D> getBest(Class<? extends T> type)
 	{
+		Objects.requireNonNull(type);
+
 		MutableHolder holder = new MutableHolder();
 		findMatching(type, (t, d) -> {
 			holder.data = d;
@@ -51,6 +61,8 @@ public abstract class AbstractClassMatchingMap<T, D>
 	@Override
 	public List<MatchedType<T, D>> getAll(Class<? extends T> type)
 	{
+		Objects.requireNonNull(type);
+
 		List<MatchedType<T, D>> result = new ArrayList<>();
 		findMatching(type, (t, d) -> {
 			result.add(new DefaultMatchedType<>(t, d));
@@ -126,6 +138,7 @@ public abstract class AbstractClassMatchingMap<T, D>
 
 	private static class MutableHolder
 	{
+		@Nullable
 		private Object data;
 	}
 }

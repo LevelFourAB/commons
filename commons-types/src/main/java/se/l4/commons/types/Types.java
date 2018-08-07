@@ -10,6 +10,9 @@ import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.types.ResolvedArrayType;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Helpers and utilities related to working with types. This class provides
  * static methods to turn types into {@link ResolvedType}s, provided by
@@ -35,7 +38,8 @@ public class Types
 	 * @return
 	 *   resolve type instance
 	 */
-	public static ResolvedType resolve(Type type, Type... typeParameters)
+	@NonNull
+	public static ResolvedType resolve(@NonNull Type type, @NonNull Type... typeParameters)
 	{
 		return typeResolver.resolve(type, typeParameters);
 	}
@@ -48,7 +52,8 @@ public class Types
 	 * @return
 	 *   resolve type instance
 	 */
-	public static ResolvedArrayType resolveArrayType(Type elementType)
+	@NonNull
+	public static ResolvedArrayType resolveArrayType(@NonNull Type elementType)
 	{
 		return typeResolver.arrayType(elementType);
 	}
@@ -64,7 +69,8 @@ public class Types
 	 *   resolved type
 	 * @see TypeResolver#resolveSubtype(ResolvedType, Class)
 	 */
-	public static ResolvedType resolveSubtype(ResolvedType superType, Class<?> subType)
+	@NonNull
+	public static ResolvedType resolveSubtype(@NonNull ResolvedType superType, @NonNull Class<?> subType)
 	{
 		return typeResolver.resolveSubtype(superType, subType);
 	}
@@ -79,7 +85,8 @@ public class Types
 	 * @return
 	 *   resolve type instance
 	 */
-	public static ResolvedTypeWithMembers resolveMembers(Type type, Type... typeParameters)
+	@NonNull
+	public static ResolvedTypeWithMembers resolveMembers(@NonNull Type type, @NonNull Type... typeParameters)
 	{
 		ResolvedType rt = typeResolver.resolve(type, typeParameters);
 		return memberResolver.resolve(rt, null, null);
@@ -93,7 +100,8 @@ public class Types
 	 * @return
 	 *   resolved type with members
 	 */
-	public static ResolvedTypeWithMembers resolveMembers(ResolvedType mainType)
+	@NonNull
+	public static ResolvedTypeWithMembers resolveMembers(@NonNull ResolvedType mainType)
 	{
 		return memberResolver.resolve(mainType, null, null);
 	}
@@ -111,10 +119,11 @@ public class Types
 	 * @return
 	 *   resolved type with members
 	 */
+	@NonNull
 	public static ResolvedTypeWithMembers resolveMembers(
-		ResolvedType mainType,
-		AnnotationConfiguration annotationConfig,
-		AnnotationOverrides annotationOverrides
+		@NonNull ResolvedType mainType,
+		@Nullable AnnotationConfiguration annotationConfig,
+		@Nullable AnnotationOverrides annotationOverrides
 	)
 	{
 		return memberResolver.resolve(mainType, annotationConfig, annotationOverrides);

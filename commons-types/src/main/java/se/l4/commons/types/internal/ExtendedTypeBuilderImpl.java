@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import com.fasterxml.classmate.ResolvedType;
@@ -40,13 +40,13 @@ import se.l4.commons.types.proxies.ProxyException;
 public class ExtendedTypeBuilderImpl<ContextType>
 	implements ExtendedTypeBuilder<ContextType>
 {
-	private static final AtomicInteger compiled = new AtomicInteger();
-
 	private Class<ContextType> contextType;
 	private List<MethodResolver<ContextType>> resolvers;
 
 	public ExtendedTypeBuilderImpl(Class<ContextType> contextType)
 	{
+		Objects.requireNonNull(contextType);
+
 		this.contextType = contextType;
 		resolvers = new ArrayList<>();
 	}
@@ -54,6 +54,8 @@ public class ExtendedTypeBuilderImpl<ContextType>
 	@Override
 	public ExtendedTypeBuilder<ContextType> with(MethodResolver<ContextType> resolver)
 	{
+		Objects.requireNonNull(contextType);
+
 		resolvers.add(resolver);
 		return this;
 	}
@@ -210,6 +212,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		};
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static class Runner
 	{
 		private final MethodInvocationHandler handler;

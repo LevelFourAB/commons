@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
@@ -26,18 +27,25 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	@Override
 	public void put(Class<? extends T> type, D data)
 	{
+		Objects.requireNonNull(type);
+		Objects.requireNonNull(data);
+
 		backingMap.put(type, data);
 	}
 
 	@Override
 	public Set<D> get(Class<? extends T> type)
 	{
+		Objects.requireNonNull(type);
+
 		return backingMap.get(type);
 	}
 
 	@Override
 	public Set<D> getBest(Class<? extends T> type)
 	{
+		Objects.requireNonNull(type);
+
 		Set<D> result = new HashSet<>();
 		findMatching(type, (t, d) -> {
 			result.addAll(d);
@@ -51,6 +59,8 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	@Override
 	public List<MatchedType<T, D>> getAll(Class<? extends T> type)
 	{
+		Objects.requireNonNull(type);
+
 		List<MatchedType<T, D>> result = new ArrayList<>();
 		findMatching(type, (t, all) -> {
 			for(D d : all)

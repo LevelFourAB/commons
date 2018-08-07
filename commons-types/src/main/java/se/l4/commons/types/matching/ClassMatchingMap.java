@@ -3,6 +3,8 @@ package se.l4.commons.types.matching;
 import java.util.List;
 import java.util.Optional;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Specialized map to associated classes and interfaces with data. This map
  * supports matching against the type hierarchy to fetch data.
@@ -17,9 +19,9 @@ public interface ClassMatchingMap<T, D>
 	 * @param type
 	 *   the type to associate data with
 	 * @param data
-	 *   the data to store
+	 *   the data to store, never {@code null}
 	 */
-	void put(Class<? extends T> type, D data);
+	void put(@NonNull Class<? extends T> type, @NonNull D data);
 
 	/**
 	 * Get data directly associated with the given type.
@@ -29,7 +31,8 @@ public interface ClassMatchingMap<T, D>
 	 * @return
 	 *   optional containing data if there is direct match or empty optional
 	 */
-	Optional<D> get(Class<? extends T> type);
+	@NonNull
+	Optional<D> get(@NonNull Class<? extends T> type);
 
 	/**
 	 * Get the best matching data for the given type.
@@ -39,7 +42,8 @@ public interface ClassMatchingMap<T, D>
 	 * @return
 	 *   optional with data or empty optional
 	 */
-	Optional<D> getBest(Class<? extends T> type);
+	@NonNull
+	Optional<D> getBest(@NonNull Class<? extends T> type);
 
 	/**
 	 * Get all types and their associated data matching the given type.
@@ -50,5 +54,6 @@ public interface ClassMatchingMap<T, D>
 	 *   list of matching entries. The list will be empty if no matches are
 	 *   available.
 	 */
-	List<MatchedType<T, D>> getAll(Class<? extends T> type);
+	@NonNull
+	List<MatchedType<T, D>> getAll(@NonNull Class<? extends T> type);
 }
