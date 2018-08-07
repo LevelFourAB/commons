@@ -9,9 +9,20 @@ import java.lang.annotation.Target;
 /**
  * Indicate that a field may contain any type that is compatible with the
  * declaration. This will cause the library to use dynamic serialization based
- * on names for the field.
+ * on names for the field. This annotation is handled when using
+ * {@link ReflectionSerializer}.
  *
- * @author Andreas Holstenson
+ * <p>
+ * Example:
+ *
+ * <pre>
+ * @Use(ReflectionSerializer.class)
+ * public class Data {
+ *   @Expose
+ *   @AllowAny
+ *   private Object anyObject;
+ * }
+ * </pre>
  *
  */
 @Retention(RetentionPolicy.RUNTIME)

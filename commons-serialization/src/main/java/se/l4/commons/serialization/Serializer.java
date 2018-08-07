@@ -5,6 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.function.Function;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.UnknownNullness;
 import se.l4.commons.serialization.format.BinaryInput;
 import se.l4.commons.serialization.format.BinaryOutput;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -29,21 +32,25 @@ public interface Serializer<T>
 	 * @return
 	 * @throws IOException
 	 */
-	T read(StreamingInput in)
+	@Nullable
+	T read(@NonNull StreamingInput in)
 		throws IOException;
 
 	/**
 	 * Write and object to the specified stream.
 	 *
 	 * @param object
-	 * 		object to write
+	 *   object to write, if the serializer implements {@link NullHandling}
+	 *   this may be {@code null}, if not the serializer can assume it is not
+	 *   {@code null}
 	 * @param name
-	 * 		the name it should have in the stream
-	 * @param stream
-	 * 		the stream to use
+	 * 	 the name the object should have, should be passed along to the output
+	 * @param out
+	 * 	 the stream to use for writing
 	 * @throws IOException
+	 *   if unable to write the object
 	 */
-	void write(T object, String name, StreamingOutput stream)
+	void write(@UnknownNullness T object, @NonNull String name, @NonNull StreamingOutput out)
 		throws IOException;
 
 	/**
@@ -52,6 +59,7 @@ public interface Serializer<T>
 	 *
 	 * @return
 	 */
+	@NonNull
 	default SerializerFormatDefinition getFormatDefinition()
 	{
 		return SerializerFormatDefinition.unknown();
@@ -63,7 +71,8 @@ public interface Serializer<T>
 	 * @param instance
 	 * @return
 	 */
-	default byte[] toBytes(T instance)
+	@Nullable
+	default byte[] toBytes(@Nullable T instance)
 	{
 		/*
 		 * If the value being serialized is null and we do not handle null
@@ -90,6 +99,7 @@ public interface Serializer<T>
 	 *
 	 * @return
 	 */
+	@NonNull
 	default Function<T, byte[]> toBytes()
 	{
 		return this::toBytes;
@@ -101,7 +111,8 @@ public interface Serializer<T>
 	 * @param data
 	 * @return
 	 */
-	default T fromBytes(byte[] data)
+	@Nullable
+	default T fromBytes(@Nullable byte[] data)
 	{
 		if(data == null) return null;
 
@@ -122,6 +133,7 @@ public interface Serializer<T>
 	 *
 	 * @return
 	 */
+	@NonNull
 	default Function<byte[], T> fromBytes()
 	{
 		return this::fromBytes;

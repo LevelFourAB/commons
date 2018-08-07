@@ -8,6 +8,10 @@ import com.google.common.collect.ImmutableSet;
 
 import se.l4.commons.serialization.Serializer;
 
+/**
+ * Chain of {@link SerializerResolver}s that are tried in order. The first
+ * resolver that returns a {@link Serializer} determines the result.
+ */
 public class SerializerResolverChain<T>
 	implements SerializerResolver<T>
 {

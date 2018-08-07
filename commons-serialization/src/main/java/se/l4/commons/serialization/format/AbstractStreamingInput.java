@@ -35,6 +35,7 @@ public abstract class AbstractStreamingInput
 				level++;
 				break;
 			default: // Do nothing
+				break;
 		}
 
 		return this.token = token;
@@ -80,6 +81,7 @@ public abstract class AbstractStreamingInput
 				break;
 			default:
 				next();
+				break;
 		}
 	}
 

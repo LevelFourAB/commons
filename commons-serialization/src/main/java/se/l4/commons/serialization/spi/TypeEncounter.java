@@ -2,6 +2,8 @@ package se.l4.commons.serialization.spi;
 
 import java.lang.annotation.Annotation;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.serialization.SerializerCollection;
 
 /**
@@ -17,6 +19,7 @@ public interface TypeEncounter
 	 *
 	 * @return
 	 */
+	@NonNull
 	SerializerCollection getCollection();
 
 	/**
@@ -24,6 +27,7 @@ public interface TypeEncounter
 	 *
 	 * @return
 	 */
+	@NonNull
 	Type getType();
 
 	/**
@@ -33,5 +37,6 @@ public interface TypeEncounter
 	 * @return
 	 * 		the hint if found, or {@code null}
 	 */
-	<T extends Annotation> T getHint(Class<T> type);
+	@Nullable
+	<T extends Annotation> T getHint(@NonNull Class<T> type);
 }

@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerOrResolver;
 
@@ -29,13 +31,15 @@ public interface SerializerResolver<T>
 	 * @param encounter
 	 * @return
 	 */
-	Serializer<T> find(TypeEncounter encounter);
+	@Nullable
+	Serializer<T> find(@NonNull TypeEncounter encounter);
 
 	/**
 	 * Get the hints this resolver uses.
 	 *
 	 * @return
 	 */
+	@NonNull
 	default Set<Class<? extends Annotation>> getHints()
 	{
 		return Collections.emptySet();

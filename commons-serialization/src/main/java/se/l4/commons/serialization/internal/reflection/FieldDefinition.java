@@ -150,7 +150,7 @@ public class FieldDefinition
 		{
 			if(nullHandling)
 			{
-				serializer.write(value, name, stream);
+				serializer.write(null, name, stream);
 			}
 			else
 			{

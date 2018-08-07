@@ -2,6 +2,8 @@ package se.l4.commons.serialization;
 
 import java.lang.annotation.Annotation;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.types.InstanceFactory;
@@ -20,6 +22,7 @@ public interface SerializerCollection
 	 *
 	 * @return
 	 */
+	@NonNull
 	InstanceFactory getInstanceFactory();
 
 	/**
@@ -28,7 +31,8 @@ public interface SerializerCollection
 	 *
 	 * @param type
 	 */
-	SerializerCollection bind(Class<?> type);
+	@NonNull
+	SerializerCollection bind(@NonNull Class<?> type);
 
 	/**
 	 * Bind a given type to the specified serializer.
@@ -37,7 +41,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @param serializer
 	 */
-	<T> SerializerCollection bind(Class<T> type, Serializer<T> serializer);
+	@NonNull
+	<T> SerializerCollection bind(@NonNull Class<T> type, @NonNull Serializer<T> serializer);
 
 	/**
 	 * Bind a given type to the specified resolver. The resolver will be
@@ -47,7 +52,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @param resolver
 	 */
-	<T> SerializerCollection bind(Class<T> type, SerializerResolver<? extends T> resolver);
+	@NonNull
+	<T> SerializerCollection bind(@NonNull Class<T> type, @NonNull SerializerResolver<? extends T> resolver);
 
 	/**
 	 * Find a serializer suitable for the specific type.
@@ -56,7 +62,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	<T> Serializer<T> find(Class<T> type);
+	@NonNull
+	<T> Serializer<T> find(@NonNull Class<T> type);
 
 	/**
 	 * Find a serializer suitable for the specific type.
@@ -65,7 +72,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	<T> Serializer<T> find(Class<T> type, Annotation... hints);
+	@NonNull
+	<T> Serializer<T> find(@NonNull Class<T> type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -73,7 +81,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	Serializer<?> find(Type type);
+	@NonNull
+	Serializer<?> find(@NonNull Type type);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -81,7 +90,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	Serializer<?> find(Type type, Annotation... hints);
+	@NonNull
+	Serializer<?> find(@NonNull Type type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer based on its registered name.
@@ -89,6 +99,7 @@ public interface SerializerCollection
 	 * @param name
 	 * @return
 	 */
+	@NonNull
 	Serializer<?> find(String name);
 
 	/**
@@ -98,7 +109,22 @@ public interface SerializerCollection
 	 * @param name
 	 * @return
 	 */
-	Serializer<?> find(String namespace, String name);
+	@NonNull
+	Serializer<?> find(@NonNull String namespace, @NonNull String name);
+
+	/**
+	 * Find a serializer using a specific {@link SerializerResolver}.
+	 *
+	 * @param resolver
+	 * @param type
+	 * @return
+	 */
+	@NonNull
+	<T> Serializer<T> findVia(
+		@NonNull Class<? extends SerializerOrResolver<T>> resolver,
+		@NonNull Class<T> type,
+		@NonNull Annotation... hints
+	);
 
 	/**
 	 * Find a serializer using a specific {@link SerializerResolver}.
@@ -107,16 +133,12 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	<T> Serializer<T> findVia(Class<? extends SerializerOrResolver<T>> resolver, Class<T> type, Annotation... hints);
-
-	/**
-	 * Find a serializer using a specific {@link SerializerResolver}.
-	 *
-	 * @param sOrR
-	 * @param type
-	 * @return
-	 */
-	<T> Serializer<T> findVia(Class<? extends SerializerOrResolver<T>> resolver, Type type, Annotation... hints);
+	@NonNull
+	<T> Serializer<T> findVia(
+		@NonNull Class<? extends SerializerOrResolver<T>> resolver,
+		@NonNull Type type,
+		@NonNull  Annotation... hints
+	);
 
 	/**
 	 * Get the resolver this collection would use to resolve a serializer
@@ -125,7 +147,8 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	SerializerResolver<?> getResolver(Class<?> type);
+	@NonNull
+	SerializerResolver<?> getResolver(@NonNull Class<?> type);
 
 	/**
 	 * Get if the given type can be serialized.
@@ -133,7 +156,7 @@ public interface SerializerCollection
 	 * @param type
 	 * @return
 	 */
-	boolean isSupported(Class<?> type);
+	boolean isSupported(@NonNull Class<?> type);
 
 	/**
 	 * Find the name of the given serializer (if any).
@@ -141,5 +164,6 @@ public interface SerializerCollection
 	 * @param serializer
 	 * @return
 	 */
-	QualifiedName findName(Serializer<?> serializer);
+	@Nullable
+	QualifiedName findName(@NonNull Serializer<?> serializer);
 }

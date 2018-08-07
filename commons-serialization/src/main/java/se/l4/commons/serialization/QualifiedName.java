@@ -1,5 +1,9 @@
 package se.l4.commons.serialization;
 
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Name for a {@link Serializer}.
  *
@@ -11,10 +15,10 @@ public class QualifiedName
 	private final String namespace;
 	private final String name;
 
-	public QualifiedName(String namespace, String name)
+	public QualifiedName(@NonNull String namespace, @NonNull  String name)
 	{
-		this.namespace = namespace;
-		this.name = name;
+		this.namespace = Objects.requireNonNull(namespace);
+		this.name = Objects.requireNonNull(name);
 	}
 
 	public String getName()

@@ -7,9 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicate that a field may contain any type that is compatible with the
- * declaration. This will cause the library to use dynamic serialization based
- * on names for the field.
+ * Indicate that a field may contain any simple type, which is all primtive
+ * types and {@link String}, the field may not contain any object.
  *
  * @author Andreas Holstenson
  *
@@ -20,11 +19,11 @@ import java.lang.annotation.Target;
 public @interface AllowSimpleTypes
 {
 	/**
-	 * Set if this should use the compact format or not. The compact format
-	 * will write the container as a list, while the non-compact format is
-	 * an object with the keys {@code namespace}, {@code name}, {@code value}.
+	 * Deprecated value for compact serialization that was never used.
 	 *
+	 * @deprecated
 	 * @return
 	 */
+	@Deprecated
 	boolean compact() default false;
 }

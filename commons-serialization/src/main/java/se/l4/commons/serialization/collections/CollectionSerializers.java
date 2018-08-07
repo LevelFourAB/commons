@@ -5,6 +5,10 @@ import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
 import se.l4.commons.serialization.standard.DynamicSerializer;
 
+/**
+ * Utilities that are useful when using or creating serializers that work on
+ * collection types.
+ */
 public class CollectionSerializers
 {
 	private CollectionSerializers()

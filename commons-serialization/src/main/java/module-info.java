@@ -1,4 +1,6 @@
 module se.l4.commons.serialization {
+	requires com.github.spotbugs.annotations;
+
 	requires se.l4.commons.types;
 
 	requires com.fasterxml.classmate;
