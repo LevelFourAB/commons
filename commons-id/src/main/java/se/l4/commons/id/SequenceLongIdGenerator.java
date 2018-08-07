@@ -17,8 +17,8 @@ public class SequenceLongIdGenerator
 {
 	public static final int MAX_SEQUENCE = (int) Math.pow(2, 21);
 
-	private volatile int sequence;
-	private volatile long lastTime;
+	private int sequence;
+	private long lastTime;
 
 	private final Clock clock;
 	private final Lock lock;
