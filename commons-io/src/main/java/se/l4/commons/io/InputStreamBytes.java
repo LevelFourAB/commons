@@ -3,6 +3,9 @@ package se.l4.commons.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Implementation of {@link Bytes} over a {@link InputStream}.
@@ -15,9 +18,9 @@ public class InputStreamBytes
 {
 	private final IOSupplier<InputStream> in;
 
-	public InputStreamBytes(IOSupplier<InputStream> in)
+	public InputStreamBytes(@NonNull IOSupplier<InputStream> in)
 	{
-		this.in = in;
+		this.in = Objects.requireNonNull(in);
 	}
 
 	@Override

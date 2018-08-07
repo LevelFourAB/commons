@@ -2,7 +2,11 @@ package se.l4.commons.io;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Objects;
 import java.util.function.Supplier;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * {@link Supplier} of a result that can throw a {@link IOException}.
@@ -18,6 +22,7 @@ public interface IOSupplier<T>
 	 * @throws IOException
 	 *   if I/O error occurs
 	 */
+	@Nullable
 	T get()
 		throws IOException;
 
@@ -30,6 +35,7 @@ public interface IOSupplier<T>
 	 * @return
 	 *   supplier
 	 */
+	@NonNull
 	default Supplier<T> toSupplier()
 	{
 		return () -> {
@@ -50,8 +56,10 @@ public interface IOSupplier<T>
 	 * @return
 	 *   {@link IOSupplier<T>} that delegates to the given supplier
 	 */
-	static <T> IOSupplier<T> adapt(Supplier<T> supplier)
+	@NonNull
+	static <T> IOSupplier<T> adapt(@NonNull Supplier<T> supplier)
 	{
+		Objects.requireNonNull(supplier);
 		return () -> supplier.get();
 	}
 }

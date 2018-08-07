@@ -3,12 +3,15 @@ package se.l4.commons.io;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class ExtendedDataOutputStream
 	extends DataOutputStream
 	implements ExtendedDataOutput
 {
-	public ExtendedDataOutputStream(OutputStream out)
+	public ExtendedDataOutputStream(@NonNull OutputStream out)
 	{
 		super(out);
 	}
@@ -52,9 +55,11 @@ public class ExtendedDataOutputStream
 	}
 
 	@Override
-	public void writeString(String string)
+	public void writeString(@NonNull String string)
 		throws IOException
 	{
+		Objects.requireNonNull(string);
+
 		writeVInt(string.length());
 		for(int i=0, n=string.length(); i<n; i++)
 		{
@@ -78,9 +83,11 @@ public class ExtendedDataOutputStream
 	}
 
 	@Override
-	public void writeBytes(Bytes bytes)
+	public void writeBytes(@NonNull Bytes bytes)
 		throws IOException
 	{
+		Objects.requireNonNull(bytes);
+
 		bytes.asChunks(8192, (data, offset, len) -> {
 			writeVInt(len);
 			write(data, offset, len);

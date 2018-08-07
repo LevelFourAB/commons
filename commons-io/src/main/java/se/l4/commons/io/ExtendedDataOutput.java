@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 public interface ExtendedDataOutput
 	extends DataOutput, Closeable
 {
@@ -13,9 +15,9 @@ public interface ExtendedDataOutput
 	void writeVLong(long l)
 		throws IOException;
 
-	void writeString(String string)
+	void writeString(@NonNull String string)
 		throws IOException;
 
-	void writeBytes(Bytes bytes)
+	void writeBytes(@NonNull Bytes bytes)
 		throws IOException;
 }

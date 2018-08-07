@@ -5,6 +5,9 @@ import java.io.UncheckedIOException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Version of {@link Consumer} that throws an {@link IOException}.
  */
@@ -19,7 +22,7 @@ public interface IOConsumer<T>
 	 * @throws IOException
 	 *   on I/O failure
 	 */
-	void accept(T item)
+	void accept(@Nullable T item)
 		throws IOException;
 
 	/**
@@ -31,7 +34,8 @@ public interface IOConsumer<T>
 	 * @return
 	 *   composed consumer
 	 */
-	default IOConsumer<T> andThen(IOConsumer<? super T> after)
+	@NonNull
+	default IOConsumer<T> andThen(@NonNull IOConsumer<? super T> after)
 	{
 		Objects.requireNonNull(after);
 		return item -> { accept(item); after.accept(item); };
@@ -46,7 +50,8 @@ public interface IOConsumer<T>
 	 * @return
 	 *   composed consumer
 	 */
-	default IOConsumer<T> andThen(Consumer<? super T> after)
+	@NonNull
+	default IOConsumer<T> andThen(@NonNull Consumer<? super T> after)
 	{
 		Objects.requireNonNull(after);
 		return item -> { accept(item); after.accept(item); };
@@ -59,6 +64,7 @@ public interface IOConsumer<T>
 	 * @return
 	 *   instance of {@link Consumer}
 	 */
+	@NonNull
 	default Consumer<T> toConsumer()
 	{
 		return item -> {
@@ -81,8 +87,10 @@ public interface IOConsumer<T>
 	 * @return
 	 *   {@link IOConsumer} that runs the given regular {@link Consumer}
 	 */
-	static <T> IOConsumer<T> adapt(Consumer<T> consumer)
+	@NonNull
+	static <T> IOConsumer<T> adapt(@NonNull Consumer<T> consumer)
 	{
+		Objects.requireNonNull(consumer);
 		return item -> consumer.accept(item);
 	}
 }

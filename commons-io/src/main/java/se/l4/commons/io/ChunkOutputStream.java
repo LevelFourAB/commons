@@ -2,9 +2,13 @@ package se.l4.commons.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * A @{link OutputStream} that will send chunks of the written data to the given @{link ByteArrayConsumer}.
+ * A @{link OutputStream} that will send chunks of the written data to the
+ * given @{link ByteArrayConsumer}.
  *
  * @author Andreas Holstenson
  *
@@ -16,9 +20,9 @@ public class ChunkOutputStream
 	private final byte[] buffer;
 	private int len;
 
-	public ChunkOutputStream(int size, ByteArrayConsumer out)
+	public ChunkOutputStream(int size, @NonNull ByteArrayConsumer out)
 	{
-		this.out = out;
+		this.out = Objects.requireNonNull(out);
 		buffer = new byte[size];
 	}
 

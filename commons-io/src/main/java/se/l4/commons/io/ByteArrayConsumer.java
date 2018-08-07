@@ -2,6 +2,8 @@ package se.l4.commons.io;
 
 import java.io.IOException;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Consumer of {@code byte[]} arrays.
  *
@@ -21,6 +23,6 @@ public interface ByteArrayConsumer
 	 * @param length
 	 *   the number of bytes to consume
 	 */
-	void consume(byte[] data, int offset, int length)
+	void consume(@NonNull byte[] data, int offset, int length)
 		throws IOException;
 }

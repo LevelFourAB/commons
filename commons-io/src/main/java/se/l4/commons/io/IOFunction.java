@@ -5,6 +5,9 @@ import java.io.UncheckedIOException;
 import java.util.Objects;
 import java.util.function.Function;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * {@link Function} that can throw {@link IOException}.
  *
@@ -24,7 +27,8 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   result
 	 */
-	R apply(T t)
+	@Nullable
+	R apply(@Nullable T t)
 		throws IOException;
 
 	/**
@@ -36,7 +40,8 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   composed function
 	 */
-	default <V> IOFunction<V, R> compose(IOFunction<? super V, ? extends T> before)
+	@NonNull
+	default <V> IOFunction<V, R> compose(@NonNull IOFunction<? super V, ? extends T> before)
 	{
 		Objects.requireNonNull(before);
 		return t -> apply(before.apply(t));
@@ -51,7 +56,8 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   composed function
 	 */
-	default <V> IOFunction<V, R> compose(Function<? super V, ? extends T> before)
+	@NonNull
+	default <V> IOFunction<V, R> compose(@NonNull Function<? super V, ? extends T> before)
 	{
 		Objects.requireNonNull(before);
 		return t -> apply(before.apply(t));
@@ -66,7 +72,8 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   composed function
 	 */
-	default <V> IOFunction<T, V> andThen(IOFunction<? super R, ? extends V> after)
+	@NonNull
+	default <V> IOFunction<T, V> andThen(@NonNull IOFunction<? super R, ? extends V> after)
 	{
 		Objects.requireNonNull(after);
 		return t -> after.apply(apply(t));
@@ -81,7 +88,8 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   composed function
 	 */
-	default <V> IOFunction<T, V> andThen(Function<? super R, ? extends V> after)
+	@NonNull
+	default <V> IOFunction<T, V> andThen(@NonNull Function<? super R, ? extends V> after)
 	{
 		Objects.requireNonNull(after);
 		return t -> after.apply(apply(t));
@@ -95,6 +103,7 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   function that invokes this one
 	 */
+	@NonNull
 	default Function<T, R> toFunction()
 	{
 		return t -> {
@@ -117,8 +126,10 @@ public interface IOFunction<T, R>
 	 * @return
 	 *   {@link IOFunction} that runs the given regular {@link Function}
 	 */
-	static <T, R> IOFunction<T, R> adapt(Function<T, R> func)
+	@NonNull
+	static <T, R> IOFunction<T, R> adapt(@NonNull Function<T, R> func)
 	{
+		Objects.requireNonNull(func);
 		return item -> func.apply(item);
 	}
 }
