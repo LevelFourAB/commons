@@ -24,5 +24,9 @@ public enum ValueType
 
 	BYTES,
 
-	NULL;
+	NULL,
+
+	BYTE,
+
+	CHAR;
 }

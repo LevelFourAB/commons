@@ -73,6 +73,10 @@ public interface StreamingInput
 	 * {@link Token#NULL} this method will raise a
 	 * {@link SerializationException}.
 	 *
+	 * <p>
+	 * The type of value is defined by the input, and many number values can
+	 * be converted.
+	 *
 	 * @return
 	 *   current type of value
 	 */
@@ -101,6 +105,26 @@ public interface StreamingInput
 	 * @return
 	 */
 	boolean getBoolean();
+
+	/**
+	 * Get the value as a byte.
+	 *
+	 * @return
+	 */
+	default byte getByte()
+	{
+		return (byte) getInt();
+	}
+
+	/**
+	 * Get the value as a character.
+	 *
+	 * @return
+	 */
+	default char getChar()
+	{
+		return (char) getInt();
+	}
 
 	/**
 	 * Get the value as a double.

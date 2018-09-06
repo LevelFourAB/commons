@@ -59,6 +59,32 @@ public interface StreamingOutput
 		throws IOException;
 
 	/**
+	 * Write a single byte value to the output.
+	 *
+	 * @param name
+	 * @param b
+	 * @throws IOException
+	 */
+	default void write(String name, byte b)
+		throws IOException
+	{
+		write(name, (int) b);
+	}
+
+	/**
+	 * Write a single char value to the output.
+	 *
+	 * @param name
+	 * @param c
+	 * @throws IOException
+	 */
+	default void write(String name, char c)
+		throws IOException
+	{
+		write(name, (int) c);
+	}
+
+	/**
 	 * Write an integer.
 	 *
 	 * @param name

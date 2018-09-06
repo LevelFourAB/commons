@@ -15,6 +15,8 @@ public abstract class AbstractStreamingInput
 	private Object value;
 
 	private boolean valueBoolean;
+	private byte valueByte;
+	private char valueChar;
 	private double valueDouble;
 	private float valueFloat;
 	private int valueInt;
@@ -217,6 +219,18 @@ public abstract class AbstractStreamingInput
 		this.valueBoolean = value;
 	}
 
+	protected void setValue(byte value)
+	{
+		valueType = ValueType.BYTE;
+		this.valueByte = value;
+	}
+
+	protected void setValue(char value)
+	{
+		valueType = ValueType.CHAR;
+		this.valueChar = value;
+	}
+
 	protected void setValue(double value)
 	{
 		valueType = ValueType.DOUBLE;
@@ -258,6 +272,10 @@ public abstract class AbstractStreamingInput
 	{
 		switch(valueType)
 		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return valueChar;
 			case DOUBLE:
 				return valueDouble;
 			case FLOAT:
@@ -303,10 +321,62 @@ public abstract class AbstractStreamingInput
 	}
 
 	@Override
+	public byte getByte()
+	{
+		switch(valueType)
+		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return (byte) valueChar;
+			case DOUBLE:
+				return (byte) valueDouble;
+			case FLOAT:
+				return (byte) valueFloat;
+			case INTEGER:
+				return (byte) valueInt;
+			case LONG:
+				return (byte) valueLong;
+			case SHORT:
+				return (byte) valueShort;
+			default:
+				throw raiseSerializationException("Expected a value that can be turned into a byte but got " + valueType);
+		}
+	}
+
+	@Override
+	public char getChar()
+	{
+		switch(valueType)
+		{
+			case BYTE:
+				return (char) valueByte;
+			case CHAR:
+				return valueChar;
+			case DOUBLE:
+				return (char) valueDouble;
+			case FLOAT:
+				return (char) valueFloat;
+			case INTEGER:
+				return (char) valueInt;
+			case LONG:
+				return (char) valueLong;
+			case SHORT:
+				return (char) valueShort;
+			default:
+				throw raiseSerializationException("Expected a value that can be turned into a char but got " + valueType);
+		}
+	}
+
+	@Override
 	public double getDouble()
 	{
 		switch(valueType)
 		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return valueChar;
 			case DOUBLE:
 				return valueDouble;
 			case FLOAT:
@@ -327,6 +397,10 @@ public abstract class AbstractStreamingInput
 	{
 		switch(valueType)
 		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return valueChar;
 			case DOUBLE:
 				return (float) valueDouble;
 			case FLOAT:
@@ -347,6 +421,10 @@ public abstract class AbstractStreamingInput
 	{
 		switch(valueType)
 		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return valueChar;
 			case DOUBLE:
 				return (long) valueDouble;
 			case FLOAT:
@@ -367,6 +445,10 @@ public abstract class AbstractStreamingInput
 	{
 		switch(valueType)
 		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return valueChar;
 			case DOUBLE:
 				return (int) valueDouble;
 			case FLOAT:
@@ -387,6 +469,10 @@ public abstract class AbstractStreamingInput
 	{
 		switch(valueType)
 		{
+			case BYTE:
+				return valueByte;
+			case CHAR:
+				return (short) valueChar;
 			case DOUBLE:
 				return (short) valueDouble;
 			case FLOAT:

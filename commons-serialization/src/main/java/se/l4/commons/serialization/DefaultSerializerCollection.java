@@ -15,6 +15,8 @@ import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.SerializerResolverRegistry;
 import se.l4.commons.serialization.standard.BooleanSerializer;
 import se.l4.commons.serialization.standard.ByteArraySerializer;
+import se.l4.commons.serialization.standard.ByteSerializer;
+import se.l4.commons.serialization.standard.CharacterSerializer;
 import se.l4.commons.serialization.standard.DoubleSerializer;
 import se.l4.commons.serialization.standard.FloatSerializer;
 import se.l4.commons.serialization.standard.IntSerializer;
@@ -61,11 +63,13 @@ public class DefaultSerializerCollection
 
 		// Standard types
 		bind(Boolean.class, new BooleanSerializer(), "", "boolean");
-		bind(Float.class, new FloatSerializer(), "", "float");
+		bind(Byte.class, new ByteSerializer(), "", "byte");
+		bind(Character.class, new CharacterSerializer(), "", "char");
 		bind(Double.class, new DoubleSerializer(), "", "double");
-		bind(Short.class, new ShortSerializer(), "", "short");
+		bind(Float.class, new FloatSerializer(), "", "float");
 		bind(Integer.class, new IntSerializer(), "", "integer");
 		bind(Long.class, new LongSerializer(), "", "long");
+		bind(Short.class, new ShortSerializer(), "", "short");
 		bind(String.class, new StringSerializer(), "", "string");
 		bind(byte[].class, new ByteArraySerializer(), "", "byte[]");
 		bind(UUID.class, new UuidSerializer(), "", "uuid");
