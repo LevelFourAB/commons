@@ -249,7 +249,7 @@ public class BinaryInput
 				setValue(-readLong());
 				break;
 			case BinaryOutput.TAG_NULL:
-				setValue(null);
+				setValueNull();
 				break;
 			case BinaryOutput.TAG_KEY:
 			case BinaryOutput.TAG_STRING:

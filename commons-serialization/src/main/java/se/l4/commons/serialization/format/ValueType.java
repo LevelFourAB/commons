@@ -9,11 +9,20 @@ package se.l4.commons.serialization.format;
 public enum ValueType
 {
 	STRING,
+
 	BOOLEAN,
+
 	FLOAT,
+
 	DOUBLE,
+
 	SHORT,
+
 	INTEGER,
+
 	LONG,
-	BYTES;
+
+	BYTES,
+
+	NULL;
 }

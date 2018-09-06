@@ -392,7 +392,7 @@ public class JsonInput
 			{
 				readNextValue();
 
-				setValue(null);
+				setValueNull();
 
 				// Check for trailing commas
 				readWhitespace();

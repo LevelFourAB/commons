@@ -15,9 +15,9 @@ import static se.l4.commons.serialization.format.Token.VALUE;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.junit.Test;
-
 import com.google.common.base.Charsets;
+
+import org.junit.Test;
 
 /**
  * Test for {@link JsonInput}. Runs a set of JSON documents and makes sure
@@ -347,13 +347,20 @@ public class JsonInputTest
 			{
 				case KEY:
 				case VALUE:
-				case NULL:
 					if(i == values.length)
 					{
 						fail("Did not expect more values, but got " + in.getValue());
 					}
 
-					assertEquals(values[i++], in.getValue());
+					assertThat(in.getValue(), is(values[i++]));
+					break;
+				case NULL:
+					if(i == values.length)
+					{
+						fail("Did not expect more values, but got " + in.getValue());
+					}
+					i++; // consume the value
+					assertThat(in.getValueType(), is(ValueType.NULL));
 					break;
 				default:
 					// Do nothing

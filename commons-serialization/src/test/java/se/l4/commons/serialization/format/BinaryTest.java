@@ -286,13 +286,20 @@ public class BinaryTest
 			{
 				case KEY:
 				case VALUE:
-				case NULL:
 					if(i == values.length)
 					{
 						fail("Did not expect more values, but got " + in.getValue());
 					}
 
-					assertThat(values[i++], is(in.getValue()));
+					assertThat(in.getValue(), is(values[i++]));
+					break;
+				case NULL:
+					if(i == values.length)
+					{
+						fail("Did not expect more values, but got " + in.getValue());
+					}
+					i++; // consume the value
+					assertThat(in.getValueType(), is(ValueType.NULL));
 					break;
 				default:
 					// Do nothing

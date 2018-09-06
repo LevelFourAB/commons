@@ -3,6 +3,8 @@ package se.l4.commons.serialization.format;
 import java.io.Closeable;
 import java.io.IOException;
 
+import se.l4.commons.serialization.SerializationException;
+
 /**
  * Input that is streamed as a set of token with values.
  *
@@ -64,6 +66,20 @@ public interface StreamingInput
 	 * @return
 	 */
 	Token current();
+
+	/**
+	 * Get the type of value the input currently has. If the
+	 * {@link #current() current token} is not {@link Token#VALUE} or
+	 * {@link Token#NULL} this method will raise a
+	 * {@link SerializationException}.
+	 *
+	 * @return
+	 *   current type of value
+	 */
+	default ValueType getValueType()
+	{
+		throw new UnsupportedOperationException("StreamingInput implementation does not extend AbstractStreamingInput and does not override getValueType()");
+	}
 
 	/**
 	 * Get the current value.
