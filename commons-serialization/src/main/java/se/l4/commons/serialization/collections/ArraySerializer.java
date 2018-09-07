@@ -92,4 +92,15 @@ public class ArraySerializer
 	{
 		return formatDefinition;
 	}
+
+	/**
+	 * Helper for calculating the size of the array when it needs to grow.
+	 *
+	 * @param currentSize
+	 *   the current size of the array
+	 */
+	public static int growArray(int currentSize)
+	{
+		return currentSize + (currentSize >> 1);
+	}
 }
