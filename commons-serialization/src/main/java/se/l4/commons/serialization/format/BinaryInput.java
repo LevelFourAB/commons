@@ -4,6 +4,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.google.common.io.ByteStreams;
+
 /**
  * Input for binary format.
  *
@@ -201,12 +203,7 @@ public class BinaryInput
 	{
 		int length = readInteger();
 		byte[] buffer = new byte[length];
-		int read = in.read(buffer);
-
-		if(read != length)
-		{
-			throw new EOFException("Stream ended before entire byte array was sent");
-		}
+		ByteStreams.readFully(in, buffer);
 
 		return buffer;
 	}
