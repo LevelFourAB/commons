@@ -118,7 +118,6 @@ public class AnnotatedTypeEmulation
 			return getAnnotations();
 		}
 
-		@Override
 		public AnnotatedType getAnnotatedOwnerType()
 		{
 			return null;

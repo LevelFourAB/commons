@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import se.l4.commons.types.reflect.TypeUsage;
@@ -27,6 +28,12 @@ public class TypeUsageImpl
 	public Annotation[] getAnnotations()
 	{
 		return annotations;
+	}
+
+	@Override
+	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	{
+		return getAnnotation(annotationClass);
 	}
 
 	@Override

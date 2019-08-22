@@ -196,4 +196,18 @@ public interface TypeRef
 	 * @return
 	 */
 	<T> Optional<T> find(@NonNull Function<TypeRef, Optional<T>> finder);
+
+	/**
+	 * Get the public fields in this type.
+	 *
+	 * @return
+	 */
+	List<FieldRef> getFields();
+
+	/**
+	 * Get all the public methods in this type.
+	 *
+	 * @return
+	 */
+	List<MethodRef> getMethods();
 }

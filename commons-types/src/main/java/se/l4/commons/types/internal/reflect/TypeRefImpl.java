@@ -15,6 +15,8 @@ import java.util.function.Function;
 
 import com.google.common.collect.ImmutableList;
 
+import se.l4.commons.types.reflect.FieldRef;
+import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.commons.types.reflect.TypeUsage;
 
@@ -103,13 +105,7 @@ public class TypeRefImpl
 	@Override
 	public Optional<TypeRef> getTypeParameter(int index)
 	{
-		List<TypeRef> resolved = typeBindings.getResolvedTypeVariables();
-		if(index < resolved.size())
-		{
-			return Optional.of(resolved.get(index));
-		}
-
-		return Optional.empty();
+		return typeBindings.getBinding(index);
 	}
 
 	@Override
@@ -122,6 +118,12 @@ public class TypeRefImpl
 	public Annotation[] getAnnotations()
 	{
 		return erasedType.getAnnotations();
+	}
+
+	@Override
+	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	{
+		return find(tr -> tr.getAnnotation(annotationClass));
 	}
 
 	@Override
@@ -308,6 +310,22 @@ public class TypeRefImpl
 		}
 
 		return Optional.empty();
+	}
+
+	@Override
+	public List<FieldRef> getFields()
+	{
+		return Arrays.stream(erasedType.getFields())
+			.map(f -> TypeHelperImpl.resolveField(this, f, typeBindings))
+			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public List<MethodRef> getMethods()
+	{
+		return Arrays.stream(erasedType.getMethods())
+			.map(m -> TypeHelperImpl.resolveMethod(this, m, typeBindings))
+			.collect(ImmutableList.toImmutableList());
 	}
 
 	@Override

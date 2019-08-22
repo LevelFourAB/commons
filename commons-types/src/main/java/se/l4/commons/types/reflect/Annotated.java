@@ -58,4 +58,28 @@ public interface Annotated
 
 		return Optional.empty();
 	}
+
+	/**
+	 * Find an annotation. Depending on the type of object that is annotated
+	 * this will perform different things.
+	 *
+	 * <ul>
+	 *   <li>
+	 *     For a {@link TypeRef} it will look through interfaces and
+	 *     superclasses until an instance of the annotation is found.
+	 *   <li>
+	 *     For a {@link FieldRef} it will only search through annotations
+	 *     directly present.
+	 *   <li>
+	 *     For a {@link MethodRef} it will search through interfaces and
+	 *     superclasses and if the method is present will return the first
+	 *     annotation seen.
+	 * </ul>
+	 *
+	 *
+	 * @param <T>
+	 * @param annotationClass
+	 * @return
+	 */
+	<T extends Annotation> Optional<T> findAnnotation(@NonNull Class<T> annotationClass);
 }

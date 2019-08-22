@@ -46,6 +46,16 @@ public class TypeRefBindings
 		return typeVariables;
 	}
 
+	public Optional<TypeRef> getBinding(int index)
+	{
+		if(index < resolvedTypeVariables.size())
+		{
+			return Optional.of(resolvedTypeVariables.get(index));
+		}
+
+		return Optional.empty();
+	}
+
 	public Optional<TypeRef> getBinding(String name)
 	{
 		for(int i=0, n=typeVariables.size(); i<n; i++)
@@ -82,6 +92,17 @@ public class TypeRefBindings
 		}
 
 		return resolvedTypeVariables.equals(((TypeRefBindings) obj).resolvedTypeVariables);
+	}
+
+	public TypeRefBindings with(
+		TypeVariable<?>[] typeVariables,
+		TypeRef[] resolvedVariables
+	)
+	{
+		return new TypeRefBindings(
+			ImmutableList.<TypeVariable<?>>builder().addAll(this.typeVariables).add(typeVariables).build(),
+			ImmutableList.<TypeRef>builder().addAll(this.resolvedTypeVariables).add(resolvedVariables).build()
+		);
 	}
 
 	public static TypeRefBindings createUnresolved(

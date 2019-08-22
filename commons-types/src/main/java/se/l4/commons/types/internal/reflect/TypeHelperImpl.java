@@ -6,8 +6,10 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.AnnotatedTypeVariable;
 import java.lang.reflect.AnnotatedWildcardType;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -16,6 +18,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
+import se.l4.commons.types.reflect.FieldRef;
+import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
@@ -180,6 +184,35 @@ public class TypeHelperImpl
 		return Arrays.stream(types)
 			.map(at -> resolve(at, bindings))
 			.toArray(TypeRef[]::new);
+	}
+
+	/**
+	 * Resolve a field in a type.
+	 */
+	public static FieldRef resolveField(TypeRef parent, Field field, TypeRefBindings typeBindings)
+	{
+		return new FieldRefImpl(field, typeBindings);
+	}
+
+	/**
+	 * Resolve a method in a type.
+	 */
+	public static MethodRef resolveMethod(TypeRef parent, Method method, TypeRefBindings typeBindings)
+	{
+		TypeVariable<?>[] variables = method.getTypeParameters();
+		if(variables.length > 0)
+		{
+			TypeRef[] typeArguments = resolveAll(
+				Arrays.stream(variables)
+					.map(AnnotatedTypeEmulation::annotate)
+					.toArray(AnnotatedType[]::new),
+				typeBindings
+			);
+
+			typeBindings = typeBindings.with(variables, typeArguments);
+		}
+
+		return new MethodRefImpl(parent, method, typeBindings);
 	}
 
 	/**
