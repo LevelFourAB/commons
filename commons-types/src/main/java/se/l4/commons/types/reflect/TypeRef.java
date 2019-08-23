@@ -188,6 +188,12 @@ public interface TypeRef
 	Optional<TypeRef> findInterface(@NonNull Class<?> type);
 
 	/**
+	 * Perform a search for the given interface or superclass.
+	 */
+	@NonNull
+	Optional<TypeRef> findSuperclassOrInterface(@NonNull Class<?> type);
+
+	/**
 	 * Perform a search over this type hierarchy, returning the value of the
 	 * first optional that is not empty.
 	 *

@@ -266,6 +266,14 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public Optional<TypeRef> findSuperclassOrInterface(Class<?> type)
+	{
+		Objects.requireNonNull(type);
+
+		return find(tr -> tr.getErasedType() == type ? Optional.of(tr) : Optional.empty());
+	}
+
+	@Override
 	public <T> Optional<T> find(Function<TypeRef, Optional<T>> finder)
 	{
 		Objects.requireNonNull(finder);
