@@ -13,16 +13,26 @@ import se.l4.commons.types.reflect.TypeRef;
 public class FieldRefImpl
 	implements FieldRef
 {
+	private final TypeRef parent;
 	private final Field field;
 	private final TypeRefBindings typeBindings;
 
 	public FieldRefImpl(
+		TypeRef parent,
 		Field field,
 		TypeRefBindings typeBindings
 	)
 	{
+		this.parent = parent;
 		this.field = field;
 		this.typeBindings = typeBindings;
+	}
+
+	@Override
+	public TypeRef getDeclaringType()
+	{
+		Class<?> declaring = field.getDeclaringClass();
+		return parent.findSuperclassOrInterface(declaring).get();
 	}
 
 	@Override

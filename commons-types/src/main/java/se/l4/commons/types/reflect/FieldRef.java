@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
  * {@link TypeRef} and helps with resolving generics.
  */
 public interface FieldRef
-	extends Annotated
+	extends MemberRef
 {
 	/**
 	 * Get the underlying field.

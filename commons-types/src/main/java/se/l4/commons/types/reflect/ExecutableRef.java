@@ -10,7 +10,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * Reference to {@link Executable}.
  */
 public interface ExecutableRef
-	extends Annotated
+	extends MemberRef
 {
 	/**
 	 * Get all of the parameter names that are available for this type.

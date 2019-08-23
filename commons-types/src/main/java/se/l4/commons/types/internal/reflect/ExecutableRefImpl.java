@@ -17,7 +17,7 @@ import se.l4.commons.types.reflect.TypeRef;
 public abstract class ExecutableRefImpl
 	implements ExecutableRef
 {
-	private final TypeRef parent;
+	protected final TypeRef parent;
 	private final Executable executable;
 	private final TypeRefBindings typeBindings;
 

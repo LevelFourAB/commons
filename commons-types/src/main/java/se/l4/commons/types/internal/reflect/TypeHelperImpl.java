@@ -191,7 +191,7 @@ public class TypeHelperImpl
 	 */
 	public static FieldRef resolveField(TypeRef parent, Field field, TypeRefBindings typeBindings)
 	{
-		return new FieldRefImpl(field, typeBindings);
+		return new FieldRefImpl(parent, field, typeBindings);
 	}
 
 	/**

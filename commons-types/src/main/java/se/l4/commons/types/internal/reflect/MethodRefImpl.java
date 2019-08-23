@@ -23,8 +23,21 @@ public class MethodRefImpl
 	}
 
 	@Override
+	public TypeRef getDeclaringType()
+	{
+		Class<?> declaring = method.getDeclaringClass();
+		return parent.findSuperclassOrInterface(declaring).get();
+	}
+
+	@Override
 	public Method getMethod()
 	{
 		return method;
+	}
+
+	@Override
+	public String getName()
+	{
+		return method.getName();
 	}
 }
