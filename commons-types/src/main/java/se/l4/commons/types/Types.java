@@ -12,6 +12,8 @@ import com.fasterxml.classmate.types.ResolvedArrayType;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import se.l4.commons.types.internal.reflect.TypeHelperImpl;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Helpers and utilities related to working with types. This class provides
@@ -25,6 +27,12 @@ public class Types
 
 	private Types()
 	{
+	}
+
+	@NonNull
+	public static TypeRef reference(@NonNull Type type, @NonNull Type... typeParameters)
+	{
+		return TypeHelperImpl.reference(type, typeParameters);
 	}
 
 	/**
