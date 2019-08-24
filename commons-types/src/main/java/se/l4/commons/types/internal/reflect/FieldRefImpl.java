@@ -2,6 +2,7 @@ package se.l4.commons.types.internal.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Optional;
 
 import se.l4.commons.types.reflect.FieldRef;
@@ -65,4 +66,33 @@ public class FieldRefImpl
 		return field.getName();
 	}
 
+	@Override
+	public int getModifiers()
+	{
+		return field.getModifiers();
+	}
+
+	@Override
+	public boolean isStatic()
+	{
+		return Modifier.isStatic(getModifiers());
+	}
+
+	@Override
+	public boolean isFinal()
+	{
+		return Modifier.isFinal(getModifiers());
+	}
+
+	@Override
+	public boolean isTransient()
+	{
+		return Modifier.isTransient(getModifiers());
+	}
+
+	@Override
+	public boolean isVolatile()
+	{
+		return Modifier.isVolatile(getModifiers());
+	}
 }

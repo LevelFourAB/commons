@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -167,6 +168,36 @@ public class TypeRefImpl
 		}
 
 		return true;
+	}
+
+	@Override
+	public int getModifiers()
+	{
+		return erasedType.getModifiers();
+	}
+
+	@Override
+	public boolean isAbstract()
+	{
+		return Modifier.isAbstract(getModifiers());
+	}
+
+	@Override
+	public boolean isStatic()
+	{
+		return Modifier.isStatic(getModifiers());
+	}
+
+	@Override
+	public boolean isFinal()
+	{
+		return Modifier.isFinal(getModifiers());
+	}
+
+	@Override
+	public boolean isStrict()
+	{
+		return Modifier.isStrict(getModifiers());
 	}
 
 	@Override

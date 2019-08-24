@@ -13,7 +13,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * working with generics.
  */
 public interface TypeRef
-	extends Annotated
+	extends Annotated, Modifiers
 {
 	/**
 	 * Get the underlying type.
@@ -104,6 +104,33 @@ public interface TypeRef
 	 */
 	@NonNull
 	Optional<TypeRef> getTypeParameter(String name);
+
+	/**
+	 * Get if this type is abstract.
+	 *
+	 * @return
+	 */
+	boolean isAbstract();
+
+	/**
+	 * Get if this type is static. Interfaces and classes may be static when
+	 * they are declared inside another class.
+	 *
+	 * @return
+	 */
+	boolean isStatic();
+
+	/**
+	 * Get if the type is final.
+	 *
+	 * @return
+	 */
+	boolean isFinal();
+
+	/**
+	 * Get if this type uses strict floating point math.
+	 */
+	boolean isStrict();
 
 	/**
 	 * Get if this type is an interface.

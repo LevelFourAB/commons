@@ -43,4 +43,10 @@ public class ConstructorRefImpl
 	{
 		return constructor.getName();
 	}
+
+	@Override
+	public int getModifiers()
+	{
+		return constructor.getModifiers();
+	}
 }

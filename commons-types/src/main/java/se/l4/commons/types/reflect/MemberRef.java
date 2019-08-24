@@ -5,7 +5,7 @@ package se.l4.commons.types.reflect;
  * or {@link MethodRef}.
  */
 public interface MemberRef
-	extends Annotated
+	extends Annotated, Modifiers
 {
 	/**
 	 * Get the declaring type.

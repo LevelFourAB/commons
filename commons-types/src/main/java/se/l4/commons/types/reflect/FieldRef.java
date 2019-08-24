@@ -27,4 +27,33 @@ public interface FieldRef
 	 * @return
 	 */
 	String getName();
+
+	/**
+	 * Get if this field is static.
+	 *
+	 * @return
+	 */
+	boolean isStatic();
+
+	/**
+	 * Get if this field is final.
+	 *
+	 * @return
+	 */
+	boolean isFinal();
+
+	/**
+	 * Get if this field is transient.
+	 *
+	 * @return
+	 */
+	boolean isTransient();
+
+	/**
+	 * Get if this field is volatile.
+	 *
+	 * @return
+	 */
+	boolean isVolatile();
+
 }
