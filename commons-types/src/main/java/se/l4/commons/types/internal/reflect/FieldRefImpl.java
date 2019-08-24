@@ -101,4 +101,16 @@ public class FieldRefImpl
 	{
 		return Modifier.isVolatile(getModifiers());
 	}
+
+	@Override
+	public String toString()
+	{
+		return "FieldRef{" + field.getName() + "}";
+	}
+
+	@Override
+	public String toDescription()
+	{
+		return getType().toTypeName() + " " + field.getName();
+	}
 }

@@ -28,4 +28,9 @@ public interface MemberRef
 	 * @return
 	 */
 	boolean isSynthetic();
+
+	/**
+	 * Get a description for this this member.
+	 */
+	String toDescription();
 }

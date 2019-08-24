@@ -1,6 +1,7 @@
 package se.l4.commons.types.internal.reflect;
 
 import java.lang.reflect.Constructor;
+import java.util.stream.Collectors;
 
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -41,5 +42,16 @@ public class ConstructorRefImpl
 	public int getModifiers()
 	{
 		return constructor.getModifiers();
+	}
+
+	@Override
+	public String toDescription()
+	{
+		return parent.toTypeName() + "(" +
+			getParameterTypes()
+				.stream()
+				.map(t -> t.toTypeName())
+				.collect(Collectors.joining(", "))
+			+ ")";
 	}
 }

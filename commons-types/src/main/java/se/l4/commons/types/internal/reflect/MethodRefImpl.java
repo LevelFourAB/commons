@@ -2,6 +2,7 @@ package se.l4.commons.types.internal.reflect;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.stream.Collectors;
 
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -94,5 +95,17 @@ public class MethodRefImpl
 	public boolean isDefault()
 	{
 		return method.isDefault();
+	}
+
+	@Override
+	public String toDescription()
+	{
+		return getReturnType().toTypeName() + " "
+		 	+ getName() + "(" +
+			getParameterTypes()
+				.stream()
+				.map(t -> t.toTypeName())
+				.collect(Collectors.joining(", "))
+			+ ")";
 	}
 }

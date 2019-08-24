@@ -608,7 +608,7 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public String toString()
+	public String toTypeDescription()
 	{
 		StringBuilder builder = new StringBuilder();
 		builder.append(usage.toString());
@@ -621,5 +621,11 @@ public class TypeRefImpl
 		toTypeName(builder);
 
 		return builder.toString();
+	}
+
+	@Override
+	public String toString()
+	{
+		return "TypeRef{" + toTypeDescription() + "}";
 	}
 }

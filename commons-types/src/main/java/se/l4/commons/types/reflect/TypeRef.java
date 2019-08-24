@@ -29,6 +29,13 @@ public interface TypeRef
 	String toTypeName();
 
 	/**
+	 * Get a type description for this type, including information about the
+	 * usage of the type.
+	 */
+	@NonNull
+	String toTypeDescription();
+
+	/**
 	 * Get information about how this type was used. Contains information about
 	 * annotations present at the location the type was resolved from.
 	 *
