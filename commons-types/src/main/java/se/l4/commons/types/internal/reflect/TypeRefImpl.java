@@ -7,11 +7,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 
@@ -278,46 +282,52 @@ public class TypeRefImpl
 	{
 		Objects.requireNonNull(finder);
 
-		Set<Class<?>> visited = new HashSet<>();
-		return find(visited, finder, this);
+		AtomicReference<Optional<T>> result = new AtomicReference<>(Optional.empty());
+		visit(type -> {
+			Optional<T> found = finder.apply(type);
+			if(found.isPresent())
+			{
+				result.set(found);
+
+				// Stop the search
+				return false;
+			}
+
+			// Continue the search
+			return true;
+		});
+
+		return result.get();
 	}
 
-	private <T> Optional<T> find(
-		Set<Class<?>> visited,
-		Function<TypeRef, Optional<T>> finder,
-		TypeRefImpl type
-	)
+	private void visit(Predicate<TypeRef> visitor)
 	{
-		if(visited.contains(type.getErasedType()))
-		{
-			return Optional.empty();
-		}
+		Queue<TypeRef> queue = new LinkedList<>();
+		Set<Class<?>> visited = new HashSet<>();
 
-		Optional<T> matches = finder.apply(type);
-		if(matches.isPresent())
-		{
-			return matches;
-		}
+		queue.add(this);
 
-		visited.add(type.getErasedType());
-
-		for(AnnotatedType at : type.getErasedType().getAnnotatedInterfaces())
+		while(! queue.isEmpty())
 		{
-			TypeRefImpl tr = (TypeRefImpl) TypeHelperImpl.resolve(at, type.typeBindings);
-			matches = find(visited, finder, tr);
-			if(matches.isPresent())
+			TypeRef type = queue.poll();
+			if(! visitor.test(type))
 			{
-				return matches;
+				return;
+			}
+
+			for(TypeRef interfaceRef : type.getInterfaces())
+			{
+				if(! visited.add(interfaceRef.getErasedType())) continue;
+
+				queue.add(interfaceRef);
+			}
+
+			Optional<TypeRef> superclass = type.getSuperclass();
+			if(superclass.isPresent() && visited.add(superclass.get().getErasedType()))
+			{
+				queue.add(superclass.get());
 			}
 		}
-
-		Optional<TypeRef> superclass = type.getSuperclass();
-		if(superclass.isPresent())
-		{
-			return find(visited, finder, (TypeRefImpl) superclass.get());
-		}
-
-		return Optional.empty();
 	}
 
 	@Override
