@@ -6,6 +6,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.AnnotatedTypeVariable;
 import java.lang.reflect.AnnotatedWildcardType;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.GenericDeclaration;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
+import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -189,16 +191,18 @@ public class TypeHelperImpl
 	/**
 	 * Resolve a field in a type.
 	 */
-	public static FieldRef resolveField(TypeRef parent, Field field, TypeRefBindings typeBindings)
+	public static FieldRef resolveField(TypeRefImpl parent, Field field)
 	{
-		return new FieldRefImpl(parent, field, typeBindings);
+		return new FieldRefImpl(parent, field, parent.getTypeBindings());
 	}
 
 	/**
 	 * Resolve a method in a type.
 	 */
-	public static MethodRef resolveMethod(TypeRef parent, Method method, TypeRefBindings typeBindings)
+	public static MethodRef resolveMethod(TypeRefImpl parent, Method method)
 	{
+		TypeRefBindings typeBindings = parent.getTypeBindings();
+
 		TypeVariable<?>[] variables = method.getTypeParameters();
 		if(variables.length > 0)
 		{
@@ -213,6 +217,29 @@ public class TypeHelperImpl
 		}
 
 		return new MethodRefImpl(parent, method, typeBindings);
+	}
+
+	/**
+	 * Resolve a constructor.
+	 */
+	public static ConstructorRef resolveConstructor(TypeRefImpl parent, Constructor<?> constructor)
+	{
+		TypeRefBindings typeBindings = parent.getTypeBindings();
+
+		TypeVariable<?>[] variables = constructor.getTypeParameters();
+		if(variables.length > 0)
+		{
+			TypeRef[] typeArguments = resolveAll(
+				Arrays.stream(variables)
+					.map(AnnotatedTypeEmulation::annotate)
+					.toArray(AnnotatedType[]::new),
+				typeBindings
+			);
+
+			typeBindings = typeBindings.with(variables, typeArguments);
+		}
+
+		return new ConstructorRefImpl(parent, constructor, typeBindings);
 	}
 
 	/**

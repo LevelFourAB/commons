@@ -2,7 +2,10 @@ package se.l4.commons.types.internal.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -19,6 +22,7 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 
+import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -46,6 +50,14 @@ public class TypeRefImpl
 		this.erasedType = TypeHelperImpl.getErasedType(type);
 		this.typeBindings = typeBindings;
 		this.usage = typeUsage;
+	}
+
+	/**
+	 * Get the bindings of this type.
+	 */
+	public TypeRefBindings getTypeBindings()
+	{
+		return typeBindings;
 	}
 
 	@Override
@@ -334,18 +346,169 @@ public class TypeRefImpl
 	public List<FieldRef> getFields()
 	{
 		return Arrays.stream(erasedType.getFields())
-			.map(f -> TypeHelperImpl.resolveField(this, f, typeBindings))
+			.map(f -> TypeHelperImpl.resolveField(this, f))
 			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public Optional<FieldRef> getField(String name)
+	{
+		try
+		{
+			Field field = erasedType.getField(name);
+			return Optional.of(TypeHelperImpl.resolveField(this, field));
+		}
+		catch(NoSuchFieldException e)
+		{
+			return Optional.empty();
+		}
 	}
 
 	@Override
 	public List<MethodRef> getMethods()
 	{
 		return Arrays.stream(erasedType.getMethods())
-			.map(m -> TypeHelperImpl.resolveMethod(this, m, typeBindings))
+			.map(m -> TypeHelperImpl.resolveMethod(this, m))
 			.collect(ImmutableList.toImmutableList());
 	}
 
+	@Override
+	public Optional<MethodRef> getMethod(String name, Class<?>... parameterTypes)
+	{
+		try
+		{
+			Method method = erasedType.getMethod(name, parameterTypes);
+			return Optional.of(TypeHelperImpl.resolveMethod(this, method));
+		}
+		catch(NoSuchMethodException e)
+		{
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<MethodRef> getMethod(String name, TypeRef... parameterTypes)
+	{
+		return getMethod(name, Arrays.stream(parameterTypes)
+			.map(TypeRef::getErasedType)
+			.toArray(Class[]::new)
+		);
+	}
+
+	@Override
+	public List<ConstructorRef> getConstructors()
+	{
+		return Arrays.stream(erasedType.getConstructors())
+			.map(m -> TypeHelperImpl.resolveConstructor(this, m))
+			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public Optional<ConstructorRef> getConstructor(Class<?>... parameterTypes)
+	{
+		try
+		{
+			Constructor<?> constructor = erasedType.getConstructor(parameterTypes);
+			return Optional.of(TypeHelperImpl.resolveConstructor(this, constructor));
+		}
+		catch(NoSuchMethodException e)
+		{
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<ConstructorRef> getConstructor(TypeRef... parameterTypes)
+	{
+		return getConstructor(Arrays.stream(parameterTypes)
+			.map(TypeRef::getErasedType)
+			.toArray(Class[]::new)
+		);
+	}
+
+	@Override
+	public List<FieldRef> getDeclaredFields()
+	{
+		return Arrays.stream(erasedType.getDeclaredFields())
+			.map(f -> TypeHelperImpl.resolveField(this, f))
+			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public Optional<FieldRef> getDeclaredField(String name)
+	{
+		try
+		{
+			Field field = erasedType.getDeclaredField(name);
+			return Optional.of(TypeHelperImpl.resolveField(this, field));
+		}
+		catch(NoSuchFieldException e)
+		{
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public List<MethodRef> getDeclaredMethods()
+	{
+		return Arrays.stream(erasedType.getDeclaredMethods())
+			.map(m -> TypeHelperImpl.resolveMethod(this, m))
+			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public Optional<MethodRef> getDeclaredMethod(String name, Class<?>... parameterTypes)
+	{
+		try
+		{
+			Method method = erasedType.getDeclaredMethod(name, parameterTypes);
+			return Optional.of(TypeHelperImpl.resolveMethod(this, method));
+		}
+		catch(NoSuchMethodException e)
+		{
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<MethodRef> getDeclaredMethod(String name, TypeRef... parameterTypes)
+	{
+		return getMethod(name, Arrays.stream(parameterTypes)
+			.map(TypeRef::getErasedType)
+			.toArray(Class[]::new)
+		);
+	}
+
+	@Override
+	public List<ConstructorRef> getDeclaredConstructors()
+	{
+		return Arrays.stream(erasedType.getDeclaredConstructors())
+			.map(m -> TypeHelperImpl.resolveConstructor(this, m))
+			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public Optional<ConstructorRef> getDeclaredConstructor(Class<?>... parameterTypes)
+	{
+		try
+		{
+			Constructor<?> constructor = erasedType.getDeclaredConstructor(parameterTypes);
+			return Optional.of(TypeHelperImpl.resolveConstructor(this, constructor));
+		}
+		catch(NoSuchMethodException e)
+		{
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<ConstructorRef> getDeclaredConstructor(TypeRef... parameterTypes)
+	{
+		return getConstructor(Arrays.stream(parameterTypes)
+			.map(TypeRef::getErasedType)
+			.toArray(Class[]::new)
+		);
+	}
 	@Override
 	public String toTypeName()
 	{

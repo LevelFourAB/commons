@@ -201,6 +201,7 @@ public interface TypeRef
 	 * @param finder
 	 * @return
 	 */
+	@NonNull
 	<T> Optional<T> find(@NonNull Function<TypeRef, Optional<T>> finder);
 
 	/**
@@ -208,12 +209,152 @@ public interface TypeRef
 	 *
 	 * @return
 	 */
+	@NonNull
 	List<FieldRef> getFields();
+
+	/**
+	 * Get a public field with the given name.
+	 *
+	 * @param name
+	 * @return
+	 */
+	@NonNull
+	Optional<FieldRef> getField(@NonNull String name);
 
 	/**
 	 * Get all the public methods in this type.
 	 *
 	 * @return
 	 */
+	@NonNull
 	List<MethodRef> getMethods();
+
+	/**
+	 * Get a public method with the given name and parameter types.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<MethodRef> getMethod(@NonNull String name, @NonNull Class<?>... parameterTypes);
+
+	/**
+	 * Get a public method with the given name and parameter types. This
+	 * method will use the {@link TypeRef#getErasedType()} to find the method.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<MethodRef> getMethod(@NonNull String name, @NonNull TypeRef... parameterTypes);
+
+	/**
+	 * Get all the public constructors in this type.
+	 *
+	 * @return
+	 */
+	@NonNull
+	List<ConstructorRef> getConstructors();
+
+	/**
+	 * Get a public constructor with the given parameter types.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<ConstructorRef> getConstructor(@NonNull Class<?>... parameterTypes);
+
+	/**
+	 * Get a public constructor with the given parameter types. This method
+	 * will use the {@link TypeRef#getErasedType()} to find the constructor.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<ConstructorRef> getConstructor(@NonNull TypeRef... parameterTypes);
+
+	/**
+	 * Get the all fields declared by this type.
+	 *
+	 * @return
+	 */
+	@NonNull
+	List<FieldRef> getDeclaredFields();
+
+	/**
+	 * Get a specific field declared by this type.
+	 *
+	 * @param name
+	 * @return
+	 */
+	@NonNull
+	Optional<FieldRef> getDeclaredField(@NonNull String name);
+
+	/**
+	 * Get all methods declared by this type.
+	 *
+	 * @return
+	 */
+	@NonNull
+	List<MethodRef> getDeclaredMethods();
+
+	/**
+	 * Get a specific method declared by this type with the given name and
+	 * parameter types.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<MethodRef> getDeclaredMethod(@NonNull String name, @NonNull Class<?>... parameterTypes);
+
+	/**
+	 * Get a specific method declared by this type with the given name and
+	 * parameter types. This method will use the {@link TypeRef#getErasedType()}
+	 * to find the method.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<MethodRef> getDeclaredMethod(@NonNull String name, @NonNull TypeRef... parameterTypes);
+
+	/**
+	 * Get all the constructors declared by this type.
+	 *
+	 * @return
+	 */
+	@NonNull
+	List<ConstructorRef> getDeclaredConstructors();
+
+	/**
+	 * Get a constructor declared by this this type with the given type
+	 * parameters.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<ConstructorRef> getDeclaredConstructor(@NonNull Class<?>... parameterTypes);
+
+	/**
+	 * Get a specific constructor declared by this type with the given
+	 * parameter types. This method will use the {@link TypeRef#getErasedType()}
+	 * to find the constructor.
+	 *
+	 * @param name
+	 * @param parameterTypes
+	 * @return
+	 */
+	@NonNull
+	Optional<ConstructorRef> getDeclaredConstructor(@NonNull TypeRef... parameterTypes);
 }
