@@ -69,6 +69,13 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
+	public TypeRef getDeclaringType()
+	{
+		Class<?> declaring = executable.getDeclaringClass();
+		return parent.findSuperclassOrInterface(declaring).get();
+	}
+
+	@Override
 	public TypeRef getReturnType()
 	{
 		return TypeHelperImpl.resolve(
@@ -100,5 +107,17 @@ public abstract class ExecutableRefImpl
 		return Arrays.stream(executable.getAnnotatedExceptionTypes())
 			.map(a -> TypeHelperImpl.resolve(a, typeBindings))
 			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public boolean isSynthetic()
+	{
+		return executable.isSynthetic();
+	}
+
+	@Override
+	public boolean isVarArgs()
+	{
+		return executable.isVarArgs();
 	}
 }

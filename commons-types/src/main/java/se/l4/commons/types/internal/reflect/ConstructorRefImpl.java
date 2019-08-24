@@ -26,13 +26,6 @@ public class ConstructorRefImpl
 	}
 
 	@Override
-	public TypeRef getDeclaringType()
-	{
-		Class<?> declaring = constructor.getDeclaringClass();
-		return parent.findSuperclassOrInterface(declaring).get();
-	}
-
-	@Override
 	public Constructor<?> getConstructor()
 	{
 		return constructor;

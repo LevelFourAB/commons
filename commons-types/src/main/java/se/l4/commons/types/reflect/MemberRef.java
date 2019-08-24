@@ -16,6 +16,16 @@ public interface MemberRef
 
 	/**
 	 * Get the name of the member.
+	 *
+	 * @return
 	 */
 	String getName();
+
+	/**
+	 * Get if this member is synthetic, in which case it was introduced by
+	 * the compiler.
+	 *
+	 * @return
+	 */
+	boolean isSynthetic();
 }

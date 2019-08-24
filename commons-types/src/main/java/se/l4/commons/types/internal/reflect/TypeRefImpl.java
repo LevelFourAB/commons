@@ -225,6 +225,36 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public boolean isAnonymousClass()
+	{
+		return erasedType.isAnonymousClass();
+	}
+
+	@Override
+	public boolean isLocalClass()
+	{
+		return erasedType.isLocalClass();
+	}
+
+	@Override
+	public boolean isMemberClass()
+	{
+		return erasedType.isMemberClass();
+	}
+
+	@Override
+	public boolean isPrimitive()
+	{
+		return erasedType.isPrimitive();
+	}
+
+	@Override
+	public boolean isSynthetic()
+	{
+		return erasedType.isSynthetic();
+	}
+
+	@Override
 	public Class<?> getErasedType()
 	{
 		return erasedType;

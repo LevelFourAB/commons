@@ -37,6 +37,12 @@ public class FieldRefImpl
 	}
 
 	@Override
+	public boolean isSynthetic()
+	{
+		return field.isSynthetic();
+	}
+
+	@Override
 	public Field getField()
 	{
 		return field;

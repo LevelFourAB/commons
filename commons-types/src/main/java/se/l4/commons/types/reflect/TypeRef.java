@@ -141,18 +141,59 @@ public interface TypeRef
 
 	/**
 	 * Get if this type is an array.
+	 *
+	 * @return
 	 */
 	boolean isArray();
 
 	/**
 	 * Get if this type is an enumeration.
+	 *
+	 * @return
 	 */
 	boolean isEnum();
 
 	/**
 	 * Get if this type is an annotation.
+	 *
+	 * @return
 	 */
 	boolean isAnnotation();
+
+	/**
+	 * Get if this type is an anonymous class.
+	 *
+	 * @return
+	 */
+	boolean isAnonymousClass();
+
+	/**
+	 * Get if this type is a local class.
+	 *
+	 * @return
+	 */
+	boolean isLocalClass();
+
+	/**
+	 * Get if this type is a member class.
+	 *
+	 * @return
+	 */
+	boolean isMemberClass();
+
+	/**
+	 * Get if this type is a primitive class.
+	 *
+	 * @return
+	 */
+	boolean isPrimitive();
+
+	/**
+	 * Get if this type is a synthetic class.
+	 *
+	 * @return
+	 */
+	boolean isSynthetic();
 
 	/**
 	 * Get the {@link Class} this type is when type information has been erased.

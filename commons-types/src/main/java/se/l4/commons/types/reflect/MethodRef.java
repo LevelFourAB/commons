@@ -55,4 +55,18 @@ public interface MethodRef
 	 * @return
 	 */
 	boolean isStrict();
+
+	/**
+	 * Get if this is a bridge method.
+	 *
+	 * @return
+	 */
+	boolean isBridge();
+
+	/**
+	 * Get if this is a default method.
+	 *
+	 * @return
+	 */
+	boolean isDefault();
 }

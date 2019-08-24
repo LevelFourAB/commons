@@ -66,4 +66,10 @@ public interface ExecutableRef
 	 * Get the exception types of this executable.
 	 */
 	List<TypeRef> getExceptionTypes();
+
+	/**
+	 * Get if this executable was declared to take a variable number of
+	 * arguments.
+	 */
+	boolean isVarArgs();
 }

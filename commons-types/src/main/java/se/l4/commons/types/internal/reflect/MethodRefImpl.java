@@ -83,4 +83,16 @@ public class MethodRefImpl
 	{
 		return Modifier.isStrict(getModifiers());
 	}
+
+	@Override
+	public boolean isBridge()
+	{
+		return method.isBridge();
+	}
+
+	@Override
+	public boolean isDefault()
+	{
+		return method.isDefault();
+	}
 }
