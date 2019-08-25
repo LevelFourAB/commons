@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 
 import se.l4.commons.types.reflect.ExecutableRef;
+import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
@@ -98,6 +99,14 @@ public abstract class ExecutableRefImpl
 	{
 		return Arrays.stream(executable.getAnnotatedParameterTypes())
 			.map(a -> TypeHelperImpl.resolve(a, typeBindings))
+			.collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public List<ParameterRef> getParameters()
+	{
+		return Arrays.stream(executable.getParameters())
+			.map(p -> new ParameterRefImpl(this, p, typeBindings))
 			.collect(ImmutableList.toImmutableList());
 	}
 

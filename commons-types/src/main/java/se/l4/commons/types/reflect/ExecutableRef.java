@@ -52,6 +52,13 @@ public interface ExecutableRef
 	List<TypeRef> getParameterTypes();
 
 	/**
+	 * Get the parameters of this executable.
+	 *
+	 * @return
+	 */
+	List<ParameterRef> getParameters();
+
+	/**
 	 * Get the receiver type of this executable. See {@link Executable#getAnnotatedReceiverType()}
 	 * for details.
 	 */
