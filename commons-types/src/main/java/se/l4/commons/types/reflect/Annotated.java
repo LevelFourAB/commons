@@ -50,7 +50,7 @@ public interface Annotated
 	{
 		for(Annotation a : getAnnotations())
 		{
-			if(annotationClass.isAssignableFrom(a.getClass()))
+			if(a.annotationType() == annotationClass)
 			{
 				return Optional.of((T) a);
 			}
