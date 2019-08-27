@@ -1,6 +1,7 @@
 package se.l4.commons.types;
 
 import java.lang.reflect.Type;
+import java.util.function.Predicate;
 
 import com.fasterxml.classmate.AnnotationConfiguration;
 import com.fasterxml.classmate.AnnotationOverrides;
@@ -12,6 +13,7 @@ import com.fasterxml.classmate.types.ResolvedArrayType;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import se.l4.commons.types.internal.TypeHierarchy;
 import se.l4.commons.types.internal.reflect.TypeHelperImpl;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -135,5 +137,19 @@ public class Types
 	)
 	{
 		return memberResolver.resolve(mainType, annotationConfig, annotationOverrides);
+	}
+
+	/**
+	 * Visit the hierarchy of the specified type. Will visit all interfaces,
+	 * directly or indirectly present, and the superclasses.
+	 *
+	 * @param visitor
+	 *   the visitor to apply to each item, should return {@code true} to
+	 *   continue visiting other parts of the hierarchy and {@code false} to
+	 *   abort the visiting
+	 */
+	public void visitHierarchy(Class<?> type, Predicate<Class<?>> visitor)
+	{
+		TypeHierarchy.visitHierarchy(type, visitor);
 	}
 }
