@@ -194,7 +194,7 @@ public abstract class AbstractTypeConverter
 		return 1;
 	}
 
-	private static class CacheKey
+	protected static class CacheKey
 	{
 		private Class<?> in;
 		private Class<?> out;
