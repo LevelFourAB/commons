@@ -45,15 +45,39 @@ public class TypeHelperImpl
 	 */
 	public static TypeRef reference(Type type, Type... parameters)
 	{
-		/*
-		 * Create emulated AnnotatedType instances for the type parameters
-		 * provided and use those for further resolving.
-		 */
-		return reference(
-			AnnotatedTypeEmulation.annotate(type),
-			Arrays.stream(parameters)
-				.map(AnnotatedTypeEmulation::annotate)
-				.toArray(AnnotatedType[]::new)
+		TypeRefBindings bindings;
+		if(type instanceof Class)
+		{
+			Class<?> c = (Class<?>) type;
+
+			TypeVariable<?>[] typeVariables = c.getTypeParameters();
+			TypeRef[] resolved = new TypeRef[typeVariables.length];
+			for(int i=0, n=typeVariables.length; i<n; i++)
+			{
+				TypeVariable<?> tv = typeVariables[i];
+
+				if(i < parameters.length)
+				{
+					// There are still parameters available
+					resolved[i] = reference(parameters[i]);
+				}
+				else
+				{
+					resolved[i] = reference(tv);
+				}
+			}
+
+			bindings = TypeRefBindings.create(typeVariables, resolved);
+		}
+		else
+		{
+			bindings = TypeRefBindings.empty();
+		}
+
+		return new TypeRefImpl(
+			type,
+			bindings,
+			TypeUsageImpl.empty()
 		);
 	}
 
