@@ -45,7 +45,19 @@ public interface ClassMatchingMap<T, D>
 	 *   optional containing data if there is direct match or empty optional
 	 */
 	@NonNull
-	Optional<D> get(@NonNull Class<? extends T> type, Function<Class<? extends T>, D> creator);
+	default Optional<D> get(@NonNull Class<? extends T> type, Function<Class<? extends T>, D> creator)
+	{
+		Optional<D> result = get(type);
+		if(! result.isPresent())
+		{
+			D created = creator.apply(type);
+			put(type, created);
+
+			return Optional.of(created);
+		}
+
+		return result;
+	}
 
 	/**
 	 * Get the best matching data for the given type.
