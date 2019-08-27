@@ -2,6 +2,7 @@ package se.l4.commons.types.matching;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -33,6 +34,18 @@ public interface ClassMatchingMap<T, D>
 	 */
 	@NonNull
 	Optional<D> get(@NonNull Class<? extends T> type);
+
+	/**
+	 * Get data directly associated with the given type or create it if it
+	 * there is no value present.
+	 *
+	 * @param type
+	 *   the type get data for
+	 * @return
+	 *   optional containing data if there is direct match or empty optional
+	 */
+	@NonNull
+	Optional<D> get(@NonNull Class<? extends T> type, Function<Class<? extends T>, D> creator);
 
 	/**
 	 * Get the best matching data for the given type.

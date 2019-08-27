@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
@@ -40,6 +41,14 @@ public abstract class AbstractClassMatchingMap<T, D>
 		Objects.requireNonNull(type);
 
 		return Optional.ofNullable(backingMap.get(type));
+	}
+
+	@Override
+	public Optional<D> get(Class<? extends T> type, Function<Class<? extends T>, D> creator)
+	{
+		Objects.requireNonNull(type);
+
+		return Optional.ofNullable(backingMap.computeIfAbsent(type, creator));
 	}
 
 	@Override
