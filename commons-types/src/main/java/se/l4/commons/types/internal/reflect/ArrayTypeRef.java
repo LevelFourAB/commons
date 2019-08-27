@@ -28,4 +28,15 @@ public class ArrayTypeRef
 	{
 		return Optional.of(componentType);
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(! (obj instanceof ArrayTypeRef))
+		{
+			return false;
+		}
+
+		return super.equals(obj);
+	}
 }

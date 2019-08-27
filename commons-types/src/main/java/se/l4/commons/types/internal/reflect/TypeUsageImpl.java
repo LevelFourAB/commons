@@ -27,7 +27,7 @@ public class TypeUsageImpl
 	@Override
 	public Annotation[] getAnnotations()
 	{
-		return annotations;
+		return Arrays.copyOf(annotations, annotations.length);
 	}
 
 	@Override
@@ -44,13 +44,13 @@ public class TypeUsageImpl
 			return false;
 		}
 
-		return Arrays.equals(getAnnotations(), ((TypeUsage) obj).getAnnotations());
+		return Arrays.equals(this.annotations, ((TypeUsageImpl) obj).annotations);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Arrays.hashCode(getAnnotations());
+		return Arrays.hashCode(this.annotations);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class TypeUsageImpl
 	{
 		StringBuilder builder = new StringBuilder();
 
-		for(Annotation annotation : getAnnotations())
+		for(Annotation annotation : annotations)
 		{
 			if(builder.length() > 0)
 			{
