@@ -434,7 +434,7 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public Optional<MethodRef> getMethod(String name, Class<?>... parameterTypes)
+	public Optional<MethodRef> getMethodViaClassParameters(String name, Class<?>... parameterTypes)
 	{
 		try
 		{
@@ -450,7 +450,7 @@ public class TypeRefImpl
 	@Override
 	public Optional<MethodRef> getMethod(String name, TypeRef... parameterTypes)
 	{
-		return getMethod(name, Arrays.stream(parameterTypes)
+		return getMethodViaClassParameters(name, Arrays.stream(parameterTypes)
 			.map(TypeRef::getErasedType)
 			.toArray(Class[]::new)
 		);
@@ -465,7 +465,7 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public Optional<ConstructorRef> getConstructor(Class<?>... parameterTypes)
+	public Optional<ConstructorRef> getConstructorViaClassParameters(Class<?>... parameterTypes)
 	{
 		try
 		{
@@ -481,7 +481,7 @@ public class TypeRefImpl
 	@Override
 	public Optional<ConstructorRef> getConstructor(TypeRef... parameterTypes)
 	{
-		return getConstructor(Arrays.stream(parameterTypes)
+		return getConstructorViaClassParameters(Arrays.stream(parameterTypes)
 			.map(TypeRef::getErasedType)
 			.toArray(Class[]::new)
 		);
@@ -518,7 +518,7 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public Optional<MethodRef> getDeclaredMethod(String name, Class<?>... parameterTypes)
+	public Optional<MethodRef> getDeclaredMethodViaClassParameters(String name, Class<?>... parameterTypes)
 	{
 		try
 		{
@@ -534,7 +534,7 @@ public class TypeRefImpl
 	@Override
 	public Optional<MethodRef> getDeclaredMethod(String name, TypeRef... parameterTypes)
 	{
-		return getMethod(name, Arrays.stream(parameterTypes)
+		return getMethodViaClassParameters(name, Arrays.stream(parameterTypes)
 			.map(TypeRef::getErasedType)
 			.toArray(Class[]::new)
 		);
@@ -549,7 +549,7 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public Optional<ConstructorRef> getDeclaredConstructor(Class<?>... parameterTypes)
+	public Optional<ConstructorRef> getDeclaredConstructorViaClassParameters(Class<?>... parameterTypes)
 	{
 		try
 		{
@@ -565,7 +565,7 @@ public class TypeRefImpl
 	@Override
 	public Optional<ConstructorRef> getDeclaredConstructor(TypeRef... parameterTypes)
 	{
-		return getConstructor(Arrays.stream(parameterTypes)
+		return getConstructorViaClassParameters(Arrays.stream(parameterTypes)
 			.map(TypeRef::getErasedType)
 			.toArray(Class[]::new)
 		);
@@ -600,7 +600,7 @@ public class TypeRefImpl
 					first = false;
 				}
 
-				builder.append(ref.toString());
+				builder.append(ref.toTypeName());
 			}
 
 			builder.append('>');
@@ -618,9 +618,36 @@ public class TypeRefImpl
 			builder.append(' ');
 		}
 
-		toTypeName(builder);
+		toTypeDescription(builder);
 
 		return builder.toString();
+	}
+
+	private void toTypeDescription(StringBuilder builder)
+	{
+		builder.append(erasedType.getName());
+
+		if(! typeBindings.isEmpty())
+		{
+			builder.append('<');
+
+			boolean first = true;
+			for(TypeRef ref : typeBindings.getResolvedTypeVariables())
+			{
+				if(! first)
+				{
+					builder.append(", ");
+				}
+				else
+				{
+					first = false;
+				}
+
+				builder.append(ref.toTypeDescription());
+			}
+
+			builder.append('>');
+		}
 	}
 
 	@Override

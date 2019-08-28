@@ -312,7 +312,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	Optional<MethodRef> getMethod(@NonNull String name, @NonNull Class<?>... parameterTypes);
+	Optional<MethodRef> getMethodViaClassParameters(@NonNull String name, @NonNull Class<?>... parameterTypes);
 
 	/**
 	 * Get a public method with the given name and parameter types. This
@@ -341,7 +341,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	Optional<ConstructorRef> getConstructor(@NonNull Class<?>... parameterTypes);
+	Optional<ConstructorRef> getConstructorViaClassParameters(@NonNull Class<?>... parameterTypes);
 
 	/**
 	 * Get a public constructor with the given parameter types. This method
@@ -388,7 +388,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	Optional<MethodRef> getDeclaredMethod(@NonNull String name, @NonNull Class<?>... parameterTypes);
+	Optional<MethodRef> getDeclaredMethodViaClassParameters(@NonNull String name, @NonNull Class<?>... parameterTypes);
 
 	/**
 	 * Get a specific method declared by this type with the given name and
@@ -419,7 +419,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	Optional<ConstructorRef> getDeclaredConstructor(@NonNull Class<?>... parameterTypes);
+	Optional<ConstructorRef> getDeclaredConstructorViaClassParameters(@NonNull Class<?>... parameterTypes);
 
 	/**
 	 * Get a specific constructor declared by this type with the given
