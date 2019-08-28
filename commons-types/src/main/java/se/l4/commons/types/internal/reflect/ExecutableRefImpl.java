@@ -34,6 +34,12 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
+	public Executable getExecutable()
+	{
+		return executable;
+	}
+
+	@Override
 	public Annotation[] getAnnotations()
 	{
 		return executable.getAnnotations();

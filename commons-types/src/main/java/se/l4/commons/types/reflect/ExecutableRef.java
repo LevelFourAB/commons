@@ -13,7 +13,17 @@ public interface ExecutableRef
 	extends MemberRef
 {
 	/**
+	 * Get the executable that this is a reference to.
+	 *
+	 * @return
+	 */
+	@NonNull
+	Executable getExecutable();
+
+	/**
 	 * Get all of the parameter names that are available for this type.
+	 *
+	 * @return
 	 */
 	@NonNull
 	List<String> getTypeParameterNames();
