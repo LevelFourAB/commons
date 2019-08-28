@@ -81,7 +81,8 @@ public abstract class ExecutableRefImpl
 	{
 		return TypeHelperImpl.resolve(
 			executable.getAnnotatedReturnType(),
-			typeBindings
+			typeBindings,
+			getAnnotations()
 		);
 	}
 
@@ -89,7 +90,7 @@ public abstract class ExecutableRefImpl
 	public TypeRef getReceiverType()
 	{
 		return TypeHelperImpl.resolve(
-			executable.getAnnotatedReturnType(),
+			executable.getAnnotatedReceiverType(),
 			typeBindings
 		);
 	}

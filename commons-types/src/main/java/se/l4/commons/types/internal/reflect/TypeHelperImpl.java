@@ -1,5 +1,6 @@
 package se.l4.commons.types.internal.reflect;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
@@ -124,7 +125,26 @@ public class TypeHelperImpl
 		);
 	}
 
-	public static TypeRef resolve(AnnotatedType type, TypeRefBindings bindings)
+	/**
+	 * Resolve the given type using the specified bindings.
+	 *
+	 * @param type
+	 * @param bindings
+	 * @return
+	 */
+	public static TypeRef resolve(
+		AnnotatedType type,
+		TypeRefBindings bindings
+	)
+	{
+		return resolve(type, bindings, null);
+	}
+
+	public static TypeRef resolve(
+		AnnotatedType type,
+		TypeRefBindings bindings,
+		Annotation[] usageAnnotations
+	)
 	{
 		if(type instanceof AnnotatedTypeVariable)
 		{
@@ -137,7 +157,7 @@ public class TypeHelperImpl
 				return ref
 					.withUsage(TypeUsageImpl.merge(
 						ref.getUsage(),
-						TypeUsageImpl.forAnnotatedType(type)
+						TypeUsageImpl.forAnnotatedType(type, usageAnnotations)
 					));
 			}
 			else
@@ -145,7 +165,7 @@ public class TypeHelperImpl
 				return new TypeRefImpl(
 					type.getType(),
 					TypeRefBindings.empty(),
-					TypeUsageImpl.forAnnotatedType(type)
+					TypeUsageImpl.forAnnotatedType(type, usageAnnotations)
 				);
 			}
 		}
@@ -162,7 +182,7 @@ public class TypeHelperImpl
 			return new TypeRefImpl(
 				type.getType(),
 				TypeRefBindings.create(variables, typeArguments),
-				TypeUsageImpl.forAnnotatedType(type)
+				TypeUsageImpl.forAnnotatedType(type, usageAnnotations)
 			);
 		}
 		else if(type instanceof AnnotatedWildcardType)
@@ -170,7 +190,7 @@ public class TypeHelperImpl
 			return new TypeRefImpl(
 				type.getType(),
 				TypeRefBindings.empty(),
-				TypeUsageImpl.forAnnotatedType(type)
+				TypeUsageImpl.forAnnotatedType(type, usageAnnotations)
 			);
 		}
 		else if(type instanceof AnnotatedArrayType)
@@ -185,7 +205,7 @@ public class TypeHelperImpl
 			return new ArrayTypeRef(
 				type.getType(),
 				TypeRefBindings.empty(),
-				TypeUsageImpl.forAnnotatedType(type),
+				TypeUsageImpl.forAnnotatedType(type, usageAnnotations),
 				componentType
 			);
 		}
@@ -196,7 +216,7 @@ public class TypeHelperImpl
 			return new TypeRefImpl(
 				type.getType(),
 				TypeRefBindings.createUnresolved(c.getTypeParameters()),
-				TypeUsageImpl.forAnnotatedType(type)
+				TypeUsageImpl.forAnnotatedType(type, usageAnnotations)
 			);
 		}
 		else

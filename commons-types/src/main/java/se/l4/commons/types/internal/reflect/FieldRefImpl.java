@@ -63,7 +63,11 @@ public class FieldRefImpl
 	@Override
 	public TypeRef getType()
 	{
-		return TypeHelperImpl.resolve(field.getAnnotatedType(), typeBindings);
+		return TypeHelperImpl.resolve(
+			field.getAnnotatedType(),
+			typeBindings,
+			getAnnotations()
+		);
 	}
 
 	@Override

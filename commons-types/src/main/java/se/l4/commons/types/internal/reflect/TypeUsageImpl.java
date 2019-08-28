@@ -81,19 +81,40 @@ public class TypeUsageImpl
 		return new TypeUsageImpl(type.getAnnotations());
 	}
 
+	public static TypeUsageImpl forAnnotatedType(AnnotatedType type, Annotation[] extra)
+	{
+		if(extra == null)
+		{
+			return forAnnotatedType(type);
+		}
+
+		return new TypeUsageImpl(mergeAnnotations(
+			type.getAnnotations(),
+			extra
+		));
+	}
+
 	public static TypeUsageImpl merge(TypeUsage t1, TypeUsage t2)
 	{
+		return new TypeUsageImpl(mergeAnnotations(
+			t1.getAnnotations(),
+			t2.getAnnotations()
+		));
+	}
+
+	private static Annotation[] mergeAnnotations(Annotation[] annotations1, Annotation[] annotations2)
+	{
 		Set<Annotation> annotations = new LinkedHashSet<>();
-		for(Annotation a : t1.getAnnotations())
+		for(Annotation a : annotations1)
 		{
 			annotations.add(a);
 		}
 
-		for(Annotation a : t2.getAnnotations())
+		for(Annotation a : annotations2)
 		{
 			annotations.add(a);
 		}
 
-		return new TypeUsageImpl(annotations.toArray(new Annotation[annotations.size()]));
+		return annotations.toArray(new Annotation[annotations.size()]);
 	}
 }
