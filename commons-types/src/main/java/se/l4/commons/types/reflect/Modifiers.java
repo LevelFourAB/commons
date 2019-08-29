@@ -36,6 +36,6 @@ public interface Modifiers
 	 */
 	default boolean isPrivate()
 	{
-		return Modifier.isPublic(getModifiers());
+		return Modifier.isPrivate(getModifiers());
 	}
 }
