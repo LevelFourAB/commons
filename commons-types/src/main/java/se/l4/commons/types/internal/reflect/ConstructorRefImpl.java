@@ -53,6 +53,12 @@ public class ConstructorRefImpl
 	}
 
 	@Override
+	public String toString()
+	{
+		return "ConstructorRef{" + toDescription() + "}";
+	}
+
+	@Override
 	public String toDescription()
 	{
 		return parent.toTypeName() + "(" +

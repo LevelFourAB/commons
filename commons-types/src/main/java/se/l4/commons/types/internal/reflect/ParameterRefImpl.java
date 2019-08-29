@@ -83,4 +83,10 @@ public class ParameterRefImpl
 	{
 		return parameter.isVarArgs();
 	}
+
+	@Override
+	public String toString()
+	{
+		return "ParameterRef{" + getType().toTypeName() + "}";
+	}
 }

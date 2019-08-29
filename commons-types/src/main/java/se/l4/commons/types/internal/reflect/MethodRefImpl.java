@@ -114,6 +114,12 @@ public class MethodRefImpl
 	}
 
 	@Override
+	public String toString()
+	{
+		return "MethodRef{" + toDescription() + "}";
+	}
+
+	@Override
 	public String toDescription()
 	{
 		return getReturnType().toTypeName() + " "
