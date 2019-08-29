@@ -356,7 +356,7 @@ public class TypeRefImpl
 		Objects.requireNonNull(finder);
 
 		AtomicReference<Optional<T>> result = new AtomicReference<>(Optional.empty());
-		visit(type -> {
+		visitHierarchy(type -> {
 			Optional<T> found = finder.apply(type);
 			if(found.isPresent())
 			{
@@ -373,7 +373,8 @@ public class TypeRefImpl
 		return result.get();
 	}
 
-	private void visit(Predicate<TypeRef> visitor)
+	@Override
+	public void visitHierarchy(Predicate<TypeRef> visitor)
 	{
 		Queue<TypeRef> queue = new LinkedList<>();
 		Set<Class<?>> visited = new HashSet<>();
@@ -522,6 +523,7 @@ public class TypeRefImpl
 	{
 		try
 		{
+			System.out.println("erased " + erasedType + " " + name);
 			Method method = erasedType.getDeclaredMethod(name, parameterTypes);
 			return Optional.of(TypeHelperImpl.resolveMethod(this, method));
 		}

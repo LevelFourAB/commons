@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -278,6 +279,15 @@ public interface TypeRef
 	 */
 	@NonNull
 	<T> Optional<T> find(@NonNull Function<TypeRef, Optional<T>> finder);
+
+	/**
+	 * Visit the type hierarchy of this type. Will visit superclasses and
+	 * superinterfaces in a breadth-first fashion. If the visitor returns
+	 * {@code false} the visit will abort.
+	 *
+	 * @param visitor
+	 */
+	void visitHierarchy(Predicate<TypeRef> visitor);
 
 	/**
 	 * Get the public fields in this type.
