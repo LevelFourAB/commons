@@ -529,7 +529,6 @@ public class TypeRefImpl
 	{
 		try
 		{
-			System.out.println("erased " + erasedType + " " + name);
 			Method method = erasedType.getDeclaredMethod(name, parameterTypes);
 			return Optional.of(TypeHelperImpl.resolveMethod(this, method));
 		}
