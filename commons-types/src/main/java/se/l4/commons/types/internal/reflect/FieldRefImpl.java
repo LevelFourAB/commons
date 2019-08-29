@@ -55,6 +55,12 @@ public class FieldRefImpl
 	}
 
 	@Override
+	public boolean hasAnnotation(Class<? extends Annotation> annotationClass)
+	{
+		return field.isAnnotationPresent(annotationClass);
+	}
+
+	@Override
 	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
 	{
 		return getAnnotation(annotationClass);

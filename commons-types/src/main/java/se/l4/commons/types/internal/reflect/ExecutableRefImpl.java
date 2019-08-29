@@ -46,9 +46,9 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public boolean hasAnnotation(Class<? extends Annotation> annotationClass)
 	{
-		return getAnnotation(annotationClass);
+		return executable.isAnnotationPresent(annotationClass);
 	}
 
 	@Override

@@ -138,6 +138,12 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public boolean hasAnnotation(Class<? extends Annotation> annotationClass)
+	{
+		return erasedType.isAnnotationPresent(annotationClass);
+	}
+
+	@Override
 	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
 	{
 		return find(tr -> tr.getAnnotation(annotationClass));
