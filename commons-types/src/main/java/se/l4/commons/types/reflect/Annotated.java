@@ -24,7 +24,7 @@ public interface Annotated
 	/**
 	 * Get if an annotation of the specific type is present.
 	 */
-	default boolean hasAnnotation(@NonNull Class<?> annotationClass)
+	default boolean hasAnnotation(@NonNull Class<? extends Annotation> annotationClass)
 	{
 		for(Annotation a : getAnnotations())
 		{
