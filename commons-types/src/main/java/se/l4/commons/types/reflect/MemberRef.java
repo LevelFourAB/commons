@@ -30,7 +30,9 @@ public interface MemberRef
 	boolean isSynthetic();
 
 	/**
-	 * Get a description for this this member.
+	 * Get a description for this member.
+	 *
+	 * @return
 	 */
 	String toDescription();
 }

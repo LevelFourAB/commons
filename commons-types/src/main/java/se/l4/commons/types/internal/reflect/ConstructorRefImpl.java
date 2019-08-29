@@ -1,6 +1,8 @@
 package se.l4.commons.types.internal.reflect;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import se.l4.commons.types.reflect.ConstructorRef;
@@ -36,6 +38,12 @@ public class ConstructorRefImpl
 	public String getName()
 	{
 		return constructor.getName();
+	}
+
+	@Override
+	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	{
+		return getAnnotation(annotationClass);
 	}
 
 	@Override

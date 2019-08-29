@@ -48,6 +48,18 @@ public class MethodRefImpl
 	}
 
 	@Override
+	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	{
+		return parent.find(type -> {
+			Optional<MethodRef> method = findIn(type, TypeSpecificity.LESS);
+
+			if(! method.isPresent()) return Optional.empty();
+
+			return method.get().getAnnotation(annotationClass);
+		});
+	}
+
+	@Override
 	public int getModifiers()
 	{
 		return method.getModifiers();
