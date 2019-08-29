@@ -43,9 +43,38 @@ public class MethodRefTest
 		assertThat("return type has annotation", returnType.getUsage().hasAnnotation(TestAnnotation.class), is(true));
 	}
 
+	@Test
+	public void testFindIn()
+	{
+		class A
+		{
+			Object m(String a)
+			{
+				return "";
+			}
+		}
+
+		class B extends A
+		{
+			@Override
+			String m(String a)
+			{
+				return "";
+			}
+		}
+
+		TypeRef type = Types.reference(A.class);
+		MethodRef inA = type.getDeclaredMethodViaClassParameters("m", String.class).get();
+
+		MethodRef inB = inA.findIn(Types.reference(B.class), TypeSpecificity.MORE).get();
+
+		MethodRef inA2 = inB.findIn(type, TypeSpecificity.LESS).get();
+	}
+
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface TestAnnotation
 	{
 
 	}
+
 }
