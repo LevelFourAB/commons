@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -23,6 +24,23 @@ public class MethodRefTest
 		TypeRef type = Types.reference(Test.class);
 		MethodRef method = type.getMethod("get").get();
 		assertThat(method.getReturnType().getErasedType(), is((Object) String.class));
+	}
+
+	@Test
+	public void testGenericReturnType()
+	{
+		class Test
+		{
+			public Optional<String> get() { return null; }
+		}
+
+		TypeRef type = Types.reference(Test.class);
+		MethodRef method = type.getMethod("get").get();
+
+		TypeRef returnType = method.getReturnType();
+		assertThat(returnType.getErasedType(), is((Object) Optional.class));
+
+		assertThat(returnType.getTypeParameter(0).get().getErasedType(), is((Object) String.class));
 	}
 
 	@Test
