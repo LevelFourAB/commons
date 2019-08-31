@@ -22,7 +22,10 @@ public class AnnotatedTypeEmulation
 		return annotate(type, EMPTY);
 	}
 
-	public static AnnotatedType annotate(Type type, Annotation[] annotations)
+	public static AnnotatedType annotate(
+		Type type,
+		Annotation[] annotations
+	)
 	{
 		if(type instanceof Class<?>)
 		{
@@ -50,9 +53,7 @@ public class AnnotatedTypeEmulation
 			return new AnnotatedTypeVariableImpl(
 				tv,
 				annotations,
-				Arrays.stream(tv.getBounds())
-					.map(AnnotatedTypeEmulation::annotate)
-					.toArray(AnnotatedType[]::new)
+				tv.getAnnotatedBounds()
 			);
 		}
 		else if(type instanceof WildcardType)
