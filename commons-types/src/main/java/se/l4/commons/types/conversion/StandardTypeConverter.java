@@ -13,6 +13,7 @@ public class StandardTypeConverter
 	public StandardTypeConverter()
 	{
 		super(new ClassMatchingHashMultimap<>());
-	}
 
+		DefaultConversions.register(this::addConversion);
+	}
 }
