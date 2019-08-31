@@ -148,7 +148,7 @@ public class Types
 	 *   continue visiting other parts of the hierarchy and {@code false} to
 	 *   abort the visiting
 	 */
-	public void visitHierarchy(Class<?> type, Predicate<Class<?>> visitor)
+	public static void visitHierarchy(Class<?> type, Predicate<Class<?>> visitor)
 	{
 		TypeHierarchy.visitHierarchy(type, visitor);
 	}
