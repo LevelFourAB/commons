@@ -11,6 +11,8 @@ import java.util.function.BiPredicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 
+import se.l4.commons.types.internal.TypeHierarchy;
+
 /**
  * Abstract implementation of {@link ClassMatchingMap} that implements all of
  * the matching methods on top any {@link Map} implementation.
@@ -91,60 +93,18 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	 * hierarchy and interfaces of the type trying to find if this map has
 	 * an entry for them.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void findMatching(Class<? extends T> type, BiPredicate<Class<? extends T>, Set<D>> predicate)
 	{
-		traverseType(type, predicate, new HashSet<>());
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private boolean traverseType(
-		Class<?> type,
-		BiPredicate<Class<? extends T>, Set<D>> predicate,
-		Set<Class<?>> checked
-	)
-	{
-		// Add this to checked set and abort if already traversed
-		if(! checked.add(type)) return true;
-
-		// First check if the type matches directly
-		Set<D> data = backingMap.get((Class) type);
-		if(! data.isEmpty() && ! predicate.test((Class) type, data))
-		{
-			// The predicate doesn't want more items
-			return false;
-		}
-
-		// Check all of the interfaces directly declared by the class
-		for(Class<?> c : type.getInterfaces())
-		{
-			if(! checked.add(c)) continue;
-
-			data = backingMap.get((Class) c);
-			if(! data.isEmpty() && ! predicate.test((Class) c, data))
+		TypeHierarchy.visitHierarchy(type, t -> {
+			if(backingMap.containsKey(t))
 			{
-				// The predicate doesn't want more items
-				return false;
+				Set<D> data = backingMap.get((Class) t);
+				return predicate.test((Class) t, data);
 			}
-		}
 
-		// Check the hierarchy of the interfaces
-		for(Class<?> c : type.getInterfaces())
-		{
-			if(! traverseType(c, predicate, checked))
-			{
-				// The predicate doesn't want more items
-				return false;
-			}
-		}
-
-		// Look at the super class
-		if(type.getSuperclass() == null)
-		{
-			// No superclass, so continue the search
 			return true;
-		}
-
-		// Traverse up to the superclass
-		return traverseType(type.getSuperclass(), predicate, checked);
+		});
 	}
+
 }

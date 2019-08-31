@@ -1,18 +1,17 @@
 package se.l4.commons.types.matching;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableList;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
+import se.l4.commons.types.internal.TypeHierarchy;
 
 /**
  * Abstract implementation of {@link ClassMatchingMap} that implements all of
@@ -100,61 +99,18 @@ public abstract class AbstractClassMatchingMap<T, D>
 	 * hierarchy and interfaces of the type trying to find if this map has
 	 * an entry for them.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void findMatching(Class<? extends T> type, BiPredicate<Class<? extends T>, D> predicate)
 	{
-		traverseType(type, predicate, new HashSet<>());
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private boolean traverseType(
-		Class<?> type,
-		BiPredicate<Class<? extends T>, D> predicate,
-		Set<Class<?>> checked
-	)
-	{
-		// Add this to checked set and abort if already traversed
-		if(! checked.add(type)) return true;
-
-		// First check if the type matches directly
-		D data = backingMap.get(type);
-		if(data != null && ! predicate.test((Class) type, data))
-		{
-			// The predicate doesn't want more items
-			return false;
-		}
-
-		// Check all of the interfaces directly declared by the class
-		for(Class<?> c : type.getInterfaces())
-		{
-			if(! checked.add(c)) continue;
-
-			data = backingMap.get(c);
-			if(data != null && ! predicate.test((Class) c, data))
+		TypeHierarchy.visitHierarchy(type, t -> {
+			if(backingMap.containsKey(t))
 			{
-				// The predicate doesn't want more items
-				return false;
+				D data = backingMap.get(t);
+				return predicate.test((Class) t, data);
 			}
-		}
 
-		// Check the hierarchy of the interfaces
-		for(Class<?> c : type.getInterfaces())
-		{
-			if(! traverseType(c, predicate, checked))
-			{
-				// The predicate doesn't want more items
-				return false;
-			}
-		}
-
-		// Look at the super class
-		if(type.getSuperclass() == null)
-		{
-			// No superclass, so continue the search
 			return true;
-		}
-
-		// Traverse up to the superclass
-		return traverseType(type.getSuperclass(), predicate, checked);
+		});
 	}
 
 	private static class MutableHolder
