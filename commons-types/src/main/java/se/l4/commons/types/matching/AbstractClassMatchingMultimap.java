@@ -33,7 +33,7 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	{
 		return backingMap.entries()
 			.stream()
-			.map(e -> new DefaultMatchedType<>((Class) e.getKey(), e.getValue()))
+			.map(e -> new DefaultMatchedType<T, D>((Class) e.getKey(), e.getValue()))
 			.collect(ImmutableList.toImmutableList());
 	}
 
