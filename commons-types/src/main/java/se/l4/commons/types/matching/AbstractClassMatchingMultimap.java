@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 
 /**
@@ -22,6 +23,16 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	protected AbstractClassMatchingMultimap(SetMultimap<Class<? extends T>, D> backingMap)
 	{
 		this.backingMap = backingMap;
+	}
+
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<MatchedType<T, D>> entries()
+	{
+		return backingMap.entries()
+			.stream()
+			.map(e -> new DefaultMatchedType<>((Class) e.getKey(), e.getValue()))
+			.collect(ImmutableList.toImmutableList());
 	}
 
 	@Override

@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
+
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
@@ -24,6 +26,16 @@ public abstract class AbstractClassMatchingMap<T, D>
 	protected AbstractClassMatchingMap(Map<Class<? extends T>, D> backingMap)
 	{
 		this.backingMap = Objects.requireNonNull(backingMap);
+	}
+
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<MatchedType<T, D>> entries()
+	{
+		return backingMap.entrySet()
+			.stream()
+			.map(e -> new DefaultMatchedType<>((Class) e.getKey(), e.getValue()))
+			.collect(ImmutableList.toImmutableList());
 	}
 
 	@Override

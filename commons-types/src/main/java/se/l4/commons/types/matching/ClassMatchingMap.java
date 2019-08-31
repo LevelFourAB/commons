@@ -81,4 +81,12 @@ public interface ClassMatchingMap<T, D>
 	 */
 	@NonNull
 	List<MatchedType<T, D>> getAll(@NonNull Class<? extends T> type);
+
+	/**
+	 * Get all of the entries in this map without doing any matching.
+	 *
+	 * @return
+	 *   immutable list of all entries registered
+	 */
+	List<MatchedType<T, D>> entries();
 }
