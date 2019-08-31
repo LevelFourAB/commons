@@ -88,5 +88,8 @@ public interface ClassMatchingMap<T, D>
 	 * @return
 	 *   immutable list of all entries registered
 	 */
-	List<MatchedType<T, D>> entries();
+	default List<MatchedType<T, D>> entries()
+	{
+		throw new UnsupportedOperationException("entries() is not supported by this map");
+	}
 }
