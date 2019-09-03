@@ -27,6 +27,7 @@ import se.l4.commons.serialization.SerializerCollection;
  */
 public class ConfigBuilderImpl implements ConfigBuilder
 {
+	private final Map<String, Object> keys;
 	private final List<Bytes> suppliers;
 
 	private SerializerCollection collection;
@@ -38,6 +39,8 @@ public class ConfigBuilderImpl implements ConfigBuilder
 	{
 		suppliers = new ArrayList<>();
 		collection = new DefaultSerializerCollection();
+
+		keys = new HashMap<String, Object>();
 	}
 
 	@Override
@@ -122,9 +125,17 @@ public class ConfigBuilderImpl implements ConfigBuilder
 	}
 
 	@Override
+	public ConfigBuilder with(String key, Object value)
+	{
+		this.keys.put(key, value);
+		return this;
+	}
+
+	@Override
 	public Config build()
 	{
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<>();
+		ConfigResolver.resolveTo(this.keys, data);
 
 		for(Bytes bytes : suppliers)
 		{

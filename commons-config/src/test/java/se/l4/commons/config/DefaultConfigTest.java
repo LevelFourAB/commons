@@ -13,9 +13,9 @@ import javax.validation.Validation;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-import org.junit.Test;
-
 import com.google.common.base.Charsets;
+
+import org.junit.Test;
 
 import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.ReflectionSerializer;
@@ -34,6 +34,24 @@ public class DefaultConfigTest
 	{
 		Config config = Config.builder()
 			.addStream(stream("medium: { width: 100, height: 100 }"))
+			.build();
+
+		Value<Size> size = config.get("medium", Size.class);
+		assertThat(size, notNullValue());
+
+		Size actual = size.get();
+		assertThat(actual, notNullValue());
+
+		assertThat(actual.width, is(100));
+		assertThat(actual.height, is(100));
+	}
+
+	@Test
+	public void testSizeObjectViaKeys()
+	{
+		Config config = Config.builder()
+			.with("medium.width", 100)
+			.with("medium.height", 100)
 			.build();
 
 		Value<Size> size = config.get("medium", Size.class);

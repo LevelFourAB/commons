@@ -104,6 +104,19 @@ public interface ConfigBuilder
 	ConfigBuilder addStream(@NonNull InputStream stream);
 
 	/**
+	 * Add a key to the current configuration.
+	 *
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	@NonNull
+	default ConfigBuilder with(String key, Object value)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Create the configuration object. This will load any declared input
 	 * files.
 	 *
