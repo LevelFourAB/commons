@@ -2,6 +2,7 @@ package se.l4.commons.types.reflect;
 
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -60,7 +61,16 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	TypeRef withUsage(TypeUsage usage);
+	TypeRef withUsage(@NonNull TypeUsage usage);
+
+	/**
+	 * Merge with usage from the specified instance.
+	 *
+	 * @param usage
+	 * @return
+	 */
+	@NonNull
+	TypeRef mergeWithUsage(@NonNull TypeUsage usage);
 
 	/**
 	 * Get if this reference is resolved. A reference is resolved if the
@@ -79,6 +89,22 @@ public interface TypeRef
 	 * parameters are resolved.
 	 */
 	boolean isFullyResolved();
+
+	/**
+	 * Get the parameters as raw {@link TypeVariable}s.
+	 *
+	 * @return
+	 *   list of type variables
+	 */
+	@NonNull
+	List<TypeVariable<?>> getTypeVariables();
+
+	/**
+	 * Get the number of type parameters available in this type.
+	 *
+	 * @return
+	 */
+	int getTypeParameterCount();
 
 	/**
 	 * Get all of the parameter names that are available for this type.
@@ -111,7 +137,120 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	Optional<TypeRef> getTypeParameter(String name);
+	Optional<TypeRef> getTypeParameter(@NonNull String name);
+
+	/**
+	 * Get a type where the specified type parameter has been changed to the
+	 * specified type.
+	 *
+	 * @param index
+	 *   index of the parameter to change
+	 * @param type
+	 *   the new type for the parameter
+	 * @return
+	 *   optional containing this type with the new parameter. If the optional
+	 *   is empty the parameter either does not exist or the type is not
+	 *   assignable
+	 */
+	@NonNull
+	Optional<TypeRef> withTypeParameter(int index, @NonNull TypeRef type);
+
+	/**
+	 * Get a type where the specified type parameter has been changed to the
+	 * specified type.
+	 *
+	 * @param name
+	 *   the name of the parameter to update
+	 * @param type
+	 *   the new type for the parameter
+	 * @return
+	 *   optional containing this type with the new parameter. If the optional
+	 *   is empty the parameter either does not exist or the type is not
+	 *   assignable
+	 */
+	@NonNull
+	Optional<TypeRef> withTypeParameter(@NonNull String name, @NonNull TypeRef type);
+
+	/**
+	 * Get a {@link TypeInferrer} that can infer how a type parameter is used
+	 * in a concrete type. This method takes a pattern type where the type
+	 * variable may be used, when inferring another this is matched against
+	 * the pattern and the usage of the type variable is calculated.
+	 *
+	 * <p>
+	 * Type inferring is commonly used for scenarios where type conversion is
+	 * needed. It helps where you have signatures like:
+	 *
+	 * <p>
+	 * <pre>
+	 * class Example<T> implements Conversion<List<T>, Set<T>> {
+	 * }
+	 * </pre>
+	 *
+	 * <p>
+	 * In which case a type inferrer can be used to extract how {@code T} is
+	 * used in {@code Example<T>}:
+	 *
+	 * <p>
+	 * <pre>
+	 * TypeRef type = Types.reference(Example.class);
+	 * TypeRef conversionType = type.findInterface(Conversion.class).get();
+	 * TypeRef inType = type.getTypeParameter(0).get();
+	 *
+	 * TypeInferrer inferrer = type.getTypeParameterUsageInferrer(0, inType);
+	 *
+	 * // Infer that String is used as T
+	 * Optional<TypeRef> ref = inferrer.infer(Types.reference(List.class, String.class));
+	 * </pre>
+	 *
+	 * @param index
+	 *   the index of the type variable
+	 * @param patternType
+	 *   the pattern type
+	 * @return
+	 */
+	TypeInferrer getTypeParameterUsageInferrer(int index, @NonNull TypeRef patternType);
+
+	/**
+	 * Get a {@link TypeInferrer} that can infer how a type parameter is used
+	 * in a concrete type. See {@link #getTypeParameterUsageInferrer(int, TypeRef)}
+	 * for details.
+	 *
+	 * @param name
+	 *   the name of the type variable
+	 * @param patternType
+	 *   the pattern type
+	 * @return
+	 */
+	TypeInferrer getTypeParameterUsageInferrer(String name, @NonNull TypeRef patternType);
+
+	/**
+	 * Get a {@link TypeInferrer} that can modify the given pattern type using
+	 * the type parameters of this type. This inferrer needs all of the type
+	 * parameters as its input to resolve a type.
+	 *
+	 * <p>
+	 * <pre>
+	 * class Example<T> implements Conversion<List<T>, Set<T>> {
+	 * }
+	 * </pre>
+	 *
+	 * <p>
+	 * <pre>
+	 * TypeRef type = Types.reference(Example.class);
+	 * TypeRef conversionType = type.findInterface(Conversion.class).get();
+	 * TypeRef outType = type.getTypeParameter(1).get();
+	 *
+	 * TypeInferrer inferrer = type.getTypeParameterInferrer(outType);
+	 *
+	 * // Get a Set with T bound to String
+	 * Optional<TypeRef> ref = inferrer.infer(Types.reference(String.class));
+	 * </pre>
+	 *
+	 * @param patternType
+	 * @return
+	 */
+	TypeInferrer getTypeParameterInferrer(@NonNull TypeRef patternType);
 
 	/**
 	 * Get if this type is abstract.
@@ -202,6 +341,14 @@ public interface TypeRef
 	 * @return
 	 */
 	boolean isSynthetic();
+
+	/**
+	 * Get if this type is assignable from another type.
+	 *
+	 * @param other
+	 * @return
+	 */
+	boolean isAssignableFrom(TypeRef other);
 
 	/**
 	 * Get the {@link Class} this type is when type information has been erased.

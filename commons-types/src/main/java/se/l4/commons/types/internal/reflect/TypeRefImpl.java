@@ -9,7 +9,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
+import se.l4.commons.types.reflect.TypeInferrer;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.commons.types.reflect.TypeUsage;
 
@@ -86,6 +89,12 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public TypeRef mergeWithUsage(TypeUsage usage)
+	{
+		return new TypeRefImpl(type, typeBindings, TypeUsageImpl.merge(this.usage, usage));
+	}
+
+	@Override
 	public boolean equals(Object obj)
 	{
 		if(! (obj instanceof TypeRefImpl))
@@ -105,6 +114,18 @@ public class TypeRefImpl
 		return TypeHelperImpl.typeHashCode(type)
 			^ typeBindings.hashCode()
 			^ usage.hashCode();
+	}
+
+	@Override
+	public List<TypeVariable<?>> getTypeVariables()
+	{
+		return typeBindings.getTypeVariables();
+	}
+
+	@Override
+	public int getTypeParameterCount()
+	{
+		return typeBindings.getTypeVariables().size();
 	}
 
 	@Override
@@ -129,6 +150,53 @@ public class TypeRefImpl
 	public Optional<TypeRef> getTypeParameter(String name)
 	{
 		return typeBindings.getBinding(name);
+	}
+
+	@Override
+	public TypeInferrer getTypeParameterUsageInferrer(int index, TypeRef patternType)
+	{
+		Optional<TypeVariable<?>> variable = typeBindings.getTypeVariable(index);
+		if(! variable.isPresent())
+		{
+			return EmptyTypeInferrer.INSTANCE;
+		}
+
+		return new TypeParameterUsageInferrer(variable.get(), patternType);
+	}
+
+	@Override
+	public TypeInferrer getTypeParameterUsageInferrer(String name, TypeRef patternType)
+	{
+		Optional<TypeVariable<?>> variable = typeBindings.getTypeVariable(name);
+		if(! variable.isPresent())
+		{
+			return EmptyTypeInferrer.INSTANCE;
+		}
+
+		return new TypeParameterUsageInferrer(variable.get(), patternType);
+	}
+
+	@Override
+	public TypeInferrer getTypeParameterInferrer(TypeRef patternType)
+	{
+		return new TypeParameterInferrer(
+			patternType,
+			typeBindings.getTypeVariables()
+		);
+	}
+
+	@Override
+	public Optional<TypeRef> withTypeParameter(String name, TypeRef type)
+	{
+		return typeBindings.withParameter(name, type)
+			.map(bindings -> new TypeRefImpl(this.type, bindings, usage));
+	}
+
+	@Override
+	public Optional<TypeRef> withTypeParameter(int index, TypeRef type)
+	{
+		return typeBindings.withParameter(index, type)
+			.map(bindings -> new TypeRefImpl(this.type, bindings, usage));
 	}
 
 	@Override
@@ -258,6 +326,53 @@ public class TypeRefImpl
 	public boolean isSynthetic()
 	{
 		return erasedType.isSynthetic();
+	}
+
+	@Override
+	public boolean isAssignableFrom(TypeRef other)
+	{
+		List<TypeRef> thisParameters;
+		List<TypeRef> otherParameters;
+
+		if(this.getErasedType() == other.getErasedType())
+		{
+			// If the types are the same
+			otherParameters = other.getTypeParameters();
+		}
+		else if(this.getErasedType() == Object.class)
+		{
+			// Object are always assignable
+			otherParameters = Collections.emptyList();
+		}
+		else if(! this.getErasedType().isAssignableFrom(other.getErasedType()))
+		{
+			// Not assignable to us, return false
+			return false;
+		}
+		else
+		{
+			TypeRef type = other.findSuperclassOrInterface(this.getErasedType())
+				.orElseThrow(() -> new RuntimeException("Could not find " + this + " in " + other));
+
+			otherParameters = type.getTypeParameters();
+		}
+
+		thisParameters = this.getTypeParameters();
+
+		if(thisParameters.size() != otherParameters.size())
+		{
+			return false;
+		}
+
+		for(int i=0, n=thisParameters.size(); i<n; i++)
+		{
+			if(! thisParameters.get(i).isAssignableFrom(otherParameters.get(i)))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override

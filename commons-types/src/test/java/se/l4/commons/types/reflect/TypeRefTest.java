@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.junit.Test;
 
 import afu.org.checkerframework.checker.nullness.qual.NonNull;
+import se.l4.commons.types.Types;
 import se.l4.commons.types.internal.reflect.TypeHelperImpl;
 
 public class TypeRefTest
@@ -186,5 +187,40 @@ public class TypeRefTest
 		TypeRef p2 = list.getTypeParameter(0).get();
 		Optional<NonNull> o2 = p2.getUsage().getAnnotation(NonNull.class);
 		assertThat("First List param should contain @NonNull", o2.isPresent(), is(true));
+	}
+
+	@Test
+	public void testAssignable()
+	{
+		assertThat(Types.reference(List.class).isAssignableFrom(Types.reference(ArrayList.class)), is(true));
+		assertThat(Types.reference(ArrayList.class).isAssignableFrom(Types.reference(List.class)), is(false));
+
+		assertThat(
+			Types.reference(List.class, Object.class)
+				.isAssignableFrom(Types.reference(List.class, String.class)),
+
+			is(true)
+		);
+
+		assertThat(
+			Types.reference(List.class, String.class)
+				.isAssignableFrom(Types.reference(List.class, Object.class)),
+
+			is(false)
+		);
+
+		assertThat(
+			Types.reference(List.class, String.class)
+				.isAssignableFrom(Types.reference(ArrayList.class, String.class)),
+
+			is(true)
+		);
+
+		assertThat(
+			Types.reference(List.class, Object.class)
+				.isAssignableFrom(Types.reference(ArrayList.class, String.class)),
+
+			is(true)
+		);
 	}
 }

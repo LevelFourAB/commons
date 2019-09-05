@@ -1,5 +1,6 @@
 package se.l4.commons.types.internal.reflect;
 
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +47,33 @@ public class TypeRefBindings
 		return typeVariables;
 	}
 
+	public Optional<TypeVariable<?>> getTypeVariable(int index)
+	{
+		if(index >= 0 && index < typeVariables.size())
+		{
+			return Optional.of(typeVariables.get(index));
+		}
+
+		return Optional.empty();
+	}
+
+	public Optional<TypeVariable<?>> getTypeVariable(String name)
+	{
+		for(int i=0, n=typeVariables.size(); i<n; i++)
+		{
+			TypeVariable<?> tv = (TypeVariable<?>) typeVariables.get(i);
+			if(tv.getName().equals(name))
+			{
+				return Optional.of(tv);
+			}
+		}
+
+		return Optional.empty();
+	}
+
 	public Optional<TypeRef> getBinding(int index)
 	{
-		if(index < resolvedTypeVariables.size())
+		if(index >= 0 && index < resolvedTypeVariables.size())
 		{
 			return Optional.of(resolvedTypeVariables.get(index));
 		}
@@ -75,6 +100,65 @@ public class TypeRefBindings
 		return typeVariables.stream()
 			.map(tv -> tv.getName())
 			.collect(ImmutableList.toImmutableList());
+	}
+
+	public Optional<TypeRefBindings> withParameter(int index, TypeRef ref)
+	{
+		if(index < 0 || index >= typeVariables.size())
+		{
+			return Optional.empty();
+		}
+
+		if(! isAssignable(typeVariables.get(index), ref))
+		{
+			return Optional.empty();
+		}
+
+		ImmutableList.Builder<TypeRef> resolved = ImmutableList.builder();
+		for(int i=0, n=resolvedTypeVariables.size(); i<n; i++)
+		{
+			if(i == index)
+			{
+				resolved.add(ref);
+			}
+			else
+			{
+				resolved.add(resolvedTypeVariables.get(i));
+			}
+		}
+
+		return Optional.of(
+			new TypeRefBindings(typeVariables, resolved.build())
+		);
+	}
+
+	public Optional<TypeRefBindings> withParameter(String name, TypeRef ref)
+	{
+		int index = -1;
+		for(int i=0, n=typeVariables.size(); i<n; i++)
+		{
+			TypeVariable<?> tv = (TypeVariable<?>) typeVariables.get(i);
+			if(tv.getName().equals(name))
+			{
+				index = i;
+				break;
+			}
+		}
+
+		return withParameter(index, ref);
+	}
+
+	private boolean isAssignable(TypeVariable<?> v, TypeRef ref)
+	{
+		for(Type type : v.getBounds())
+		{
+			if(! TypeHelperImpl.reference(type).isAssignableFrom(ref))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override
