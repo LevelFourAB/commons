@@ -359,12 +359,7 @@ public class TypeRefImpl
 
 		thisParameters = this.getTypeParameters();
 
-		if(thisParameters.size() != otherParameters.size())
-		{
-			return false;
-		}
-
-		for(int i=0, n=thisParameters.size(); i<n; i++)
+		for(int i=0, n=Math.min(otherParameters.size(), thisParameters.size()); i<n; i++)
 		{
 			if(! thisParameters.get(i).isAssignableFrom(otherParameters.get(i)))
 			{
