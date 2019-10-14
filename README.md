@@ -1,5 +1,8 @@
 # L4 Commons
 
+![Version](https://img.shields.io/maven-central/v/se.l4.commons/commons-base)
+![Dependencies](https://github.com/levelfourab/commons/workflows/CI/badge.svg)
+
 This is a set of Java libraries for common functionality used within the
 open-source projects published by [Level Four AB](https://github.com/LevelFourAB).
 
