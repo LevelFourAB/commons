@@ -18,6 +18,5 @@ jobs:
       run: mvn compile --file pom.xml
     - name: Test
       run: mvn test --file pom.xml
-	- name: Package
-	  run: mvn -Prelease -DskipTests package --file pom.xml
-
+    - name: Package
+      run: mvn -Prelease -DskipTests package --file pom.xml

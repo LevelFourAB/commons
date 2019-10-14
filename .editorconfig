@@ -11,3 +11,7 @@ insert_final_newline = true
 line_comment = //
 block_comment_start = /*
 block_comment_end = */
+
+[*.yml]
+indent_style = space
+indent_size = 2
