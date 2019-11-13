@@ -19,7 +19,7 @@ The indiviudal parts of this library are available from Maven central:
 <dependency>
   <groupId>se.l4.commons</groupId>
   <artifactId>commons-projectHere</artifactId>
-  <version>1.0.0</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
