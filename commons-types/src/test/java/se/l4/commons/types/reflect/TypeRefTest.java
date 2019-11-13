@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 
-import afu.org.checkerframework.checker.nullness.qual.NonNull;
 import se.l4.commons.types.Types;
 import se.l4.commons.types.internal.reflect.TypeHelperImpl;
 
