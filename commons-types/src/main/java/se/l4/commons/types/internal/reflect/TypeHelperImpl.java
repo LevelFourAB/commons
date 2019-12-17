@@ -549,7 +549,7 @@ public class TypeHelperImpl
 			WildcardType wc2 = (WildcardType) t2;
 
 			return typeEqualsArray(wc1.getLowerBounds(), wc2.getLowerBounds())
-				&& typeEqualsArray(wc2.getUpperBounds(), wc2.getUpperBounds());
+				&& typeEqualsArray(wc1.getUpperBounds(), wc2.getUpperBounds());
 		}
 		else
 		{
