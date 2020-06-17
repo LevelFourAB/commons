@@ -1,4 +1,4 @@
-module se.l4.commons.guice {
+module se.l4.commons.config {
 	requires se.l4.commons.serialization;
 	requires se.l4.commons.io;
 	requires com.google.common;
