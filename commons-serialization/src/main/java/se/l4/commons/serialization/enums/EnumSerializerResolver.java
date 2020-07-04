@@ -2,6 +2,7 @@ package se.l4.commons.serialization.enums;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.base.Throwables;
@@ -9,8 +10,9 @@ import com.google.common.collect.ImmutableSet;
 
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.spi.AbstractSerializerResolver;
+import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.TypeEncounter;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Resolver for {@link Enum enums}, can handle any enum type and supports
@@ -20,39 +22,41 @@ import se.l4.commons.serialization.spi.TypeEncounter;
  *
  */
 public class EnumSerializerResolver
-	extends AbstractSerializerResolver<Enum<?>>
+	implements SerializerResolver<Enum<?>>
 {
 	private static final Set<Class<? extends Annotation>> HINTS =
 		ImmutableSet.<Class<? extends Annotation>>of(MapEnumVia.class);
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Serializer<Enum<?>> find(TypeEncounter encounter)
+	public Optional<Serializer<Enum<?>>> find(TypeEncounter encounter)
 	{
-		Class<? extends Enum<?>> type = (Class<? extends Enum<?>>) encounter.getType().getErasedType();
+		TypeRef type = encounter.getType();
 
-		MapEnumVia hint = encounter.getHint(MapEnumVia.class);
+		Optional<MapEnumVia> hint = encounter.getHint(MapEnumVia.class);
 		ValueTranslator translator;
-		if(hint != null)
+		if(hint.isPresent())
 		{
-			translator = create(hint.value(), type);
+			translator = create(hint.get().value(), type.getErasedType());
 		}
-		else if((hint = type.getAnnotation(MapEnumVia.class)) != null)
+		else if(type.hasAnnotation(MapEnumVia.class))
 		{
-			translator = create(hint.value(), type);
+			MapEnumVia mv = type.getAnnotation(MapEnumVia.class).get();
+			translator = create(mv.value(), type.getErasedType());
 		}
 		else
 		{
-			translator = new NameTranslator(type);
+			translator = new NameTranslator((Class) type.getErasedType());
 		}
 
-		return new EnumSerializer(translator);
+		return Optional.of(new EnumSerializer(translator));
 	}
 
 	@SuppressWarnings("rawtypes")
 	private ValueTranslator create(
-			Class<? extends ValueTranslator> translator,
-			Class<? extends Enum<?>> type)
+		Class<? extends ValueTranslator> translator,
+		Class<?> type
+	)
 	{
 		for(Constructor c : translator.getConstructors())
 		{

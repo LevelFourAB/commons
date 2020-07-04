@@ -30,5 +30,4 @@ public class SerializationException
 	{
 		super(cause);
 	}
-
 }

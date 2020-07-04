@@ -377,6 +377,12 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public boolean isErasedType(Class<?> type)
+	{
+		return erasedType == type;
+	}
+
+	@Override
 	public Optional<TypeRef> getComponentType()
 	{
 		if(! erasedType.isArray())

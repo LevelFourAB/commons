@@ -1,5 +1,7 @@
 package se.l4.commons.serialization.spi;
 
+import java.util.Optional;
+
 import se.l4.commons.serialization.Serializer;
 
 /**
@@ -10,7 +12,7 @@ import se.l4.commons.serialization.Serializer;
  * @param <T>
  */
 public class StaticSerializerResolver<T>
-	extends AbstractSerializerResolver<T>
+	implements SerializerResolver<T>
 {
 	private final Serializer<T> serializer;
 
@@ -20,8 +22,8 @@ public class StaticSerializerResolver<T>
 	}
 
 	@Override
-	public Serializer<T> find(TypeEncounter encounter)
+	public Optional<Serializer<T>> find(TypeEncounter encounter)
 	{
-		return serializer;
+		return Optional.of(serializer);
 	}
 }

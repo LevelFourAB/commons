@@ -2,16 +2,16 @@ package se.l4.commons.serialization.collections;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Resolver for serializer of {@link Map}.
@@ -27,25 +27,20 @@ public class MapSerializerResolver
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Serializer<Map<?, ?>> find(TypeEncounter encounter)
+	public Optional<Serializer<Map<?, ?>>> find(TypeEncounter encounter)
 	{
-		Type[] params = encounter.getType().getParameters();
-		Type type = params.length < 2 ? new TypeViaClass(Object.class) : params[1];
+		TypeRef type = encounter.getType()
+			.getTypeParameter(1)
+			.orElseGet(() -> Types.reference(Object.class));
 
-		Class<?> erasedType = encounter.getType().getErasedType();
-		if(erasedType != Map.class)
+		Optional<StringKey> key = encounter.getHint(StringKey.class);
+		if(key.isPresent())
 		{
-			throw new SerializationException("Maps can only be serialized if they are declared as the interface Map");
+			return CollectionSerializers.resolveSerializer(encounter, type)
+				.map(itemSerializer -> new MapAsObjectSerializer(itemSerializer));
 		}
 
-		StringKey key = encounter.getHint(StringKey.class);
-		if(key != null)
-		{
-			Serializer<?> itemSerializer = CollectionSerializers.resolveSerializer(encounter, type);
-			return new MapAsObjectSerializer(itemSerializer);
-		}
-
-		return null;
+		return Optional.empty();
 	}
 
 	@Override

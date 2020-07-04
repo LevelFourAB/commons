@@ -2,7 +2,7 @@ package se.l4.commons.serialization.standard;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Optional;
 
@@ -11,8 +11,7 @@ import org.junit.Test;
 import se.l4.commons.serialization.DefaultSerializerCollection;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerCollection;
-import se.l4.commons.serialization.spi.Type;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.Types;
 
 public class OptionalSerializerTest
 {
@@ -58,20 +57,9 @@ public class OptionalSerializerTest
 	public void testViaCollection()
 	{
 		SerializerCollection collection = new DefaultSerializerCollection();
-		Serializer<Optional<String>> s = (Serializer) collection.find(new Type()
-		{
-			@Override
-			public Type[] getParameters()
-			{
-				return new Type[] { new TypeViaClass(String.class) };
-			}
-
-			@Override
-			public Class<?> getErasedType()
-			{
-				return Optional.class;
-			}
-		});
+		Serializer<Optional<String>> s = (Serializer) collection.find(
+			Types.reference(Optional.class, String.class)
+		).get();
 
 		assertThat("serializer can be resolved", s, notNullValue());
 

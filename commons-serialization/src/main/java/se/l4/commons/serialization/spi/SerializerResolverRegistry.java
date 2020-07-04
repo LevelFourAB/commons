@@ -80,15 +80,13 @@ public class SerializerResolverRegistry
 	 * @throws SerializationException
 	 *   if the resolver could not be constructed from some reason
 	 */
-	public SerializerResolver<?> getResolver(Class<?> type)
+	public Optional<SerializerResolver<?>> getResolver(Class<?> type)
 	{
 		try
 		{
-			Optional<SerializerResolver<?>> optional = typeToResolverCache.get(Primitives.wrap(type));
-
-			return optional.isPresent() ? optional.get() : null;
+			return typeToResolverCache.get(Primitives.wrap(type));
 		}
-		catch (ExecutionException e)
+		catch(ExecutionException e)
 		{
 			Throwables.throwIfInstanceOf(e.getCause(), SerializationException.class);
 

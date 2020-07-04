@@ -11,9 +11,9 @@ import se.l4.commons.serialization.collections.AllowAnyItem;
 import se.l4.commons.serialization.collections.CollectionSerializers;
 import se.l4.commons.serialization.collections.Item;
 import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Resolver that resolves a suitable {@link OptionalSerializer} based on
@@ -28,14 +28,14 @@ public class OptionalSerializerResolver
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Serializer<Optional<?>> find(TypeEncounter encounter)
+	public Optional<Serializer<Optional<?>>> find(TypeEncounter encounter)
 	{
-		Type[] params = encounter.getType().getParameters();
-		Type type = params.length == 0 ? new TypeViaClass(Object.class) : params[0];
+		TypeRef type = encounter.getType()
+			.getTypeParameter(0)
+			.orElseGet(() -> Types.reference(Object.class));
 
-		Serializer<?> itemSerializer = CollectionSerializers.resolveSerializer(encounter, type);
-
-		return new OptionalSerializer(itemSerializer);
+		return CollectionSerializers.resolveSerializer(encounter, type)
+			.map(itemSerializer -> new OptionalSerializer(itemSerializer));
 	}
 
 	@Override

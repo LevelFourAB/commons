@@ -4,15 +4,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.members.ResolvedConstructor;
 import com.google.common.base.Defaults;
 import com.google.common.base.MoreObjects;
 import com.google.common.primitives.Primitives;
@@ -22,6 +20,9 @@ import se.l4.commons.serialization.Factory;
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.SerializerCollection;
 import se.l4.commons.types.InstanceException;
+import se.l4.commons.types.reflect.ConstructorRef;
+import se.l4.commons.types.reflect.ParameterRef;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Factory that can be used to create an instance of a certain object.
@@ -52,40 +53,35 @@ public class FactoryDefinition<T>
 
 	public static <T> FactoryDefinition<T> resolve(
 		SerializerCollection collection,
-		se.l4.commons.serialization.spi.Type parentType,
+		TypeRef parentType,
 		Map<String, FieldDefinition> fields,
 		Map<String, FieldDefinition> nonRenamed,
-		ResolvedConstructor constructor
+		ConstructorRef constructor
 	)
 	{
 		List<Argument> args = new ArrayList<>();
 
-		Constructor<?> raw = constructor.getRawMember();
-
-		String[] names = findNames(raw);
-
-		Annotation[][] annotations = raw.getParameterAnnotations();
+		String[] names = findNames(constructor);
 
 		// Figure out if we are injectable
-		boolean isInjectable = constructor.getArgumentCount() == 0;
-		for(Annotation a : constructor.getRawMember().getAnnotations())
+		boolean isInjectable = constructor.getParameterCount() == 0;
+		for(Annotation a : constructor.getAnnotations())
 		{
-			if(a.annotationType() == Factory.class)
+			if(a.annotationType() == Factory.class
+				|| a.annotationType().getSimpleName().equals("Inject"))
 			{
 				isInjectable = true;
-			}
-			else if(a.annotationType().getSimpleName().equals("Inject"))
-			{
-				isInjectable = true;
+				break;
 			}
 		}
 
 		// Get if any fields are going to be serialized
 		boolean hasSerializedFields = false;
-		for(int i=0, n=constructor.getArgumentCount(); i<n; i++)
+		int i = 0;
+		for(ParameterRef param : constructor.getParameters())
 		{
-			Expose expose = findExpose(annotations[i]);
-			if(expose != null)
+			Optional<Expose> expose = param.getAnnotation(Expose.class);
+			if(expose.isPresent())
 			{
 				// An expose annotation is present - this definition has serializable fields
 				hasSerializedFields = true;
@@ -105,6 +101,8 @@ public class FactoryDefinition<T>
 					}
 				}
 			}
+
+			i++;
 		}
 
 		if(! isInjectable && ! hasSerializedFields)
@@ -113,40 +111,38 @@ public class FactoryDefinition<T>
 			return null;
 		}
 
-		for(int i=0, n=constructor.getArgumentCount(); i<n; i++)
+		for(ParameterRef parameter : constructor.getParameters())
 		{
-			ResolvedType type = constructor.getArgumentType(i);
-
-			Expose expose = findExpose(annotations[i]);
-			if(expose != null)
+			Optional<Expose> expose = parameter.getAnnotation(Expose.class);
+			if(expose.isPresent())
 			{
 				// Try to serialize
-				if("".equals(expose.value()))
+				if("".equals(expose.get().value().trim()))
 				{
 					throw new SerializationException("The annotation @" +
 						Expose.class.getSimpleName() +
 						" when used in a constructor must have a name (for " +
-						raw.getDeclaringClass() + ")");
+						parentType.getErasedType() + ")");
 				}
 
-				FieldDefinition def = fields.get(expose.value());
+				FieldDefinition def = fields.get(expose.get().value());
 				if(def == null)
 				{
 					throw new SerializationException(expose + " was used on a " +
 							"constructor but there was no such field declared" +
-							" (for " + raw.getDeclaringClass() + ")");
+							" (for " + parentType.getErasedType() + ")");
 				}
-				else if(Primitives.wrap(def.getType()) != Primitives.wrap(type.getErasedType()))
+				else if(Primitives.wrap(def.getType()) != Primitives.wrap(parameter.getType().getErasedType()))
 				{
 					throw new SerializationException(expose + " was used on a " +
 						"constructor but the type of the argument was different " +
 						"from the field. The field was resolved to " +
 						def.getType() + " but the argument was of type " +
-						type.getErasedType() +
-						" (for " + raw.getDeclaringClass() + ")");
+						parameter.getType().getErasedType() +
+						" (for " + parentType.getErasedType() + ")");
 				}
 
-				args.add(new SerializedArgument(def.getType(), expose.value()));
+				args.add(new SerializedArgument(def.getType(), expose.get().value()));
 			}
 			else
 			{
@@ -161,29 +157,29 @@ public class FactoryDefinition<T>
 					}
 				}
 
-				Type javaType = constructor.getRawMember().getParameters()[i].getParameterizedType();
+				Type javaType = parameter.getType().getType();
 
 				try
 				{
-					args.add(new InjectedArgument(collection, javaType, annotations[i]));
+					args.add(new InjectedArgument(collection, javaType, parameter.getAnnotations()));
 				}
 				catch(Exception e)
 				{
-					throw new SerializationException("Error in constructor for " + raw + " while processing argument " + i + "; " + e.getMessage(), e);
+					throw new SerializationException("Error in constructor for " + constructor.toDescription() + " while processing argument " + i + "; " + e.getMessage(), e);
 				}
 			}
 		}
 
 		Argument[] arguments = args.toArray(new Argument[args.size()]);
 		return new FactoryDefinition<>(
-			raw,
+			constructor.getConstructor(),
 			arguments,
 			hasSerializedFields,
 			isInjectable
 		);
 	}
 
-	private static String[] findNames(Constructor<?> c)
+	private static String[] findNames(ConstructorRef c)
 	{
 		String[] names = findNamesViaConstructorProperties(c);
 		if(names != null) return names;
@@ -191,7 +187,7 @@ public class FactoryDefinition<T>
 		return findNamesViaReflection(c);
 	}
 
-	private static String[] findNamesViaConstructorProperties(Constructor<?> c)
+	private static String[] findNamesViaConstructorProperties(ConstructorRef c)
 	{
 		for(Annotation a : c.getAnnotations())
 		{
@@ -205,7 +201,7 @@ public class FactoryDefinition<T>
 				}
 				catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 				{
-					// Ignore that we can't accerss this
+					// Ignore that we can't access this
 					return null;
 				}
 			}
@@ -214,16 +210,11 @@ public class FactoryDefinition<T>
 		return null;
 	}
 
-	private static String[] findNamesViaReflection(Constructor<?> c)
+	private static String[] findNamesViaReflection(ConstructorRef c)
 	{
-		Parameter[] params = c.getParameters();
-		String[] result = new String[params.length];
-		for(int i=0, n=params.length; i<n; i++)
-		{
-			Parameter param = params[i];
-			result[i] = param.isNamePresent() ? param.getName() : null;
-		}
-		return result;
+		return c.getParameters().stream()
+			.map(p -> p.isNamePresent() ? p.getName() : null)
+			.toArray(String[]::new);
 	}
 
 	private static Expose findExpose(Annotation[] annotations)

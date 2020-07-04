@@ -3,12 +3,13 @@ package se.l4.commons.serialization.internal;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerCollection;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
-import se.l4.commons.serialization.spi.Type;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Serializer that is delayed in that it will not be assigned until the entire
@@ -21,37 +22,53 @@ import se.l4.commons.serialization.spi.Type;
 public class DelayedSerializer<T>
 	implements Serializer<T>
 {
-	private final SerializerCollection collection;
-	private final Type type;
-	private final Annotation[] hints;
-
 	private volatile Serializer<T> instance;
 
-	public DelayedSerializer(SerializerCollection collection, Type type, Annotation[] hints)
+	public DelayedSerializer(SerializerCollection collection, TypeRef type, Annotation[] hints)
 	{
-		this.collection = collection;
-		this.type = type;
-		this.hints = hints.clone();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void ensureSerializer()
-	{
-		if(instance == null)
+		instance = new Serializer<T>()
 		{
-			Serializer<T> instance = (Serializer<T>) collection.find(type, hints);
-			if(! (instance instanceof DelayedSerializer))
+			@SuppressWarnings("unchecked")
+			private void ensureSerializer()
 			{
-				this.instance = instance;
+				instance = (Serializer<T>) collection.find(type, hints)
+					.filter(instance -> ! (instance instanceof DelayedSerializer))
+					.orElseThrow(() -> new SerializationException("Could not resolve serialization loop"));
 			}
-		}
+
+			@Override
+			public T read(StreamingInput in) throws IOException
+			{
+				ensureSerializer();
+
+				return instance.read(in);
+			}
+
+
+			@Override
+			public void write(T object, String name, StreamingOutput stream)
+				throws IOException
+			{
+				ensureSerializer();
+
+				instance.write(object, name, stream);
+			}
+
+			@Override
+			public SerializerFormatDefinition getFormatDefinition()
+			{
+				ensureSerializer();
+
+				if(instance == this) return null;
+
+				return instance.getFormatDefinition();
+			}
+		};
 	}
 
 	@Override
 	public T read(StreamingInput in) throws IOException
 	{
-		ensureSerializer();
-
 		return instance.read(in);
 	}
 
@@ -60,18 +77,12 @@ public class DelayedSerializer<T>
 	public void write(T object, String name, StreamingOutput stream)
 		throws IOException
 	{
-		ensureSerializer();
-
 		instance.write(object, name, stream);
 	}
 
 	@Override
 	public SerializerFormatDefinition getFormatDefinition()
 	{
-		ensureSerializer();
-
-		if(instance == null) return null;
-
 		return instance.getFormatDefinition();
 	}
 }

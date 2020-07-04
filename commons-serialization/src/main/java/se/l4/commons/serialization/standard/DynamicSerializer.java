@@ -1,6 +1,7 @@
 package se.l4.commons.serialization.standard;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.SerializationException;
@@ -81,15 +82,13 @@ public class DynamicSerializer
 
 				resultRead = true;
 
-				Serializer<?> serializer = collection.find(namespace, name);
-				if(serializer == null)
+				Optional<? extends Serializer<?>> serializer = collection.find(namespace, name);
+				if(! serializer.isPresent())
 				{
-					// TODO: What should we do if we have no serializer?
-					in.skipValue();
-					continue;
+					throw new SerializationException("No serializer found for `" + name + (namespace != null ? "` in `" + namespace + "`" : "`"));
 				}
 
-				result = serializer.read(in);
+				result = serializer.get().read(in);
 			}
 			else
 			{
@@ -111,12 +110,11 @@ public class DynamicSerializer
 	public void write(Object object, String name, StreamingOutput stream)
 		throws IOException
 	{
-		Serializer serializer = collection.find(object.getClass());
-		QualifiedName qname = collection.findName(serializer);
-		if(qname == null)
-		{
-			throw new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name");
-		}
+		Serializer serializer = collection.find(object.getClass())
+			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but no serializer could be found"));
+
+		QualifiedName qname = collection.findName(serializer)
+			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
 
 		stream.writeObjectStart(name);
 

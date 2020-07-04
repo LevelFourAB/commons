@@ -20,7 +20,7 @@ import se.l4.commons.serialization.SerializerCollection;
 import se.l4.commons.serialization.format.JsonInput;
 import se.l4.commons.serialization.format.JsonOutput;
 import se.l4.commons.serialization.internal.TypeEncounterImpl;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.Types;
 
 public class ReflectionConstructorTest
 {
@@ -36,7 +36,8 @@ public class ReflectionConstructorTest
 	public void testDefaultConstructor()
 	{
 		Serializer<A> serializer = new ReflectionSerializer<A>()
-			.find(new TypeEncounterImpl(collection, new TypeViaClass(A.class), Collections.<Annotation>emptyList()));
+			.find(new TypeEncounterImpl(collection, Types.reference(A.class), Collections.<Annotation>emptyList()))
+			.get();
 
 		A instance = new A();
 		instance.field = "test value";
@@ -47,7 +48,8 @@ public class ReflectionConstructorTest
 	public void testMultipleConstructors()
 	{
 		Serializer<B> serializer = new ReflectionSerializer<B>()
-			.find(new TypeEncounterImpl(collection, new TypeViaClass(B.class), Collections.<Annotation>emptyList()));
+			.find(new TypeEncounterImpl(collection, Types.reference(B.class), Collections.<Annotation>emptyList()))
+			.get();
 
 		B instance = new B("test", "value");
 		testSymmetry(serializer, instance);
@@ -57,7 +59,8 @@ public class ReflectionConstructorTest
 	public void testSingleConstructor()
 	{
 		Serializer<C> serializer = new ReflectionSerializer<C>()
-			.find(new TypeEncounterImpl(collection, new TypeViaClass(C.class), Collections.<Annotation>emptyList()));
+			.find(new TypeEncounterImpl(collection, Types.reference(C.class), Collections.<Annotation>emptyList()))
+			.get();
 
 		C instance = new C("test value");
 		testSymmetry(serializer, instance);
@@ -67,7 +70,8 @@ public class ReflectionConstructorTest
 	public void testSingleConstructorMixedTypes()
 	{
 		Serializer<D> serializer = new ReflectionSerializer<D>()
-			.find(new TypeEncounterImpl(collection, new TypeViaClass(D.class), Collections.<Annotation>emptyList()));
+			.find(new TypeEncounterImpl(collection, Types.reference(D.class), Collections.<Annotation>emptyList()))
+			.get();
 
 		D instance = new D(2, "test value");
 		testSymmetry(serializer, instance);

@@ -3,7 +3,6 @@ module se.l4.commons.serialization {
 
 	requires se.l4.commons.types;
 
-	requires com.fasterxml.classmate;
 	requires com.google.common;
 
 	exports se.l4.commons.serialization;

@@ -2,6 +2,7 @@ package se.l4.commons.serialization.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -12,14 +13,14 @@ import se.l4.commons.serialization.Serializer;
  * Chain of {@link SerializerResolver}s that are tried in order. The first
  * resolver that returns a {@link Serializer} determines the result.
  */
-public class SerializerResolverChain<T>
-	implements SerializerResolver<T>
+public class SerializerResolverChain
+	implements SerializerResolver<Object>
 {
-	private final SerializerResolver<T>[] resolvers;
+	private final SerializerResolver<?>[] resolvers;
 	private final Set<Class<? extends Annotation>> hints;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public SerializerResolverChain(Collection<SerializerResolver<T>> resolvers)
+	@SuppressWarnings({ "rawtypes" })
+	public SerializerResolverChain(Collection<? extends SerializerResolver<?>> resolvers)
 	{
 		int i = 0;
 		ImmutableSet.Builder<Class<? extends Annotation>> builder = ImmutableSet.builder();
@@ -35,15 +36,19 @@ public class SerializerResolverChain<T>
 	}
 
 	@Override
-	public Serializer<T> find(TypeEncounter encounter)
+	@SuppressWarnings({ "unchecked" , "rawtypes" })
+	public Optional<Serializer<Object>> find(TypeEncounter encounter)
 	{
-		for(SerializerResolver<T> resolver : resolvers)
+		for(SerializerResolver<?> resolver : resolvers)
 		{
-			Serializer<T> serializer = resolver.find(encounter);
-			if(serializer != null) return serializer;
+			Optional serializer = resolver.find(encounter);
+			if(serializer.isPresent())
+			{
+				return serializer;
+			}
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	@Override

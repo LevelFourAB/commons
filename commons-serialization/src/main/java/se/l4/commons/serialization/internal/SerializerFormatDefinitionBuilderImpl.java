@@ -12,8 +12,8 @@ import se.l4.commons.serialization.SerializerFormatDefinition.Builder;
 import se.l4.commons.serialization.SerializerFormatDefinition.FieldBuilder;
 import se.l4.commons.serialization.SerializerFormatDefinition.FieldDefinition;
 import se.l4.commons.serialization.format.ValueType;
-import se.l4.commons.serialization.spi.Type;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Implementation of {@link SerializerDefinition.Builder}.
@@ -88,7 +88,7 @@ public class SerializerFormatDefinitionBuilderImpl
 	{
 		private final Collection<Annotation> hints;
 		private String name;
-		private Type type;
+		private TypeRef type;
 
 		public FieldBuilderImpl(String name)
 		{
@@ -116,11 +116,11 @@ public class SerializerFormatDefinitionBuilderImpl
 		@Override
 		public FieldBuilder withType(Class<?> type)
 		{
-			return withType(new TypeViaClass(type));
+			return withType(Types.reference(type));
 		}
 
 		@Override
-		public FieldBuilder withType(Type type)
+		public FieldBuilder withType(TypeRef type)
 		{
 			this.type = type;
 			return this;

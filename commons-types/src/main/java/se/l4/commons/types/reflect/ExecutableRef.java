@@ -69,6 +69,13 @@ public interface ExecutableRef
 	List<ParameterRef> getParameters();
 
 	/**
+	 * Get the number of parameters that are available.
+	 *
+	 * @return
+	 */
+	int getParameterCount();
+
+	/**
 	 * Get the receiver type of this executable. See {@link Executable#getAnnotatedReceiverType()}
 	 * for details.
 	 */

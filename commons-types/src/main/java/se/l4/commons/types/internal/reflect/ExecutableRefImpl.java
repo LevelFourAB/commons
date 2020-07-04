@@ -118,6 +118,12 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
+	public int getParameterCount()
+	{
+		return executable.getParameterCount();
+	}
+
+	@Override
 	public List<TypeRef> getExceptionTypes()
 	{
 		return Arrays.stream(executable.getAnnotatedExceptionTypes())

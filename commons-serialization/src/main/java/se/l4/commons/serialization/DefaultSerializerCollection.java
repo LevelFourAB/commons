@@ -100,7 +100,7 @@ public class DefaultSerializerCollection
 		return this;
 	}
 
-	public SerializerResolver<?> getResolver(Class<?> type)
+	public Optional<SerializerResolver<?>> getResolver(Class<?> type)
 	{
 		return resolverRegistry.getResolver(type);
 	}

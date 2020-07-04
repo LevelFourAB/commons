@@ -2,29 +2,25 @@ package se.l4.commons.serialization;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Optional;
 
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.members.ResolvedConstructor;
-import com.fasterxml.classmate.members.ResolvedField;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-import se.l4.commons.serialization.internal.TypeViaResolvedType;
 import se.l4.commons.serialization.internal.reflection.FactoryDefinition;
 import se.l4.commons.serialization.internal.reflection.FieldDefinition;
 import se.l4.commons.serialization.internal.reflection.ReflectionNonStreamingSerializer;
 import se.l4.commons.serialization.internal.reflection.ReflectionOnlySingleFactorySerializer;
 import se.l4.commons.serialization.internal.reflection.ReflectionStreamingSerializer;
 import se.l4.commons.serialization.internal.reflection.TypeInfo;
-import se.l4.commons.serialization.spi.AbstractSerializerResolver;
 import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
 import se.l4.commons.serialization.standard.CompactDynamicSerializer;
 import se.l4.commons.serialization.standard.DynamicSerializer;
 import se.l4.commons.serialization.standard.SimpleTypeSerializer;
-import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.ConstructorRef;
+import se.l4.commons.types.reflect.FieldRef;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Serializer that will use reflection to access fields and methods in a
@@ -43,7 +39,7 @@ import se.l4.commons.types.Types;
  * @author Andreas Holstenson
  */
 public class ReflectionSerializer<T>
-	extends AbstractSerializerResolver<T>
+	implements SerializerResolver<T>
 {
 	public ReflectionSerializer()
 	{
@@ -51,80 +47,46 @@ public class ReflectionSerializer<T>
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Serializer<T> find(TypeEncounter encounter)
+	public Optional<Serializer<T>> find(TypeEncounter encounter)
 	{
-		Type type = encounter.getType();
+		TypeRef type = encounter.getType();
 		SerializerCollection collection = encounter.getCollection();
 
 		ImmutableMap.Builder<String, FieldDefinition> builder = ImmutableMap.builder();
 		ImmutableMap.Builder<String, FieldDefinition> nonRenamedFields = ImmutableMap.builder();
 
-		Type[] params = type.getParameters();
-		ResolvedType rt = params.length == 0
-			? Types.resolve(type.getErasedType())
-			: resolveWithParams(type, params);
-
-		ResolvedTypeWithMembers typeWithMembers = Types.resolveMembers(rt);
-
-		for(ResolvedField field : typeWithMembers.getMemberFields())
+		for(FieldRef field : type.getDeclaredFields())
 		{
-			Field reflectiveField = field.getRawMember();
-
-			if(! reflectiveField.isAnnotationPresent(Expose.class))
+			if(! field.hasAnnotation(Expose.class))
 			{
 				continue;
 			}
 
 			// Resolve the serializer to use for the field
-			ResolvedType fieldType = field.getType();
-
 			Serializer<?> serializer;
-			if(reflectiveField.isAnnotationPresent(Use.class))
+			if(field.hasAnnotation(Use.class))
 			{
 				// Serializer has been set to a specific type
-				Use annotation = reflectiveField.getAnnotation(Use.class);
-				if(Serializer.class.isAssignableFrom(annotation.value()))
-				{
-					try
-					{
-						serializer = (Serializer) collection.getInstanceFactory().create(annotation.value());
-					}
-					catch(Exception e)
-					{
-						throw new SerializationException("Unable to create " + annotation.value() + " for " + type + "; " + e.getMessage(), e);
-					}
-				}
-				else if(SerializerResolver.class.isAssignableFrom(annotation.value()))
-				{
-					serializer = collection.findVia((Class) annotation.value(), new TypeViaResolvedType(fieldType), reflectiveField.getAnnotations());
-				}
-				else
-				{
-					throw new SerializationException("Unable to create " + annotation.value() + " for " +  type + "; Class either needs to a Serializer or a SerializerResolver");
-				}
+				Use annotation = field.getAnnotation(Use.class).get();
+				serializer = collection.findVia((Class<SerializerOrResolver<?>>) annotation.value(), field.getType(), field.getAnnotations())
+					.orElseThrow(() -> new SerializationException("Could not locate serializer for " + field.getType().toTypeDescription()));
 			}
-			else if(reflectiveField.isAnnotationPresent(AllowAny.class))
+			else if(field.hasAnnotation(AllowAny.class))
 			{
-				AllowAny allowAny = reflectiveField.getAnnotation(AllowAny.class);
+				AllowAny allowAny = field.getAnnotation(AllowAny.class).get();
 				serializer = allowAny.compact()
 					? new CompactDynamicSerializer(collection)
 					: new DynamicSerializer(collection);
 			}
-			else if(reflectiveField.isAnnotationPresent(AllowSimpleTypes.class))
+			else if(field.hasAnnotation(AllowSimpleTypes.class))
 			{
 				serializer = new SimpleTypeSerializer();
 			}
 			else
 			{
 				// Dynamically find a suitable type
-				try
-				{
-					serializer = collection.find(new TypeViaResolvedType(fieldType), reflectiveField.getAnnotations());
-				}
-				catch(SerializationException e)
-				{
-					throw new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType() + "; " + e.getMessage(), e);
-				}
+				serializer = collection.find(field.getType(), field.getAnnotations())
+					.orElseThrow(() -> new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType()));
 			}
 
 			if(serializer == null)
@@ -132,14 +94,15 @@ public class ReflectionSerializer<T>
 				throw new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType() + "; No serializer found");
 			}
 
-			boolean skipIfDefault = reflectiveField.isAnnotationPresent(SkipDefaultValue.class);
+			boolean skipIfDefault = field.hasAnnotation(SkipDefaultValue.class);
 
 			// Force the field to be accessible
+			Field reflectiveField = field.getField();
 			reflectiveField.setAccessible(true);
 
 			// Define how we access this field
 			String name = getName(reflectiveField);
-			FieldDefinition def = new FieldDefinition(reflectiveField, name, serializer, fieldType.getErasedType(), skipIfDefault);
+			FieldDefinition def = new FieldDefinition(reflectiveField, name, serializer, field.getType().getErasedType(), skipIfDefault);
 			builder.put(name, def);
 			nonRenamedFields.put(reflectiveField.getName(), def);
 		}
@@ -153,7 +116,7 @@ public class ReflectionSerializer<T>
 		boolean hasSerializerInFactory = false;
 		List<FactoryDefinition<T>> factories = Lists.newArrayList();
 
-		for(ResolvedConstructor constructor : typeWithMembers.getConstructors())
+		for(ConstructorRef constructor : type.getConstructors())
 		{
 			FactoryDefinition<T> def = FactoryDefinition.resolve(collection, type, fields, nonRenamed, constructor);
 			if(def == null) continue;
@@ -178,28 +141,17 @@ public class ReflectionSerializer<T>
 			if(factoryWithEverything == null)
 			{
 				// There is no factory that takes in every single field, use a non-streaming serializer
-				return new ReflectionNonStreamingSerializer<>(typeInfo);
+				return Optional.of(new ReflectionNonStreamingSerializer<>(typeInfo));
 			}
 			else
 			{
-				return new ReflectionOnlySingleFactorySerializer<>(typeInfo, factoryWithEverything);
+				return Optional.of(new ReflectionOnlySingleFactorySerializer<>(typeInfo, factoryWithEverything));
 			}
 		}
 		else
 		{
-			return new ReflectionStreamingSerializer<>(typeInfo);
+			return Optional.of(new ReflectionStreamingSerializer<>(typeInfo));
 		}
-	}
-
-	private static ResolvedType resolveWithParams(Type type, Type[] params)
-	{
-		if(type instanceof TypeViaResolvedType)
-		{
-			return ((TypeViaResolvedType) type).getResolvedType();
-		}
-
-		//return Types.resolve(type, params);
-		return null;
 	}
 
 	private static String getName(Field field)

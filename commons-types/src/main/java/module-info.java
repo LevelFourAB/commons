@@ -3,8 +3,6 @@ module se.l4.commons.types {
 
 	requires io.github.classgraph;
 
-	requires transitive com.fasterxml.classmate;
-
 	requires net.bytebuddy;
 	requires com.google.common;
 

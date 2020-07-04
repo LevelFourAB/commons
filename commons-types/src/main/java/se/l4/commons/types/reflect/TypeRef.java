@@ -1,6 +1,7 @@
 package se.l4.commons.types.reflect;
 
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
@@ -357,6 +358,14 @@ public interface TypeRef
 	 */
 	@NonNull
 	Class<?> getErasedType();
+
+	/**
+	 * Check if this type represents the given class.
+	 *
+	 * @param type
+	 * @return
+	 */
+	boolean isErasedType(Class<?> type);
 
 	/**
 	 * Get the super class of this type.

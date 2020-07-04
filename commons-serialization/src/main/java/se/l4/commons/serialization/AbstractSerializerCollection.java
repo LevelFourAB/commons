@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,8 +15,8 @@ import se.l4.commons.serialization.internal.DelayedSerializer;
 import se.l4.commons.serialization.internal.TypeEncounterImpl;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.StaticSerializerResolver;
-import se.l4.commons.serialization.spi.Type;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.Types;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Default implementation of {@link SerializerCollection}.
@@ -26,7 +27,7 @@ import se.l4.commons.serialization.spi.TypeViaClass;
 public abstract class AbstractSerializerCollection
 	implements SerializerCollection
 {
-	private static final ThreadLocal<Set<Type>> stack = new ThreadLocal<Set<Type>>();
+	private static final ThreadLocal<Set<TypeRef>> stack = new ThreadLocal<Set<TypeRef>>();
 
 	private final Map<QualifiedName, Serializer<?>> nameToSerializer;
 	private final Map<Serializer<?>, QualifiedName> serializerToName;
@@ -67,76 +68,79 @@ public abstract class AbstractSerializerCollection
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T> Serializer<T> find(Class<T> type)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> Optional<? extends Serializer<T>> find(Class<T> type)
 	{
-		return (Serializer<T>) find(new TypeViaClass(type));
+		return (Optional) find(Types.reference(type));
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T> Serializer<T> find(Class<T> type, Annotation... hints)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> Optional<? extends Serializer<T>> find(Class<T> type, Annotation... hints)
 	{
-		return (Serializer<T>) find(new TypeViaClass(type), hints);
+		return (Optional) find(Types.reference(type), hints);
 	}
 
 	@Override
-	public Serializer<?> find(Type type)
+	public Optional<? extends Serializer<?>> find(TypeRef type)
 	{
 		return find(type, (Annotation[]) null);
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes" })
-	public Serializer<?> find(Type type, Annotation... hints)
+	public Optional<? extends Serializer<?>> find(TypeRef type, Annotation... hints)
 	{
-		Set<Type> s = stack.get();
+		Set<TypeRef> s = stack.get();
 		if(s != null && s.contains(type))
 		{
 			// Already trying to create this serializer, delay creation
-			return new DelayedSerializer(this, type, hints);
+			return Optional.of(new DelayedSerializer<>(this, type, hints));
 		}
 
 		// Locate the resolver to use
-		SerializerResolver finder = getResolver(type.getErasedType());
-		if(finder == null)
-		{
-			throw new SerializationException("Unable to retreive serializer for " + type + "; Type does not appear serializable");
-		}
+		SerializerResolver<?> resolver = getResolver(type.getErasedType())
+			.orElseThrow(() -> new SerializationException("Unable to retrieve serializer for " + type + "; Type does not appear serializable"));
 
-		return createVia(finder, type, hints);
+		return createVia(resolver, type, hints);
 	}
 
 	@Override
-	public Serializer<?> find(String name)
+	public Optional<? extends Serializer<?>> find(String name)
 	{
 		return find("", name);
 	}
 
 	@Override
-	public Serializer<?> find(String namespace, String name)
+	public Optional<? extends Serializer<?>> find(QualifiedName name)
 	{
-		return nameToSerializer.get(new QualifiedName(namespace, name));
+		return find(name.getNamespace(), name.getName());
 	}
 
 	@Override
-	public <T> Serializer<T> findVia(Class<? extends SerializerOrResolver<T>> resolver, Class<T> type, Annotation... hints)
+	public Optional<? extends Serializer<?>> find(String namespace, String name)
 	{
-		return findVia(resolver, new TypeViaClass(type), hints);
+		return Optional.ofNullable(nameToSerializer.get(new QualifiedName(namespace, name)));
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public <T> Serializer<T> findVia(Class<? extends SerializerOrResolver<T>> resolver, Type type, Annotation... hints)
+	public <T> Optional<? extends Serializer<T>> findVia(Class<? extends SerializerOrResolver<T>> resolver, Class<T> type, Annotation... hints)
 	{
-		SerializerOrResolver<T> instance = getInstanceFactory().create(resolver);
+		return (Optional) findVia(resolver, Types.reference(type), hints);
+	}
+
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Optional<? extends Serializer<?>> findVia(Class<? extends SerializerOrResolver<?>> resolver, TypeRef type, Annotation... hints)
+	{
+		SerializerOrResolver<?> instance = getInstanceFactory().create(resolver);
 		if(instance instanceof Serializer)
 		{
-			return (Serializer<T>) instance;
+			return Optional.of((Serializer<?>) instance);
 		}
 		else
 		{
-			return (Serializer) createVia((SerializerResolver) instance, type, hints);
+			return (Optional) createVia((SerializerResolver) instance, type, hints);
 		}
 	}
 
@@ -149,9 +153,9 @@ public abstract class AbstractSerializerCollection
 	 * @param hints
 	 * @return
 	 */
-	protected Serializer<?> createVia(SerializerResolver<?> resolver, Type type, Annotation... hints)
+	protected Optional<? extends Serializer<?>> createVia(SerializerResolver<?> resolver, TypeRef type, Annotation... hints)
 	{
-		Set<Type> s = stack.get();
+		Set<TypeRef> s = stack.get();
 
 		// Only expose the hints that the resolver has declared
 		Set<Class<? extends Annotation>> hintsUsed = resolver.getHints();
@@ -177,13 +181,13 @@ public abstract class AbstractSerializerCollection
 		Serializer<?> serializer = serializers.get(key);
 		if(serializer != null)
 		{
-			return serializer;
+			return Optional.of(serializer);
 		}
 
 		// Stack to keep track of circular dependencies
 		if(s == null)
 		{
-			s = new HashSet<Type>();
+			s = new HashSet<>();
 			stack.set(s);
 		}
 
@@ -194,17 +198,14 @@ public abstract class AbstractSerializerCollection
 			// Find a serializer to use
 			TypeEncounterImpl encounter = new TypeEncounterImpl(this, type, hintsActive);
 
-			serializer = resolver.find(encounter);
-			if(serializer == null)
-			{
-				throw new SerializationException("Unable to find serializer for " + type + " using " + resolver.getClass());
-			}
+			serializer = resolver.find(encounter)
+				.orElseThrow(() -> new SerializationException("Unable to find serializer for " + type + " using " + resolver.getClass()));
 
 			registerIfNamed(type.getErasedType(), serializer);
 
 			// Store the found serializer in the cache
 			serializers.put(key, serializer);
-			return serializer;
+			return Optional.of(serializer);
 		}
 		finally
 		{
@@ -218,25 +219,28 @@ public abstract class AbstractSerializerCollection
 	}
 
 	@Override
-	public QualifiedName findName(Serializer<?> serializer)
+	public Optional<QualifiedName> findName(Serializer<?> serializer)
 	{
-		return serializerToName.get(serializer);
+		return Optional.ofNullable(serializerToName.get(serializer));
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
 	public boolean isSupported(Class<?> type)
 	{
-		SerializerResolver finder = getResolver(type);
-		if(finder == null) return false;
+		Optional<? extends SerializerResolver<?>> resolver = getResolver(type);
+		if(! resolver.isPresent())
+		{
+			return false;
+		}
 
-		if(finder instanceof StaticSerializerResolver)
+		if(resolver.get() instanceof StaticSerializerResolver)
 		{
 			return true;
 		}
 
-		Serializer serializer = finder.find(new TypeEncounterImpl(this, new TypeViaClass(type), null));
-		return serializer != null;
+		return resolver.get()
+			.find(new TypeEncounterImpl(this, Types.reference(type), null))
+			.isPresent();
 	}
 
 	/**
@@ -258,10 +262,10 @@ public abstract class AbstractSerializerCollection
 
 	private static class CacheKey
 	{
-		private final Type type;
+		private final TypeRef type;
 		private final Object[] hints;
 
-		public CacheKey(Type type, Object[] hints)
+		public CacheKey(TypeRef type, Object[] hints)
 		{
 			this.type = type;
 			this.hints = hints;

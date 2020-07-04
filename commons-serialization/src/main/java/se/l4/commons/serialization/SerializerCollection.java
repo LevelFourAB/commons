@@ -1,12 +1,12 @@
 package se.l4.commons.serialization;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.types.InstanceFactory;
+import se.l4.commons.types.reflect.TypeRef;
 
 
 /**
@@ -63,7 +63,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	<T> Serializer<T> find(@NonNull Class<T> type);
+	<T> Optional<? extends Serializer<T>> find(@NonNull Class<T> type);
 
 	/**
 	 * Find a serializer suitable for the specific type.
@@ -73,7 +73,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	<T> Serializer<T> find(@NonNull Class<T> type, @NonNull Annotation... hints);
+	<T> Optional<? extends Serializer<T>> find(@NonNull Class<T> type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -82,7 +82,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	Serializer<?> find(@NonNull Type type);
+	Optional<? extends Serializer<?>> find(@NonNull TypeRef type);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -91,7 +91,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	Serializer<?> find(@NonNull Type type, @NonNull Annotation... hints);
+	Optional<? extends Serializer<?>> find(@NonNull TypeRef type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer based on its registered name.
@@ -100,7 +100,16 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	Serializer<?> find(String name);
+	Optional<? extends Serializer<?>> find(String name);
+
+	/**
+	 * Find a serializer based on its registered name.
+	 *
+	 * @param name
+	 * @return
+	 */
+	@NonNull
+	Optional<? extends Serializer<?>> find(QualifiedName name);
 
 	/**
 	 * Find a serializer based on its registered name.
@@ -110,7 +119,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	Serializer<?> find(@NonNull String namespace, @NonNull String name);
+	Optional<? extends Serializer<?>> find(@NonNull String namespace, @NonNull String name);
 
 	/**
 	 * Find a serializer using a specific {@link SerializerResolver}.
@@ -120,7 +129,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	<T> Serializer<T> findVia(
+	<T> Optional<? extends Serializer<T>> findVia(
 		@NonNull Class<? extends SerializerOrResolver<T>> resolver,
 		@NonNull Class<T> type,
 		@NonNull Annotation... hints
@@ -134,10 +143,10 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	<T> Serializer<T> findVia(
-		@NonNull Class<? extends SerializerOrResolver<T>> resolver,
-		@NonNull Type type,
-		@NonNull  Annotation... hints
+	Optional<? extends Serializer<?>> findVia(
+		@NonNull Class<? extends SerializerOrResolver<?>> resolver,
+		@NonNull TypeRef type,
+		@NonNull Annotation... hints
 	);
 
 	/**
@@ -148,7 +157,7 @@ public interface SerializerCollection
 	 * @return
 	 */
 	@NonNull
-	SerializerResolver<?> getResolver(@NonNull Class<?> type);
+	Optional<? extends SerializerResolver<?>> getResolver(@NonNull Class<?> type);
 
 	/**
 	 * Get if the given type can be serialized.
@@ -164,6 +173,6 @@ public interface SerializerCollection
 	 * @param serializer
 	 * @return
 	 */
-	@Nullable
-	QualifiedName findName(@NonNull Serializer<?> serializer);
+	@NonNull
+	Optional<QualifiedName> findName(@NonNull Serializer<?> serializer);
 }

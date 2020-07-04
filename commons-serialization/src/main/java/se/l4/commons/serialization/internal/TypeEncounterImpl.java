@@ -2,10 +2,11 @@ package se.l4.commons.serialization.internal;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Optional;
 
 import se.l4.commons.serialization.SerializerCollection;
-import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Implementation of {@link TypeEncounter}.
@@ -17,11 +18,11 @@ public class TypeEncounterImpl
 	implements TypeEncounter
 {
 	private final SerializerCollection collection;
-	private final Type type;
+	private final TypeRef type;
 	private final List<Annotation> annotations;
 
 	public TypeEncounterImpl(SerializerCollection collection,
-			Type type,
+			TypeRef type,
 			List<Annotation> annotations)
 	{
 		this.collection = collection;
@@ -37,23 +38,23 @@ public class TypeEncounterImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends Annotation> T getHint(Class<T> type)
+	public <T extends Annotation> Optional<T> getHint(Class<T> type)
 	{
-		if(annotations == null) return null;
+		if(annotations == null) return Optional.empty();
 
 		for(Annotation a : annotations)
 		{
 			if(type.isAssignableFrom(a.annotationType()))
 			{
-				return (T) a;
+				return Optional.of((T) a);
 			}
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	@Override
-	public Type getType()
+	public TypeRef getType()
 	{
 		return type;
 	}

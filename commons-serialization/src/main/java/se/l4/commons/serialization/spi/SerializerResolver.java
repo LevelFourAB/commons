@@ -2,10 +2,10 @@ package se.l4.commons.serialization.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerOrResolver;
 
@@ -31,8 +31,8 @@ public interface SerializerResolver<T>
 	 * @param encounter
 	 * @return
 	 */
-	@Nullable
-	Serializer<T> find(@NonNull TypeEncounter encounter);
+	@NonNull
+	Optional<Serializer<T>> find(@NonNull TypeEncounter encounter);
 
 	/**
 	 * Get the hints this resolver uses.

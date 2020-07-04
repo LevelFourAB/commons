@@ -21,12 +21,6 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.fasterxml</groupId>
-		    <artifactId>classmate</artifactId>
-		    <version>1.5.1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
 			<version>4.8.53</version>

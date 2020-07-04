@@ -1,6 +1,5 @@
 package se.l4.commons.types.internal;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,10 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.members.ResolvedMethod;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
@@ -32,6 +27,8 @@ import se.l4.commons.types.proxies.MethodEncounter;
 import se.l4.commons.types.proxies.MethodInvocationHandler;
 import se.l4.commons.types.proxies.MethodResolver;
 import se.l4.commons.types.proxies.ProxyException;
+import se.l4.commons.types.reflect.MethodRef;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Implementation of {@link ExtendedTypeBuilder} that uses JavaAssist to
@@ -87,14 +84,13 @@ public class ExtendedTypeBuilderImpl<ContextType>
 		List<MethodResolver<CT>> resolvers,
 		Class<I> typeToExtend)
 	{
-		// Resolve generics
-		ResolvedTypeWithMembers withMembers = Types.resolveMembers(typeToExtend);
+		TypeRef type = Types.reference(typeToExtend);
 
 		Map<Method, MethodInvocationHandler<CT>> handlers = new HashMap<>();
 		try
 		{
 			// Go through methods and create invokers for each of them
-			for(ResolvedMethod method : withMembers.getMemberMethods())
+			for(MethodRef method : type.getMethods())
 			{
 				// Only try to implement abstract methods
 				if(! method.isAbstract()) continue;
@@ -109,7 +105,7 @@ public class ExtendedTypeBuilderImpl<ContextType>
 					{
 						// This resolver created an invoker to use
 						foundInvoker = true;
-						handlers.put(method.getRawMember(), opt.get());
+						handlers.put(method.getMethod(), opt.get());
 						break;
 					}
 				}
@@ -253,77 +249,17 @@ public class ExtendedTypeBuilderImpl<ContextType>
 	private static class MethodEncounterImpl
 		implements MethodEncounter
 	{
-		private final ResolvedMethod method;
-		private Annotation[][] parameterAnnotations;
+		private final MethodRef method;
 
-		public MethodEncounterImpl(ResolvedMethod method)
+		public MethodEncounterImpl(MethodRef method)
 		{
 			this.method = method;
-			parameterAnnotations = method.getRawMember().getParameterAnnotations();
 		}
 
 		@Override
-		public Method getMethod()
+		public MethodRef getMethod()
 		{
-			return method.getRawMember();
+			return method;
 		}
-
-		@Override
-		public String getName()
-		{
-			return method.getName();
-		}
-
-		@Override
-		public ResolvedType getReturnType()
-		{
-			return method.getReturnType();
-		}
-
-		@Override
-		public boolean hasAnnotation(Class<? extends Annotation> annotation)
-		{
-			return method.getRawMember().getAnnotation(annotation) != null;
-		}
-
-		@Override
-		public <T extends Annotation> T getAnnotation(Class<T> annotation)
-		{
-			return method.getRawMember().getAnnotation(annotation);
-		}
-
-		@Override
-		public int getArgumentCount()
-		{
-			return method.getArgumentCount();
-		}
-
-		@Override
-		public ResolvedType getArgumentType(int argument)
-		{
-			return method.getArgumentType(argument);
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public <T extends Annotation> T findArgumentAnnotation(int argument, Class<T> type)
-		{
-			for(Annotation a : parameterAnnotations[argument])
-			{
-				if(a.annotationType() == type)
-				{
-					return (T) a;
-				}
-			}
-
-			return null;
-		}
-
-		@Override
-		public Annotation[] getAnnotations()
-		{
-			return method.getRawMember().getAnnotations();
-		}
-
 	}
 }

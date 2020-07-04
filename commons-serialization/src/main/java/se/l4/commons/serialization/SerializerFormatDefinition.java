@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableMap;
 
 import se.l4.commons.serialization.format.ValueType;
 import se.l4.commons.serialization.internal.SerializerFormatDefinitionBuilderImpl;
-import se.l4.commons.serialization.spi.Type;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Definition of the output of a {@link Serializer}.
@@ -117,10 +117,10 @@ public class SerializerFormatDefinition
 	{
 		private final String name;
 		private final SerializerFormatDefinition definition;
-		private final Type type;
+		private final TypeRef type;
 		private final Annotation[] hints;
 
-		public FieldDefinition(String name, SerializerFormatDefinition definition, Type type, Annotation[] hints)
+		public FieldDefinition(String name, SerializerFormatDefinition definition, TypeRef type, Annotation[] hints)
 		{
 			this.name = name;
 			this.definition = definition;
@@ -138,7 +138,7 @@ public class SerializerFormatDefinition
 			return definition;
 		}
 
-		public Type getType()
+		public TypeRef getType()
 		{
 			return type;
 		}
@@ -235,7 +235,7 @@ public class SerializerFormatDefinition
 		 * @param type
 		 * @return
 		 */
-		FieldBuilder withType(Type type);
+		FieldBuilder withType(TypeRef type);
 
 		/**
 		 * Define that this field uses the specified serializer.

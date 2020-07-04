@@ -32,6 +32,12 @@ public class QualifiedName
 	}
 
 	@Override
+	public String toString()
+	{
+		return getClass().getSimpleName() + "{namespace=" + namespace + ", name=" + name + "}";
+	}
+
+	@Override
 	public int hashCode()
 	{
 		final int prime = 31;

@@ -1,5 +1,7 @@
 package se.l4.commons.serialization.collections;
 
+import java.util.Optional;
+
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.collections.array.BooleanArraySerializer;
 import se.l4.commons.serialization.collections.array.CharArraySerializer;
@@ -8,9 +10,9 @@ import se.l4.commons.serialization.collections.array.FloatArraySerializer;
 import se.l4.commons.serialization.collections.array.IntArraySerializer;
 import se.l4.commons.serialization.collections.array.LongArraySerializer;
 import se.l4.commons.serialization.collections.array.ShortArraySerializer;
-import se.l4.commons.serialization.spi.AbstractSerializerResolver;
+import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.TypeEncounter;
-import se.l4.commons.serialization.spi.TypeViaClass;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Resolver for array types.
@@ -20,16 +22,14 @@ import se.l4.commons.serialization.spi.TypeViaClass;
  */
 @SuppressWarnings("rawtypes")
 public class ArraySerializerResolver
-	extends AbstractSerializerResolver
+	implements SerializerResolver
 {
 
 	@Override
-	public Serializer find(TypeEncounter encounter)
+	public Optional<Serializer<?>> find(TypeEncounter encounter)
 	{
-		// TODO: Generics?
-
-		Class<?> componentType = encounter.getType().getErasedType()
-			.getComponentType();
+		TypeRef componentType = encounter.getType().getComponentType()
+			.get();
 
 		/*
 		 * Resolve the serializer by first looking for serializers that handle
@@ -37,39 +37,37 @@ public class ArraySerializerResolver
 		 * we fallback on a serializer that can handle objects.
 		 */
 
-		if(componentType == char.class)
+		if(componentType.isErasedType(char.class))
 		{
-			return new CharArraySerializer();
+			return Optional.of(new CharArraySerializer());
 		}
-		else if(componentType == boolean.class)
+		else if(componentType.isErasedType(boolean.class))
 		{
-			return new BooleanArraySerializer();
+			return Optional.of(new BooleanArraySerializer());
 		}
-		else if(componentType == double.class)
+		else if(componentType.isErasedType(double.class))
 		{
-			return new DoubleArraySerializer();
+			return Optional.of(new DoubleArraySerializer());
 		}
-		else if(componentType == float.class)
+		else if(componentType.isErasedType(float.class))
 		{
-			return new FloatArraySerializer();
+			return Optional.of(new FloatArraySerializer());
 		}
-		else if(componentType == int.class)
+		else if(componentType.isErasedType(int.class))
 		{
-			return new IntArraySerializer();
+			return Optional.of(new IntArraySerializer());
 		}
-		else if(componentType == long.class)
+		else if(componentType.isErasedType(long.class))
 		{
-			return new LongArraySerializer();
+			return Optional.of(new LongArraySerializer());
 		}
-		else if(componentType == short.class)
+		else if(componentType.isErasedType(short.class))
 		{
-			return new ShortArraySerializer();
+			return Optional.of(new ShortArraySerializer());
 		}
 
-		Serializer<?> itemSerializer = encounter.getCollection()
-			.find(new TypeViaClass(componentType));
-
-		return new ArraySerializer(componentType, itemSerializer);
+		return encounter.getCollection()
+			.find(componentType)
+			.map(itemSerializer -> new ArraySerializer(componentType.getErasedType(), itemSerializer));
 	}
-
 }

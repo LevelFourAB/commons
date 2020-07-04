@@ -1,6 +1,7 @@
 package se.l4.commons.serialization.standard;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.SerializationException;
@@ -42,23 +43,28 @@ public class CompactDynamicSerializer
 		in.next(Token.LIST_START);
 
 		in.next(in.peek() == Token.NULL ? Token.NULL : Token.VALUE);
-		String namespace = in.getString();
-		if(namespace == null) namespace = "";
+		String namespace;
+		if(in.current() == Token.NULL)
+		{
+			namespace = "";
+		}
+		else
+		{
+			namespace = in.getString();
+		}
 
 		in.next(Token.VALUE);
 		String name = in.getString();
 
 		Object result = null;
 
-		Serializer<?> serializer = collection.find(namespace, name);
-		if(serializer == null)
+		Optional<? extends Serializer<?>> serializer = collection.find(namespace, name);
+		if(! serializer.isPresent())
 		{
 			throw new SerializationException("No serializer found for `" + name + (namespace != null ? "` in `" + namespace + "`" : "`"));
 		}
-		else
-		{
-			result = serializer.read(in);
-		}
+
+		result = serializer.get().read(in);
 
 		in.next(Token.LIST_END);
 		return result;
@@ -69,12 +75,11 @@ public class CompactDynamicSerializer
 	public void write(Object object, String name, StreamingOutput stream)
 		throws IOException
 	{
-		Serializer serializer = collection.find(object.getClass());
-		QualifiedName qname = collection.findName(serializer);
-		if(qname == null)
-		{
-			throw new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name");
-		}
+		Serializer serializer = collection.find(object.getClass())
+			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but no serializer could be found"));
+
+		QualifiedName qname = collection.findName(serializer)
+			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
 
 		stream.writeListStart(name);
 

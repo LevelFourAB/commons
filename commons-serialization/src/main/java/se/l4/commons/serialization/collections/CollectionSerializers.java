@@ -1,9 +1,11 @@
 package se.l4.commons.serialization.collections;
 
+import java.util.Optional;
+
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.spi.Type;
 import se.l4.commons.serialization.spi.TypeEncounter;
 import se.l4.commons.serialization.standard.DynamicSerializer;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Utilities that are useful when using or creating serializers that work on
@@ -16,19 +18,21 @@ public class CollectionSerializers
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Serializer<?> resolveSerializer(TypeEncounter encounter, Type type)
+	public static Optional<? extends Serializer<?>> resolveSerializer(TypeEncounter encounter, TypeRef type)
 	{
 		if(encounter.getHint(AllowAnyItem.class) != null)
 		{
-			return new DynamicSerializer(encounter.getCollection());
+			return Optional.of(new DynamicSerializer(encounter.getCollection()));
 		}
 
-		Item item = encounter.getHint(Item.class);
-		if(item != null)
+		Optional<Item> item = encounter.getHint(Item.class);
+		if(item.isPresent())
 		{
-			return encounter.getCollection().findVia((Class) item.value(), type);
+			return encounter.getCollection().findVia((Class) item.get().value(), type);
 		}
-
-		return encounter.getCollection().find(type);
+		else
+		{
+			return encounter.getCollection().find(type);
+		}
 	}
 }
