@@ -6,7 +6,7 @@
 
 	<groupId>se.l4.commons</groupId>
 	<artifactId>commons-base</artifactId>
-	<version>1.2.2</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>L4 Commons</name>
