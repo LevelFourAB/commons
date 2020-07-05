@@ -1,10 +1,12 @@
 package se.l4.commons.io;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Representation of a stream of bytes that can be opened.
@@ -89,6 +91,24 @@ public interface Bytes
 	}
 
 	/**
+	 * Turn this instance into an object via the given codec.
+	 *
+	 * @param <T>
+	 * @param codec
+	 * @return
+	 * @throws IOException
+	 */
+	@Nullable
+	default <T> T asObject(StreamingCodec<T> codec)
+		throws IOException
+	{
+		try(InputStream in = asInputStream())
+		{
+			return codec.read(in);
+		}
+	}
+
+	/**
 	 * Get an instance that represents no data.
 	 *
 	 * @return
@@ -151,6 +171,24 @@ public interface Bytes
 	static Bytes create(@NonNull IOSupplier<InputStream> supplier)
 	{
 		return new InputStreamBytes(supplier);
+	}
+
+	/**
+	 * Create an instance by applying the given codec to the specified object.
+	 *
+	 * @param <T>
+	 * @param codec
+	 * @param instance
+	 * @return
+	 * @throws IOException
+	 */
+	@NonNull
+	static <T> Bytes forObject(StreamingCodec<T> codec, T instance)
+		throws IOException
+	{
+		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
+		codec.write(instance, out);
+		return create(out.toByteArray());
 	}
 
 	/**
