@@ -1,17 +1,17 @@
 package se.l4.commons.serialization;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.function.Function;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.UnknownNullness;
-import se.l4.commons.serialization.format.BinaryInput;
-import se.l4.commons.serialization.format.BinaryOutput;
+import se.l4.commons.io.StreamingCodec;
+import se.l4.commons.serialization.format.StreamingFormat;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
+import se.l4.commons.serialization.format.Token;
 
 /**
  * Serializer for a specific class. A serializer is used to read and write
@@ -66,77 +66,53 @@ public interface Serializer<T>
 	}
 
 	/**
-	 * Turn an object into a byte array.
+	 * Take this serializer and transform it into a {@link StreamingCodec}.
 	 *
-	 * @param instance
-	 * @return
-	 */
-	@Nullable
-	default byte[] toBytes(@Nullable T instance)
-	{
-		/*
-		 * If the value being serialized is null and we do not handle null
-		 * return null data.
-		 */
-		if(instance == null && ! (this instanceof NullHandling)) return null;
-
-		try
-		{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-			BinaryOutput out = new BinaryOutput(baos);
-			this.write(instance, "root", out);
-			out.flush();
-			return baos.toByteArray();
-		}
-		catch(IOException e)
-		{
-			throw new SerializationException(e);
-		}
-	}
-
-	/**
-	 * Create a new function that turns objects into byte arrays.
-	 *
+	 * @param format
 	 * @return
 	 */
 	@NonNull
-	default Function<T, byte[]> toBytes()
+	default StreamingCodec<T> toCodec(StreamingFormat format)
 	{
-		return this::toBytes;
-	}
-
-	/**
-	 * Read an instance from the given byte data.
-	 *
-	 * @param data
-	 * @return
-	 */
-	@Nullable
-	default T fromBytes(@Nullable byte[] data)
-	{
-		if(data == null) return null;
-
-		try
+		return new StreamingCodec<T>()
 		{
-			ByteArrayInputStream in = new ByteArrayInputStream(data);
-			BinaryInput bin = new BinaryInput(in);
-			return this.read(bin);
-		}
-		catch(IOException e)
-		{
-			throw new SerializationException(e);
-		}
-	}
+			@Override
+			public T read(InputStream in)
+				throws IOException
+			{
+				try(StreamingInput streamingIn = format.createInput(in))
+				{
+					if(streamingIn.peek() == Token.NULL && ! (Serializer.this instanceof NullHandling))
+					{
+						/*
+						 * If this serializer doesn't handle null values read
+						 * it and return null.
+						 */
+						streamingIn.next(Token.NULL);
+						return null;
+					}
 
-	/**
-	 * Create a new function that turns byte arrays into objects.
-	 *
-	 * @return
-	 */
-	@NonNull
-	default Function<byte[], T> fromBytes()
-	{
-		return this::fromBytes;
+					return Serializer.this.read(streamingIn);
+				}
+			}
+
+			@Override
+			public void write(T item, OutputStream out)
+				throws IOException
+			{
+				try(StreamingOutput streamingOut = format.createOutput(out))
+				{
+					if(item == null && ! (this instanceof NullHandling))
+					{
+						streamingOut.writeNull("root");
+					}
+					else
+					{
+						Serializer.this.write(item, "root", streamingOut);
+					}
+				}
+			}
+		};
 	}
 
 	/**
