@@ -2,7 +2,7 @@ package se.l4.commons.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -125,10 +125,10 @@ public class DefaultConfigTest
 			.addStream(stream("values: [ \n \"one\", \n \"two\" \n ]"))
 			.build();
 
-		String value = config.asObject("values[0]", String.class);
+		String value = config.asObject("values[0]", String.class).get();
 		assertThat(value, is("one"));
 
-		value = config.asObject("values[1]", String.class);
+		value = config.asObject("values[1]", String.class).get();
 		assertThat(value, is("two"));
 	}
 
@@ -139,12 +139,12 @@ public class DefaultConfigTest
 			.addStream(stream("values: [ \n { width: 100, height: 100 }, \n { width: 200, height: 200 } \n ]"))
 			.build();
 
-		Size value = config.asObject("values[0]", Size.class);
+		Size value = config.asObject("values[0]", Size.class).get();
 		assertThat(value, notNullValue());
 		assertThat(value.width, is(100));
 		assertThat(value.height, is(100));
 
-		value = config.asObject("values[1]", Size.class);
+		value = config.asObject("values[1]", Size.class).get();
 		assertThat(value, notNullValue());
 		assertThat(value.width, is(200));
 		assertThat(value.height, is(200));
@@ -157,7 +157,7 @@ public class DefaultConfigTest
 			.addStream(stream("values: [ \n { width: 100, height: 100 } \n ]"))
 			.build();
 
-		Integer value = config.asObject("values[0].width", Integer.class);
+		Integer value = config.asObject("values[0].width", Integer.class).get();
 		assertThat(value, is(100));
 	}
 

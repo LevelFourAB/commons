@@ -1,6 +1,7 @@
 package se.l4.commons.config;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.serialization.Expose;
@@ -31,7 +32,7 @@ import se.l4.commons.serialization.format.ValueType;
  */
 public class ConfigKey
 {
-	public static final String NAME = "_aurochs_:configKey";
+	public static final String NAME = "__commons__:configKey";
 
 	private final Config config;
 	private final String key;
@@ -63,7 +64,7 @@ public class ConfigKey
 	 * @return
 	 */
 	@NonNull
-	public <T> T asObject(String subPath, Class<T> type)
+	public <T> Optional<T> asObject(String subPath, Class<T> type)
 	{
 		return config.asObject(key + '.' + subPath, type);
 	}
@@ -76,9 +77,8 @@ public class ConfigKey
 	 */
 	public <T> T asObject(Class<T> type)
 	{
-		return config.asObject(key, type);
+		return config.asObject(key, type).get();
 	}
-
 
 	public static class ConfigKeySerializer
 		implements Serializer<ConfigKey>

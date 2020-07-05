@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -188,9 +189,9 @@ public class DefaultConfig
 	}
 
 	@Override
-	public <T> T asObject(String path, Class<T> type)
+	public <T> Optional<T> asObject(String path, Class<T> type)
 	{
-		return get(path, type).get();
+		return Optional.ofNullable(get(path, type).getOrDefault(null));
 	}
 
 	@Override
@@ -225,7 +226,7 @@ public class DefaultConfig
 			}
 		}
 
-		return Collections2.filter(current.keySet(), (s) -> ! s.startsWith("_aurochs_:"));
+		return Collections2.filter(current.keySet(), (s) -> ! s.startsWith("__commons__:"));
 	}
 
 	private void validateInstance(String path, Object object)
@@ -282,8 +283,8 @@ public class DefaultConfig
 		Objects.requireNonNull(path);
 		Objects.requireNonNull(type);
 
-		Serializer<T> serializer = collection.find(type);
-		if(serializer == null)
+		Optional<? extends Serializer<T>> serializer = collection.find(type);
+		if(! serializer.isPresent())
 		{
 			throw new ConfigException("Unable to find a serializer suitable for " + type);
 		}
@@ -297,7 +298,7 @@ public class DefaultConfig
 		StreamingInput input = MapInput.resolveInput(path, data);
 		try
 		{
-			T instance = serializer.read(input);
+			T instance = serializer.get().read(input);
 
 			validateInstance(path, instance);
 

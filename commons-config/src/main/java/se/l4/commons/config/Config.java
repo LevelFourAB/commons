@@ -1,6 +1,7 @@
 package se.l4.commons.config;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.config.internal.ConfigBuilderImpl;
@@ -67,7 +68,7 @@ public interface Config
 	 * @return
 	 */
 	@NonNull
-	<T> T asObject(@NonNull String path, @NonNull Class<T> type);
+	<T> Optional<T> asObject(@NonNull String path, @NonNull Class<T> type);
 
 	/**
 	 * Resolve configuration values as an object. The object will be created
