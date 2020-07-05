@@ -44,7 +44,7 @@ public class MapAsObjectSerializer<V>
 
 			in.next(Token.KEY);
 			String key = in.getString();
-			if(key.startsWith("_aurochs_:"))
+			if(key.startsWith("__commons__:"))
 			{
 				in.skipValue();
 				continue;
