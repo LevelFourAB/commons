@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.collections.ListSerializerResolver;
 import se.l4.commons.serialization.collections.MapSerializerResolver;
 import se.l4.commons.serialization.collections.SetSerializerResolver;
@@ -16,6 +17,7 @@ import se.l4.commons.serialization.spi.SerializerResolverRegistry;
 import se.l4.commons.serialization.standard.BooleanSerializer;
 import se.l4.commons.serialization.standard.ByteArraySerializer;
 import se.l4.commons.serialization.standard.ByteSerializer;
+import se.l4.commons.serialization.standard.BytesSerializer;
 import se.l4.commons.serialization.standard.CharacterSerializer;
 import se.l4.commons.serialization.standard.DoubleSerializer;
 import se.l4.commons.serialization.standard.FloatSerializer;
@@ -84,6 +86,8 @@ public class DefaultSerializerCollection
 
 		// Optional<T>
 		bind(Optional.class, new OptionalSerializerResolver());
+
+		bind(Bytes.class, new BytesSerializer());
 	}
 
 	@Override
