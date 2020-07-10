@@ -533,7 +533,7 @@ public class ConfigJsonInput
 
 		if(limit - position < 1)
 		{
-			if(false == read(1)) return null;
+			if(false == read(1)) return Token.END_OF_STREAM;
 		}
 
 		if(limit - position > 0)
