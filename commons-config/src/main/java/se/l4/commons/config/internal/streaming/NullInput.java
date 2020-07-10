@@ -29,7 +29,7 @@ public class NullInput
 	public Token peek()
 		throws IOException
 	{
-		return used ? null : Token.NULL;
+		return used ? Token.END_OF_STREAM : Token.NULL;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class NullInput
 	{
 		if(used)
 		{
-			return null;
+			return Token.END_OF_STREAM;
 		}
 		else
 		{

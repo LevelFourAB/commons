@@ -99,7 +99,7 @@ public class MapInput
 				return Token.KEY;
 			case VALUE:
 				Token peeked = subInput.peek();
-				if(peeked != null)
+				if(peeked != Token.END_OF_STREAM)
 				{
 					return peeked;
 				}
@@ -112,7 +112,7 @@ public class MapInput
 				return Token.OBJECT_END;
 		}
 
-		return null;
+		return Token.END_OF_STREAM;
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class MapInput
 				 * Value state, check the sub input until it returns null
 				 */
 				Token t = subInput.next();
-				if(t == null)
+				if(t == Token.END_OF_STREAM)
 				{
 					// Nothing left in the value, advance and check again
 					advancePosition();
@@ -148,7 +148,7 @@ public class MapInput
 				return token = Token.OBJECT_END;
 		}
 
-		return token = null;
+		return token = Token.END_OF_STREAM;
 	}
 
 	private void setState(State state)

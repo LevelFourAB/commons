@@ -103,7 +103,7 @@ public class ObjectStreamsTest
 	{
 		int i = 0;
 		List<Token> history = new ArrayList<Token>();
-		while(in.peek() != null)
+		while(in.peek() != Token.END_OF_STREAM)
 		{
 			Token t = in.next();
 			history.add(t);
@@ -134,7 +134,7 @@ public class ObjectStreamsTest
 		throws IOException
 	{
 		int i = 0;
-		while(in.peek() != null)
+		while(in.peek() != Token.END_OF_STREAM)
 		{
 			Token t = in.next();
 			switch(t)

@@ -32,7 +32,7 @@ public class ValueInput
 	public Token peek()
 		throws IOException
 	{
-		return used ? null : Token.VALUE;
+		return used ? Token.END_OF_STREAM : Token.VALUE;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class ValueInput
 	{
 		if(used)
 		{
-			return null;
+			return Token.END_OF_STREAM;
 		}
 		else
 		{
