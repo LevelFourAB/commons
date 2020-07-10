@@ -65,7 +65,7 @@ public class TypeFinderOverScanResultBuilder
 		ScanResult result = new ClassGraph()
 			.enableAnnotationInfo()
 			.enableClassInfo()
-			.whitelistPackages(packages.toArray(new String[packages.size()]))
+			.acceptPackages(packages.toArray(new String[packages.size()]))
 			.scan();
 
 		return new TypeFinderOverScanResult(factory, result);

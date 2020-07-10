@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.FieldAccessor;
@@ -20,12 +21,14 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.FieldValue;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.matcher.ElementMatchers;
 import se.l4.commons.types.Types;
 import se.l4.commons.types.proxies.ExtendedTypeBuilder;
 import se.l4.commons.types.proxies.ExtendedTypeCreator;
 import se.l4.commons.types.proxies.MethodEncounter;
 import se.l4.commons.types.proxies.MethodInvocationHandler;
 import se.l4.commons.types.proxies.MethodResolver;
+import se.l4.commons.types.proxies.NonPublicByteBuddyRunner;
 import se.l4.commons.types.proxies.ProxyException;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -167,9 +170,9 @@ public class ExtendedTypeBuilderImpl<ContextType>
 
 			for(Map.Entry<Method, MethodInvocationHandler<CT>> e : invokers.entrySet())
 			{
-				builder = builder.define(e.getKey())
+				builder = builder.method(ElementMatchers.is(e.getKey()))
 					.intercept(
-						MethodDelegation.to(new Runner(e.getValue()))
+						MethodDelegation.to(new NonPublicByteBuddyRunner(e.getValue()))
 					);
 			}
 
@@ -206,24 +209,6 @@ public class ExtendedTypeBuilderImpl<ContextType>
 				}
 			}
 		};
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static class Runner
-	{
-		private final MethodInvocationHandler handler;
-
-		public Runner(MethodInvocationHandler handler)
-		{
-			this.handler = handler;
-		}
-
-		@RuntimeType
-		public Object run(@FieldValue("context") Object context, @AllArguments Object[] arguments)
-			throws Exception
-		{
-			return handler.handle(context, arguments);
-		}
 	}
 
 	private static class CreatorImpl<CT>

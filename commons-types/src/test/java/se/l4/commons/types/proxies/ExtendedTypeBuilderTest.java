@@ -55,6 +55,24 @@ public class ExtendedTypeBuilderTest
 	}
 
 	@Test
+	public void testNonNestedInterface()
+	{
+		Function<String, NonNestedInterface> c = createBuilder(String.class)
+			.with(encounter -> Optional.of((ctx, args) -> ctx))
+			.create(NonNestedInterface.class);
+
+		assertThat("function is created", c, notNullValue());
+
+		String contextIn = "Hello World";
+
+		NonNestedInterface obj = c.apply(contextIn);
+		assertThat("object is created", obj, notNullValue());
+
+		String contextOut = obj.returnContext();
+		assertThat("returnContext echoes context", contextOut, is(contextIn));
+	}
+
+	@Test
 	public void testNoInvokerThrowsProxyException()
 	{
 		try
