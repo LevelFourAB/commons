@@ -1,8 +1,8 @@
 module se.l4.commons.serialization {
 	requires com.github.spotbugs.annotations;
 
-	requires se.l4.commons.types;
-	requires se.l4.commons.io;
+	requires transitive se.l4.commons.types;
+	requires transitive se.l4.commons.io;
 
 	requires com.google.common;
 
