@@ -31,7 +31,7 @@ public class ByteArraySerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getByteArray();
+		return in.readByteArray();
 	}
 
 	@Override

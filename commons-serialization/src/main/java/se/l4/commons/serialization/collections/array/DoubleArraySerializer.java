@@ -34,7 +34,7 @@ public class DoubleArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getDouble();
+			current[length++] = in.readDouble();
 		}
 
 		in.next(Token.LIST_END);

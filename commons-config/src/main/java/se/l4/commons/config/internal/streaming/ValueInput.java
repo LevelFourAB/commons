@@ -1,7 +1,10 @@
 package se.l4.commons.config.internal.streaming;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.Token;
 
@@ -77,58 +80,82 @@ public class ValueInput
 	}
 
 	@Override
-	public Object getValue()
+	public Object readDynamic()
 	{
 		return value;
 	}
 
 	@Override
-	public String getString()
+	public String readString()
 	{
 		return String.valueOf(value);
 	}
 
 	@Override
-	public boolean getBoolean()
+	public boolean readBoolean()
 	{
 		return value instanceof Boolean
 			? (Boolean) value
-			: Boolean.parseBoolean(getString());
+			: Boolean.parseBoolean(readString());
 	}
 
 	@Override
-	public double getDouble()
+	public double readDouble()
 	{
 		return ((Number) value).doubleValue();
 	}
 
 	@Override
-	public float getFloat()
+	public float readFloat()
 	{
 		return ((Number) value).floatValue();
 	}
 
 	@Override
-	public long getLong()
+	public long readLong()
 	{
 		return ((Number) value).longValue();
 	}
 
 	@Override
-	public int getInt()
+	public int readInt()
 	{
 		return ((Number) value).intValue();
 	}
 
 	@Override
-	public short getShort()
+	public short readShort()
 	{
 		return ((Number) value).shortValue();
 	}
 
 	@Override
-	public byte[] getByteArray()
+	public byte readByte()
+	{
+		return ((Number) value).byteValue();
+	}
+
+	@Override
+	public char readChar()
+	{
+		return (char) readShort();
+	}
+
+	@Override
+	public byte[] readByteArray()
 	{
 		return (byte[]) value;
+	}
+
+	@Override
+	public Bytes readBytes()
+	{
+		return Bytes.create(readByteArray());
+	}
+
+	@Override
+	public InputStream asInputStream()
+	{
+		return new ByteArrayInputStream(readByteArray());
 	}
 }

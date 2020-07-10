@@ -34,7 +34,7 @@ public class BooleanArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getBoolean();
+			current[length++] = in.readBoolean();
 		}
 
 		in.next(Token.LIST_END);

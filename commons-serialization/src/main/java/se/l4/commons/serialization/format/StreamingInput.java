@@ -2,8 +2,10 @@ package se.l4.commons.serialization.format;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 
-import se.l4.commons.serialization.SerializationException;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import se.l4.commons.io.Bytes;
 
 /**
  * Input that is streamed as a set of token with values.
@@ -38,6 +40,7 @@ public interface StreamingInput
 	 * @return
 	 * @throws IOException
 	 */
+	@NonNull
 	Token next(Token expected)
 		throws IOException;
 
@@ -68,103 +71,108 @@ public interface StreamingInput
 	Token current();
 
 	/**
-	 * Get the type of value the input currently has. If the
-	 * {@link #current() current token} is not {@link Token#VALUE} or
-	 * {@link Token#NULL} this method will raise a
-	 * {@link SerializationException}.
-	 *
-	 * <p>
-	 * The type of value is defined by the input, and many number values can
-	 * be converted.
-	 *
-	 * @return
-	 *   current type of value
-	 */
-	default ValueType getValueType()
-	{
-		throw new UnsupportedOperationException("StreamingInput implementation does not extend AbstractStreamingInput and does not override getValueType()");
-	}
-
-	/**
-	 * Get the current value.
-	 *
-	 * @return
-	 */
-	Object getValue();
-
-	/**
 	 * Get the current value as a string.
 	 *
 	 * @return
 	 */
-	String getString();
+	String readString()
+		throws IOException;
+
+	/**
+	 * Read any value from the input. The types returned by this method will
+	 * be input specific and will not perform any conversions.
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	Object readDynamic()
+		throws IOException;
 
 	/**
 	 * Get the value as a boolean.
 	 *
 	 * @return
 	 */
-	boolean getBoolean();
+	boolean readBoolean()
+		throws IOException;
 
 	/**
 	 * Get the value as a byte.
 	 *
 	 * @return
 	 */
-	default byte getByte()
-	{
-		return (byte) getInt();
-	}
+	byte readByte()
+		throws IOException;
 
 	/**
 	 * Get the value as a character.
 	 *
 	 * @return
 	 */
-	default char getChar()
-	{
-		return (char) getInt();
-	}
+	char readChar()
+		throws IOException;
 
 	/**
 	 * Get the value as a double.
 	 *
 	 * @return
 	 */
-	double getDouble();
+	double readDouble()
+		throws IOException;
 
 	/**
 	 * Get the value as a float.
 	 *
 	 * @return
 	 */
-	float getFloat();
+	float readFloat()
+		throws IOException;
 
 	/**
 	 * Get the value as a long.
 	 *
 	 * @return
 	 */
-	long getLong();
+	long readLong()
+		throws IOException;
 
 	/**
 	 * Get the value as an integer.
 	 *
 	 * @return
 	 */
-	int getInt();
+	int readInt()
+		throws IOException;
 
 	/**
 	 * Get the value as a short.
 	 *
 	 * @return
 	 */
-	short getShort();
+	short readShort()
+		throws IOException;
 
 	/**
 	 * Get the value as a byte[] array.
 	 *
 	 * @return
 	 */
-	byte[] getByteArray();
+	byte[] readByteArray()
+		throws IOException;
+
+	/**
+	 * Read the next value into a {@link Bytes} instance.
+	 *
+	 * @return
+	 */
+	Bytes readBytes()
+		throws IOException;
+
+	/**
+	 * Get the current binary value as an {@link InputStream}.
+	 *
+	 * @return
+	 */
+	InputStream asInputStream()
+		throws IOException;
 }

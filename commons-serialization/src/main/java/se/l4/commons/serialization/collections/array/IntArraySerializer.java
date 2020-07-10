@@ -34,7 +34,7 @@ public class IntArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getInt();
+			current[length++] = in.readInt();
 		}
 
 		in.next(Token.LIST_END);

@@ -34,7 +34,7 @@ public class ShortArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getShort();
+			current[length++] = in.readShort();
 		}
 
 		in.next(Token.LIST_END);

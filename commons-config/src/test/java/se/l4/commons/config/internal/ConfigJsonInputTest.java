@@ -221,7 +221,7 @@ public class ConfigJsonInputTest
 		throws IOException
 	{
 		int i = 0;
-		while(in.peek() != null)
+		while(in.peek() != Token.END_OF_STREAM)
 		{
 			Token t = in.next();
 			if(i == tokens.length)
@@ -251,7 +251,7 @@ public class ConfigJsonInputTest
 		throws IOException
 	{
 		int i = 0;
-		while(in.peek() != null)
+		while(in.peek() != Token.END_OF_STREAM)
 		{
 			Token t = in.next();
 			switch(t)
@@ -261,10 +261,10 @@ public class ConfigJsonInputTest
 				case NULL:
 					if(i == values.length)
 					{
-						fail("Did not expect more values, but got " + in.getValue());
+						fail("Did not expect more values, but got " + in.readDynamic());
 					}
 
-					assertEquals(values[i++], in.getValue());
+					assertEquals(values[i++], in.readDynamic());
 					break;
 			}
 		}

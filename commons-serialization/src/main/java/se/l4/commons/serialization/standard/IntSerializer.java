@@ -30,7 +30,7 @@ public class IntSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getInt();
+		return in.readInt();
 	}
 
 	@Override

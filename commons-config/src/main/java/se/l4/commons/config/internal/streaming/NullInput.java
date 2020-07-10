@@ -1,7 +1,9 @@
 package se.l4.commons.config.internal.streaming;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.Token;
 
@@ -75,58 +77,93 @@ public class NullInput
 	}
 
 	@Override
-	public Object getValue()
+	public Object readDynamic()
+		throws IOException
 	{
 		return null;
 	}
 
 	@Override
-	public String getString()
+	public String readString()
+		throws IOException
 	{
-		return null;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public boolean getBoolean()
+	public boolean readBoolean()
+		throws IOException
 	{
-		return false;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public double getDouble()
+	public double readDouble()
+		throws IOException
 	{
-		return 0;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public float getFloat()
+	public float readFloat()
+		throws IOException
 	{
-		return 0;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public long getLong()
+	public long readLong()
+		throws IOException
 	{
-		return 0;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public int getInt()
+	public int readInt()
+		throws IOException
 	{
-		return 0;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public short getShort()
+	public short readShort()
+		throws IOException
 	{
-		return 0;
+		throw new IOException("NULL value, can not read");
 	}
 
 	@Override
-	public byte[] getByteArray()
+	public byte readByte()
+		throws IOException
 	{
-		return null;
+		throw new IOException("NULL value, can not read");
 	}
 
+	@Override
+	public char readChar()
+		throws IOException
+	{
+		throw new IOException("NULL value, can not read");
+	}
 
+	@Override
+	public byte[] readByteArray()
+		throws IOException
+	{
+		throw new IOException("NULL value, can not read");
+	}
+
+	@Override
+	public Bytes readBytes()
+		throws IOException
+	{
+		throw new IOException("NULL value, can not read");
+	}
+
+	@Override
+	public InputStream asInputStream()
+		throws IOException
+	{
+		throw new IOException("NULL value, can not read");
+	}
 }

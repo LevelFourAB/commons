@@ -23,7 +23,7 @@ public class SimpleTypeSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getValue();
+		return in.readDynamic();
 	}
 
 	@Override

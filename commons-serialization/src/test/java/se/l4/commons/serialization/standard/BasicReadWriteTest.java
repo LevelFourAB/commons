@@ -1,7 +1,7 @@
 package se.l4.commons.serialization.standard;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,7 +28,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getString()).thenReturn("value");
+		when(input.readString()).thenReturn("value");
 
 		StringSerializer serializer = new StringSerializer();
 		String value = serializer.read(input);
@@ -54,7 +54,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getLong()).thenReturn(12l);
+		when(input.readLong()).thenReturn(12l);
 
 		LongSerializer serializer = new LongSerializer();
 		Long value = serializer.read(input);
@@ -80,8 +80,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getValue()).thenReturn(12);
-		when(input.getInt()).thenReturn(12);
+		when(input.readInt()).thenReturn(12);
 
 		IntSerializer serializer = new IntSerializer();
 		Integer value = serializer.read(input);
@@ -107,8 +106,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getValue()).thenReturn(true);
-		when(input.getBoolean()).thenReturn(true);
+		when(input.readBoolean()).thenReturn(true);
 
 		BooleanSerializer serializer = new BooleanSerializer();
 		Boolean value = serializer.read(input);
@@ -134,8 +132,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getValue()).thenReturn(3.14);
-		when(input.getDouble()).thenReturn(3.14);
+		when(input.readDouble()).thenReturn(3.14);
 
 		DoubleSerializer serializer = new DoubleSerializer();
 		Double value = serializer.read(input);
@@ -161,7 +158,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getFloat()).thenReturn(7.4f);
+		when(input.readFloat()).thenReturn(7.4f);
 
 		FloatSerializer serializer = new FloatSerializer();
 		Float value = serializer.read(input);
@@ -187,7 +184,7 @@ public class BasicReadWriteTest
 	{
 		StreamingInput input = mock(StreamingInput.class);
 		when(input.next()).thenReturn(Token.VALUE);
-		when(input.getShort()).thenReturn((short) 12);
+		when(input.readShort()).thenReturn((short) 12);
 
 		ShortSerializer serializer = new ShortSerializer();
 		Short value = serializer.read(input);

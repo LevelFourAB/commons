@@ -30,7 +30,7 @@ public class DoubleSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getDouble();
+		return in.readDouble();
 	}
 
 	@Override

@@ -143,10 +143,10 @@ public class ObjectStreamsTest
 				case VALUE:
 					if(i == values.length)
 					{
-						fail("Did not expect more values, but got " + in.getValue());
+						fail("Did not expect more values, but got " + in.readDynamic());
 					}
 
-					assertEquals(values[i++], in.getValue());
+					assertEquals(values[i++], in.readDynamic());
 					break;
 			}
 		}

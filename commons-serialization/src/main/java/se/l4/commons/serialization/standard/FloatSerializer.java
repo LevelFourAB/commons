@@ -30,7 +30,7 @@ public class FloatSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getFloat();
+		return in.readFloat();
 	}
 
 	@Override

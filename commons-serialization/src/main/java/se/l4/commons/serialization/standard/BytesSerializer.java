@@ -19,7 +19,7 @@ public class BytesSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return Bytes.create(in.getByteArray());
+		return in.readBytes();
 	}
 
 	@Override

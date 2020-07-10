@@ -34,7 +34,7 @@ public class LongArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getLong();
+			current[length++] = in.readLong();
 		}
 
 		in.next(Token.LIST_END);

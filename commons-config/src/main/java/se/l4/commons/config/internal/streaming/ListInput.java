@@ -1,9 +1,11 @@
 package se.l4.commons.config.internal.streaming;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.format.AbstractStreamingInput;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.Token;
@@ -140,99 +142,171 @@ public class ListInput
 	}
 
 	@Override
-	public Object getValue()
+	public Object readDynamic()
+		throws IOException
 	{
 		switch(previousState)
 		{
 			case VALUE:
-				return subInput.getValue();
+				return subInput.readDynamic();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return null;
 	}
 
 	@Override
-	public String getString()
+	public String readString()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getString();
+				return subInput.readString();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return null;
 	}
 
 	@Override
-	public boolean getBoolean()
+	public boolean readBoolean()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getBoolean();
+				return subInput.readBoolean();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return false;
 	}
 
 	@Override
-	public double getDouble()
+	public double readDouble()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getDouble();
+				return subInput.readDouble();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return 0;
 	}
 
 	@Override
-	public float getFloat()
+	public float readFloat()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getFloat();
+				return subInput.readFloat();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return 0;
 	}
 
 	@Override
-	public long getLong()
+	public long readLong()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getLong();
+				return subInput.readLong();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return 0;
 	}
 
 	@Override
-	public int getInt()
+	public int readInt()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getInt();
+				return subInput.readInt();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return 0;
 	}
 
 	@Override
-	public short getShort()
+	public short readShort()
+		throws IOException
 	{
 		switch(state)
 		{
 			case VALUE:
-				return subInput.getShort();
+				return subInput.readShort();
+			default:
+				throw raiseException("Not reading a value");
 		}
-
-		return 0;
 	}
 
+	@Override
+	public byte readByte()
+		throws IOException
+	{
+		switch(state)
+		{
+			case VALUE:
+				return subInput.readByte();
+			default:
+				throw raiseException("Not reading a value");
+		}
+	}
+
+	@Override
+	public char readChar()
+		throws IOException
+	{
+		switch(state)
+		{
+			case VALUE:
+				return subInput.readChar();
+			default:
+				throw raiseException("Not reading a value");
+		}
+	}
+
+	@Override
+	public byte[] readByteArray()
+		throws IOException
+	{
+		switch(state)
+		{
+			case VALUE:
+				return subInput.readByteArray();
+			default:
+				throw raiseException("Not reading a value");
+		}
+	}
+
+	@Override
+	public InputStream asInputStream()
+		throws IOException
+	{
+		switch(state)
+		{
+			case VALUE:
+				return subInput.asInputStream();
+			default:
+				throw raiseException("Not reading a value");
+		}
+	}
+
+	@Override
+	public Bytes readBytes()
+		throws IOException
+	{
+		switch(state)
+		{
+			case VALUE:
+				return subInput.readBytes();
+			default:
+				throw raiseException("Not reading a value");
+		}
+	}
 }

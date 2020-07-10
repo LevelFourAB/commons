@@ -34,7 +34,7 @@ public class FloatArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getFloat();
+			current[length++] = in.readFloat();
 		}
 
 		in.next(Token.LIST_END);

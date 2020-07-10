@@ -30,7 +30,7 @@ public class StringSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getString();
+		return in.readString();
 	}
 
 	@Override

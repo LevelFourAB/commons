@@ -30,7 +30,7 @@ public class ShortSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getShort();
+		return in.readShort();
 	}
 
 	@Override

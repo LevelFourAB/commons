@@ -30,7 +30,7 @@ public class LongSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getLong();
+		return in.readLong();
 	}
 
 	@Override

@@ -35,5 +35,9 @@ public enum Token
 	/**
 	 * Null, special case of {@link #VALUE}.
 	 */
-	NULL
+	NULL,
+	/**
+	 * Special token returned when end of stream has been reached.
+	 */
+	END_OF_STREAM
 }

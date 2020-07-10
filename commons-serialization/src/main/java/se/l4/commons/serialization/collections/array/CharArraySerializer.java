@@ -34,7 +34,7 @@ public class CharArraySerializer
 				current = Arrays.copyOf(current, newSize);
 			}
 
-			current[length++] = in.getChar();
+			current[length++] = in.readChar();
 		}
 
 		in.next(Token.LIST_END);

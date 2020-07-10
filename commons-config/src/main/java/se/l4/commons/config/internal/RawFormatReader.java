@@ -94,7 +94,7 @@ public class RawFormatReader
 		{
 			// Read the key
 			input.next(Token.KEY);
-			String key = input.getString();
+			String key = input.readString();
 
 			// Read the value
 			Object value = readDynamic(input);
@@ -149,10 +149,10 @@ public class RawFormatReader
 		{
 			case VALUE:
 				input.next();
-				return input.getValue();
+				return input.readDynamic();
 			case NULL:
 				input.next();
-				return input.getValue();
+				return input.readDynamic();
 			case LIST_START:
 				return readList(input);
 			case OBJECT_START:

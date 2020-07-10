@@ -30,7 +30,7 @@ public class ByteSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getByte();
+		return in.readByte();
 	}
 
 	@Override

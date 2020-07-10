@@ -1,10 +1,13 @@
 package se.l4.commons.config.internal.streaming;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.Base64;
 
+import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.format.JsonInput;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.Token;
@@ -166,7 +169,7 @@ public class ConfigJsonInput
 	{
 		if(position > limit)
 		{
-			return null;
+			return Token.END_OF_STREAM;
 		}
 
 		char c = buffer[position];
@@ -460,7 +463,7 @@ public class ConfigJsonInput
 			}
 		}
 
-		return null;
+		return Token.END_OF_STREAM;
 	}
 
 	private char peekChar()
@@ -538,7 +541,7 @@ public class ConfigJsonInput
 			return toToken(position);
 		}
 
-		return null;
+		return Token.END_OF_STREAM;
 	}
 
 	@Override
@@ -611,60 +614,86 @@ public class ConfigJsonInput
 	}
 
 	@Override
-	public Object getValue()
+	public Object readDynamic()
 	{
 		return value;
 	}
 
 	@Override
-	public String getString()
+	public String readString()
 	{
 		return String.valueOf(value);
 	}
 
 	@Override
-	public boolean getBoolean()
+	public boolean readBoolean()
 	{
 		return (Boolean) value;
 	}
 
 	@Override
-	public double getDouble()
+	public double readDouble()
 	{
 		return ((Number) value).doubleValue();
 	}
 
 	@Override
-	public float getFloat()
+	public float readFloat()
 	{
 		return ((Number) value).floatValue();
 	}
 
 	@Override
-	public long getLong()
+	public long readLong()
 	{
 		return ((Number) value).longValue();
 	}
 
 	@Override
-	public int getInt()
+	public int readInt()
 	{
 		return ((Number) value).intValue();
 	}
 
 	@Override
-	public short getShort()
+	public short readShort()
 	{
 		return ((Number) value).shortValue();
 	}
 
 	@Override
-	public byte[] getByteArray()
+	public byte readByte()
+	{
+		return ((Number) value).byteValue();
+	}
+
+	@Override
+	public char readChar()
+	{
+		return (char) ((Number) value).shortValue();
+	}
+
+	@Override
+	public byte[] readByteArray()
 	{
 		/*
 		 * JSON uses Base64 strings, so we need to decode on demand.
 		 */
-		String value = getString();
+		String value = readString();
 		return Base64.getDecoder().decode(value);
+	}
+
+	@Override
+	public InputStream asInputStream()
+		throws IOException
+	{
+		return new ByteArrayInputStream(readByteArray());
+	}
+
+	@Override
+	public Bytes readBytes()
+		throws IOException
+	{
+		return Bytes.create(readByteArray());
 	}
 }

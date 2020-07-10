@@ -40,7 +40,7 @@ public class ReflectionNonStreamingSerializer<T>
 		while(in.peek() != Token.OBJECT_END)
 		{
 			in.next(Token.KEY);
-			String key = in.getString();
+			String key = in.readString();
 
 			FieldDefinition def = type.getField(key);
 			if(def == null)

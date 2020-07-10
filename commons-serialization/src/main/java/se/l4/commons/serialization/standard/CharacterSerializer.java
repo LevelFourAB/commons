@@ -30,7 +30,7 @@ public class CharacterSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getChar();
+		return in.readChar();
 	}
 
 	@Override

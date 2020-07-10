@@ -30,7 +30,7 @@ public class BooleanSerializer
 		throws IOException
 	{
 		in.next(Token.VALUE);
-		return in.getBoolean();
+		return in.readBoolean();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package se.l4.commons.serialization.format;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import se.l4.commons.io.Bytes;
 
 /**
  * Input for JSON. Please note that this class is not intended for general use
@@ -28,6 +31,12 @@ public class JsonInput
 
 	private final boolean[] lists;
 	private final String[] names;
+
+	private ValueType value;
+	private String valueString;
+	private boolean valueBoolean;
+	private long valueLong;
+	private double valueDouble;
 
 	public JsonInput(InputStream in)
 	{
@@ -63,6 +72,65 @@ public class JsonInput
 		return new IOException(message + (level > 0 ? " (at " + path + ")" : ""));
 	}
 
+	@Override
+	public Token next0()
+		throws IOException
+	{
+		Token token = peek();
+		switch(token)
+		{
+			case OBJECT_END:
+			case LIST_END:
+			{
+				readNext();
+
+				char c = peekChar();
+				if(c == ',') read();
+
+				return token;
+			}
+			case OBJECT_START:
+			case LIST_START:
+				readNext();
+				lists[level + 1] = token == Token.LIST_START;
+				return token;
+			case KEY:
+			{
+				readWhitespace();
+				String key = readString(true);
+				char next = readNext();
+				if(next != ':')
+				{
+					throw raiseException("Expected `:`, got `" + next + "`");
+				}
+
+				names[level] = key;
+				setStringValue(key);
+				return token;
+			}
+			case VALUE:
+			case NULL:
+			{
+				readNextValue();
+
+				// Check for trailing commas
+				readWhitespace();
+
+				char c = peekChar();
+				if(c == ',') read();
+
+				return token;
+			}
+		}
+
+		return Token.END_OF_STREAM;
+	}
+
+	/**
+	 * Read all of the whitespace at the current position.
+	 *
+	 * @throws IOException
+	 */
 	private void readWhitespace()
 		throws IOException
 	{
@@ -87,6 +155,12 @@ public class JsonInput
 		}
 	}
 
+	/**
+	 * Reader the next character while also skipping whitespace as necessary.
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	private char readNext()
 		throws IOException
 	{
@@ -95,6 +169,12 @@ public class JsonInput
 		return read();
 	}
 
+	/**
+	 * Read a single character at the current position.
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	private char read()
 		throws IOException
 	{
@@ -109,6 +189,14 @@ public class JsonInput
 		return buffer[position++];
 	}
 
+	/**
+	 * Perform a read ahead for the given number of characters. Will read the
+	 * characters into the buffer.
+	 *
+	 * @param minChars
+	 * @return
+	 * @throws IOException
+	 */
 	private boolean readAhead(int minChars)
 		throws IOException
 	{
@@ -152,6 +240,15 @@ public class JsonInput
 		return true;
 	}
 
+	/**
+	 * Fully read a number of characters.
+	 *
+	 * @param buffer
+	 * @param offset
+	 * @param length
+	 * @return
+	 * @throws IOException
+	 */
 	private int read(char[] buffer, int offset, int length)
 		throws IOException
 	{
@@ -166,8 +263,19 @@ public class JsonInput
 		return result;
 	}
 
+	/**
+	 * Take the current character and turn it into a {@link Token}.
+	 *
+	 * @param c
+	 * @return
+	 */
 	private Token toToken(char c)
 	{
+		if(c == NULL)
+		{
+			return Token.END_OF_STREAM;
+		}
+
 		switch(c)
 		{
 			case '{':
@@ -194,14 +302,14 @@ public class JsonInput
 		return Token.VALUE;
 	}
 
-	private Object readNextValue()
+	private void readNextValue()
 		throws IOException
 	{
 		char c = readNext();
 		if(c == '"')
 		{
 			// This is a string
-			return readString(false);
+			setStringValue(readString(false));
 		}
 		else
 		{
@@ -214,6 +322,7 @@ public class JsonInput
 				c = peekChar(false);
 				switch(c)
 				{
+					case NULL:
 					case '}':
 					case ']':
 					case ',':
@@ -226,37 +335,75 @@ public class JsonInput
 				read();
 			}
 
-			return toObject(value.toString());
+			readNonString(value.toString());
 		}
 	}
 
-	private Object toObject(String in)
+	private void readNonString(String in)
+		throws IOException
 	{
-		if(in.equals("false"))
+		if("null".equals(in))
 		{
-			return false;
+			setNullValue();
 		}
-		else if(in.equals("true"))
+		else if("false".equals(in))
 		{
-			return true;
+			setBooleanValue(false);
 		}
-
-		try
+		else if("true".equals(in))
 		{
-			return Long.parseLong(in);
+			setBooleanValue(true);
 		}
-		catch(NumberFormatException e)
+		else
 		{
 			try
 			{
-				return Double.parseDouble(in);
+				setLongValue(Long.parseLong(in));
+				return;
 			}
-			catch(NumberFormatException e2)
+			catch(NumberFormatException e)
 			{
+				try
+				{
+					setDoubleValue(Double.parseDouble(in));
+					return;
+				}
+				catch(NumberFormatException e2)
+				{
+				}
 			}
-		}
 
-		return in;
+			throw raiseException("Unknown type of value: " + in);
+		}
+	}
+
+	private void setStringValue(String s)
+	{
+		value = ValueType.STRING;
+		this.valueString = s;
+	}
+
+	private void setBooleanValue(boolean b)
+	{
+		value = ValueType.BOOLEAN;
+		this.valueBoolean = b;
+	}
+
+	private void setLongValue(long l)
+	{
+		value = ValueType.LONG;
+		this.valueLong = l;
+	}
+
+	private void setDoubleValue(double d)
+	{
+		value = ValueType.DOUBLE;
+		this.valueDouble = d;
+	}
+
+	private void setNullValue()
+	{
+		value = ValueType.NULL;
 	}
 
 	private String readString(boolean readStart)
@@ -330,82 +477,6 @@ public class JsonInput
 		}
 	}
 
-	@Override
-	public Token next(Token expected)
-		throws IOException
-	{
-		Token t = next();
-		if(t != expected)
-		{
-			throw raiseException("Expected "+ expected + " but got " + t);
-		}
-		return t;
-	}
-
-	@Override
-	public Token next0()
-		throws IOException
-	{
-		Token token = toToken(peekChar());
-		char c;
-		switch(token)
-		{
-			case OBJECT_END:
-			case LIST_END:
-				readNext();
-
-				c = peekChar();
-				if(c == ',') read();
-
-				return token;
-			case OBJECT_START:
-			case LIST_START:
-				readNext();
-				lists[level + 1] = token == Token.LIST_START;
-				return token;
-			case KEY:
-			{
-				readWhitespace();
-				String key = readString(true);
-				char next = readNext();
-				if(next != ':')
-				{
-					throw raiseException("Expected :, got " + next);
-				}
-
-				names[level] = key;
-				setValue(key);
-				return token;
-			}
-			case VALUE:
-			{
-				setValue(readNextValue());
-
-				// Check for trailing commas
-				readWhitespace();
-				c = peekChar();
-				if(c == ',') read();
-
-				return token;
-			}
-			case NULL:
-			{
-				readNextValue();
-
-				setValueNull();
-
-				// Check for trailing commas
-				readWhitespace();
-				c = peekChar();
-				if(c == ',') read();
-
-				return token;
-			}
-		}
-
-		return null;
-	}
-
 	private char peekChar()
 		throws IOException
 	{
@@ -441,7 +512,7 @@ public class JsonInput
 
 		if(limit - position < 1)
 		{
-			if(false == readAhead(1)) return null;
+			if(false == readAhead(1)) return Token.END_OF_STREAM;
 		}
 
 		if(limit - position > 0)
@@ -449,16 +520,210 @@ public class JsonInput
 			return toToken(buffer[position]);
 		}
 
+		return Token.END_OF_STREAM;
+	}
+
+	@Override
+	public Object readDynamic()
+		throws IOException
+	{
+		switch(value)
+		{
+			case STRING:
+				return valueString;
+			case BOOLEAN:
+				return valueBoolean;
+			case LONG:
+				return valueLong;
+			case DOUBLE:
+				return valueDouble;
+		}
+
 		return null;
 	}
 
 	@Override
-	public byte[] getByteArray()
+	public boolean readBoolean()
+		throws IOException
 	{
-		/*
-		 * JSON uses Base64 strings, so we need to decode on demand.
-		 */
-		String value = getString();
-		return Base64.getDecoder().decode(value);
+		switch(value)
+		{
+			case BOOLEAN:
+				return valueBoolean;
+			default:
+				throw raiseException("Expected " + ValueType.BOOLEAN + " but found " + value);
+		}
+	}
+
+	@Override
+	public byte readByte()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				if(valueLong < Byte.MIN_VALUE || valueLong > Byte.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.BYTE + " but " + valueLong + " is outside valid range");
+				}
+				return (byte) valueLong;
+			default:
+				throw raiseException("Expected " + ValueType.BYTE + " but found " + value);
+		}
+	}
+
+	@Override
+	public char readChar()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				if(valueLong < Character.MIN_VALUE || valueLong > Character.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.CHAR + " but " + valueLong + " is outside valid range");
+				}
+				return (char) valueLong;
+			case STRING:
+				if(valueString.length() != 1)
+				{
+					throw raiseException("Expected " + ValueType.CHAR + " but STRING value was not a single character");
+				}
+				return valueString.charAt(0);
+			default:
+				throw raiseException("Expected " + ValueType.CHAR + " but found " + value);
+		}
+	}
+
+	@Override
+	public short readShort()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				if(valueLong < Short.MIN_VALUE || valueLong > Short.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.SHORT + " but " + valueLong + " is outside valid range");
+				}
+				return (short) valueLong;
+			default:
+				throw raiseException("Expected " + ValueType.SHORT + " but found " + value);
+		}
+	}
+
+	@Override
+	public int readInt()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				if(valueLong < Integer.MIN_VALUE || valueLong > Integer.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.INTEGER + " but " + valueLong + " is outside valid range");
+				}
+				return (int) valueLong;
+			default:
+				throw raiseException("Expected " + ValueType.INTEGER + " but found " + value);
+		}
+	}
+
+	@Override
+	public long readLong()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				return valueLong;
+			default:
+				throw raiseException("Expected " + ValueType.LONG + " but found " + value);
+		}
+	}
+
+	@Override
+	public float readFloat()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				if(valueLong < Float.MIN_VALUE || valueLong > Float.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.FLOAT + " but " + valueLong + " is outside valid range");
+				}
+				return (float) valueLong;
+			case DOUBLE:
+				if(valueDouble < Float.MIN_VALUE || valueDouble > Float.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.FLOAT + " but " + valueDouble + " is outside valid range");
+				}
+				return (float) valueDouble;
+			default:
+				throw raiseException("Expected " + ValueType.FLOAT + " but found " + value);
+		}
+	}
+
+	@Override
+	public double readDouble()
+		throws IOException
+	{
+		switch(value)
+		{
+			case LONG:
+				if(valueLong < Double.MIN_VALUE || valueLong > Double.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.DOUBLE + " but " + valueLong + " is outside valid range");
+				}
+				return (float) valueLong;
+			case DOUBLE:
+				return valueDouble;
+			default:
+				throw raiseException("Expected " + ValueType.DOUBLE + " but found " + value);
+		}
+	}
+
+	@Override
+	public String readString()
+		throws IOException
+	{
+		switch(value)
+		{
+			case STRING:
+				return valueString;
+			default:
+				throw raiseException("Expected " + ValueType.STRING + " but found " + value);
+		}
+	}
+
+	@Override
+	public byte[] readByteArray()
+		throws  IOException
+	{
+		switch(value)
+		{
+			case STRING:
+				/*
+		 		 * JSON uses Base64 strings, so we need to decode on demand.
+				 */
+				return Base64.getDecoder().decode(valueString);
+			default:
+				throw raiseException("Expected " + ValueType.BYTES + " but found " + value);
+		}
+	}
+
+	@Override
+	public InputStream asInputStream()
+		throws IOException
+	{
+		return new ByteArrayInputStream(readByteArray());
+	}
+
+	@Override
+	public Bytes readBytes()
+		throws IOException
+	{
+		return Bytes.create(readByteArray());
 	}
 }

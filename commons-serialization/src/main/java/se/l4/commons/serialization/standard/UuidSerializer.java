@@ -30,7 +30,7 @@ public class UuidSerializer
 	public UUID read(StreamingInput in) throws IOException
 	{
 		in.next(Token.VALUE);
-		return fromBytes0(in.getByteArray());
+		return fromBytes0(in.readByteArray());
 	}
 
 	@Override

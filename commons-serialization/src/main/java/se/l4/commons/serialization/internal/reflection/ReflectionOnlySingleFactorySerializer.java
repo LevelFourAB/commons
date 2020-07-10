@@ -83,7 +83,7 @@ public class ReflectionOnlySingleFactorySerializer<T>
 		while(in.peek() != Token.OBJECT_END)
 		{
 			in.next(Token.KEY);
-			String key = in.getString();
+			String key = in.readString();
 
 			int idx = Arrays.binarySearch(names, key);
 			if(idx >= 0)

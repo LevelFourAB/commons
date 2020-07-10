@@ -43,7 +43,7 @@ public class MapAsObjectSerializer<V>
 			}
 
 			in.next(Token.KEY);
-			String key = in.getString();
+			String key = in.readString();
 			if(key.startsWith("__commons__:"))
 			{
 				in.skipValue();

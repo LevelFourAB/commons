@@ -44,25 +44,34 @@ public class EnumSerializer<T extends Enum<T>>
 		switch(translator.getType())
 		{
 			case BOOLEAN:
-				value = in.getBoolean();
+				value = in.readBoolean();
 				break;
 			case DOUBLE:
-				value = in.getDouble();
+				value = in.readDouble();
 				break;
 			case FLOAT:
-				value = in.getFloat();
+				value = in.readFloat();
 				break;
 			case INTEGER:
-				value = in.getInt();
+				value = in.readInt();
 				break;
 			case LONG:
-				value = in.getLong();
+				value = in.readLong();
 				break;
 			case SHORT:
-				value = in.getShort();
+				value = in.readShort();
 				break;
 			case STRING:
-				value = in.getString();
+				value = in.readString();
+				break;
+			case BYTE:
+				value = in.readByte();
+				break;
+			case BYTES:
+				value = in.readByteArray();
+				break;
+			case CHAR:
+				value = in.readChar();
 				break;
 			default:
 				throw new AssertionError("Unknown type: " + translator.getType());

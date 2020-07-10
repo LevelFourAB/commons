@@ -35,7 +35,7 @@ public class FileSerializer
 	{
 		in.next(Token.VALUE);
 
-		String file = in.getString();
+		String file = in.readString();
 		if(file == null) return null;
 
 		File temp = new File(file);

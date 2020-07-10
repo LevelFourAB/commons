@@ -95,7 +95,7 @@ public class ConfigKey
 			throws IOException
 		{
 			in.next(Token.VALUE);
-			return new ConfigKey(config, in.getString());
+			return new ConfigKey(config, in.readString());
 		}
 
 		@Override

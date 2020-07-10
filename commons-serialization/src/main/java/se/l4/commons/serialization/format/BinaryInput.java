@@ -1,10 +1,13 @@
 package se.l4.commons.serialization.format;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
 import com.google.common.io.ByteStreams;
+
+import se.l4.commons.io.Bytes;
 
 /**
  * Input for binary format.
@@ -30,6 +33,8 @@ public class BinaryInput
 	private final byte[] buffer;
 
 	private int peekedByte;
+	private int currentValueByte;
+	private boolean didReadValue;
 
 	public BinaryInput(InputStream in)
 	{
@@ -50,6 +55,12 @@ public class BinaryInput
 	public Token peek()
 		throws IOException
 	{
+		if((current() == Token.VALUE || current() == Token.KEY) && ! didReadValue)
+		{
+			// The value hasn't actually been read
+			readDynamic();
+		}
+
 		if(peekedByte == -2)
 		{
 			peekedByte = in.read();
@@ -58,7 +69,7 @@ public class BinaryInput
 		switch(peekedByte)
 		{
 			case -1:
-				return null;
+				return Token.END_OF_STREAM;
 			case BinaryOutput.TAG_KEY:
 				return Token.KEY;
 			case BinaryOutput.TAG_OBJECT_START:
@@ -81,13 +92,21 @@ public class BinaryInput
 		throws IOException
 	{
 		Token current = peek();
-		if(current == Token.KEY || current == Token.VALUE || current == Token.NULL)
+		if(current == Token.KEY || current == Token.VALUE)
 		{
 			// Read actual data of keys and values
-			readValue();
+			currentValueByte = peekedByte;
+			didReadValue = false;
 		}
+		else
+		{
+			if(current == Token.NULL)
+			{
+				currentValueByte = peekedByte;
+			}
 
-		peekedByte = in.read();
+			peekedByte = in.read();
+		}
 
 		return current;
 	}
@@ -107,7 +126,7 @@ public class BinaryInput
 		}
 	}
 
-	private double readDouble()
+	private double readRawDouble()
 		throws IOException
 	{
 		readBuffer(8);
@@ -123,7 +142,7 @@ public class BinaryInput
 		return Double.longBitsToDouble(value);
 	}
 
-	private float readFloat()
+	private float readRawFloat()
 		throws IOException
 	{
 		readBuffer(4);
@@ -135,7 +154,7 @@ public class BinaryInput
 		return Float.intBitsToFloat(value);
 	}
 
-	private int readInteger()
+	private int readRawInteger()
 		throws IOException
 	{
 		int shift = 0;
@@ -152,7 +171,7 @@ public class BinaryInput
 		throw new EOFException("Invalid integer");
 	}
 
-	private long readLong()
+	private long readRawLong()
 		throws IOException
 	{
 		int shift = 0;
@@ -169,10 +188,10 @@ public class BinaryInput
 		throw new EOFException("Invalid long");
 	}
 
-	private String readString()
+	private String readRawString()
 		throws IOException
 	{
-		int length = readInteger();
+		int length = readRawInteger();
 		char[] chars = length < CHARS_SIZE ? CHARS.get() : new char[length];
 
 		for(int i=0; i<length; i++)
@@ -198,66 +217,286 @@ public class BinaryInput
 		return new String(chars, 0, length);
 	}
 
-	private byte[] readByteArray()
+	private byte[] readRawByteArray()
 		throws IOException
 	{
-		int length = readInteger();
+		int length = readRawInteger();
 		byte[] buffer = new byte[length];
 		ByteStreams.readFully(in, buffer);
 
 		return buffer;
 	}
 
-	private void readValue()
+	public Object readDynamic()
 		throws IOException
 	{
-		switch(peekedByte)
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_BOOLEAN:
+				return readBoolean();
+			case BinaryOutput.TAG_DOUBLE:
+				return readDouble();
+			case BinaryOutput.TAG_FLOAT:
+				return readFloat();
+			case BinaryOutput.TAG_INT:
+			case BinaryOutput.TAG_POSITIVE_INT:
+			case BinaryOutput.TAG_NEGATIVE_INT:
+				return readInt();
+			case BinaryOutput.TAG_LONG:
+			case BinaryOutput.TAG_POSITIVE_LONG:
+			case BinaryOutput.TAG_NEGATIVE_LONG:
+				return readLong();
+			case BinaryOutput.TAG_KEY:
+			case BinaryOutput.TAG_STRING:
+				return readString();
+			case BinaryOutput.TAG_BYTE_ARRAY:
+				return readByteArray();
+			case BinaryOutput.TAG_NULL:
+				return null;
+			default:
+				throw new IOException("Unexpected value type, no idea what to do (type was " + currentValueByte + ")");
+		}
+	}
+
+	@Override
+	public boolean readBoolean()
+		throws IOException
+	{
+		switch(currentValueByte)
 		{
 			case BinaryOutput.TAG_BOOLEAN:
 				int b = in.read();
-				setValue(b == 1);
-				break;
-			case BinaryOutput.TAG_DOUBLE:
-				setValue(readDouble());
-				break;
-			case BinaryOutput.TAG_FLOAT:
-				setValue(readFloat());
-				break;
-			case BinaryOutput.TAG_INT:
-				int i = readInteger();
-				i = (i >>> 1) ^ -(i & 1);
-				setValue(i);
-				break;
-			case BinaryOutput.TAG_POSITIVE_INT:
-				setValue(readInteger());
-				break;
-			case BinaryOutput.TAG_NEGATIVE_INT:
-				setValue(-readInteger());
-				break;
-			case BinaryOutput.TAG_LONG:
-				long l = readLong();
-				l = (l >>> 1) ^ -(l & 1);
-				setValue(l);
-				break;
-			case BinaryOutput.TAG_POSITIVE_LONG:
-				setValue(readLong());
-				break;
-			case BinaryOutput.TAG_NEGATIVE_LONG:
-				setValue(-readLong());
-				break;
-			case BinaryOutput.TAG_NULL:
-				setValueNull();
-				break;
-			case BinaryOutput.TAG_KEY:
-			case BinaryOutput.TAG_STRING:
-				setValue(readString());
-				break;
-			case BinaryOutput.TAG_BYTE_ARRAY:
-				setValue(readByteArray());
-				break;
+				markValueRead();
+				return b == 1;
 			default:
-				throw new IOException("Unexpected value type, no idea what to do (type was " + peekedByte + ")");
+				throw raiseException("Expected " + ValueType.BOOLEAN + ", but found " + valueType(currentValueByte));
 		}
+	}
 
+	@Override
+	public byte readByte()
+		throws IOException
+	{
+		int value = readInt();
+		if(value < Byte.MIN_VALUE || value > Byte.MAX_VALUE)
+		{
+			throw raiseException("Expected " + ValueType.BYTE + " but " + value + " is outside valid range");
+		}
+		return (byte) value;
+	}
+
+	@Override
+	public short readShort()
+		throws IOException
+	{
+		int value = readInt();
+		if(value < Short.MIN_VALUE || value > Short.MAX_VALUE)
+		{
+			throw raiseException("Expected " + ValueType.SHORT + " but " + value + " is outside valid range");
+		}
+		return (short) value;
+	}
+
+	@Override
+	public char readChar()
+		throws IOException
+	{
+		int value = readInt();
+		if(value < Character.MIN_VALUE || value > Character.MAX_VALUE)
+		{
+			throw raiseException("Expected " + ValueType.CHAR + " but " + value + " is outside valid range");
+		}
+		return (char) value;
+	}
+
+	@Override
+	public int readInt()
+		throws IOException
+	{
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_INT:
+			{
+				int i = readRawInteger();
+				i = (i >>> 1) ^ -(i & 1);
+				markValueRead();
+				return i;
+			}
+			case BinaryOutput.TAG_POSITIVE_INT:
+			{
+				int i = readRawInteger();
+				markValueRead();
+				return i;
+			}
+			case BinaryOutput.TAG_NEGATIVE_INT:
+			{
+				int i = - readRawInteger();
+				markValueRead();
+				return i;
+			}
+
+			case BinaryOutput.TAG_LONG:
+			case BinaryOutput.TAG_POSITIVE_LONG:
+			case BinaryOutput.TAG_NEGATIVE_LONG:
+				long v = readLong();
+				if(v < Integer.MIN_VALUE || v > Integer.MAX_VALUE)
+				{
+					throw raiseException("Expected " + ValueType.INTEGER + " but " + v + " is outside valid range");
+				}
+				return (int) v;
+
+			default:
+				throw raiseException("Expected " + ValueType.INTEGER + ", but found " + valueType(currentValueByte));
+		}
+	}
+
+	@Override
+	public long readLong()
+		throws IOException
+	{
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_LONG:
+			{
+				long l = readRawLong();
+				l = (l >>> 1) ^ -(l & 1);
+				markValueRead();
+				return l;
+			}
+			case BinaryOutput.TAG_POSITIVE_LONG:
+			{
+				long l = readRawLong();
+				markValueRead();
+				return l;
+			}
+			case BinaryOutput.TAG_NEGATIVE_LONG:
+			{
+				long l = - readRawLong();
+				markValueRead();
+				return l;
+			}
+
+			case BinaryOutput.TAG_INT:
+			case BinaryOutput.TAG_POSITIVE_INT:
+			case BinaryOutput.TAG_NEGATIVE_INT:
+				return readInt();
+
+			default:
+				throw raiseException("Expected " + ValueType.LONG + ", but found " + valueType(currentValueByte));
+		}
+	}
+
+	@Override
+	public float readFloat()
+		throws IOException
+	{
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_FLOAT:
+				float f = readRawFloat();
+				markValueRead();
+				return f;
+
+			default:
+				throw raiseException("Expected " + ValueType.FLOAT + ", but found " + valueType(currentValueByte));
+		}
+	}
+
+	@Override
+	public double readDouble()
+		throws IOException
+	{
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_DOUBLE:
+				double d = readRawDouble();
+				markValueRead();
+				return d;
+
+			default:
+				throw raiseException("Expected " + ValueType.FLOAT + ", but found " + valueType(currentValueByte));
+		}
+	}
+
+	@Override
+	public String readString()
+		throws IOException
+	{
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_STRING:
+			case BinaryOutput.TAG_KEY:
+				String s = readRawString();
+				markValueRead();
+				return s;
+			default:
+				throw raiseException("Expected " + ValueType.STRING + ", but found " + valueType(currentValueByte));
+		}
+	}
+
+	@Override
+	public byte[] readByteArray()
+		throws IOException
+	{
+		switch(currentValueByte)
+		{
+			case BinaryOutput.TAG_BYTE_ARRAY:
+				byte[] b = readRawByteArray();
+				markValueRead();
+				return b;
+			default:
+				throw raiseException("Expected " + ValueType.BYTES + ", but found " + valueType(currentValueByte));
+		}
+	}
+
+	@Override
+	public Bytes readBytes()
+		throws IOException
+	{
+		return Bytes.create(readByteArray());
+	}
+
+	@Override
+	public InputStream asInputStream()
+		throws IOException
+	{
+		return new ByteArrayInputStream(readByteArray());
+	}
+
+	private void markValueRead()
+		throws IOException
+	{
+		didReadValue = true;
+		peekedByte = in.read();
+	}
+
+	private ValueType valueType(int b)
+		throws IOException
+	{
+		switch(b)
+		{
+			case BinaryOutput.TAG_BOOLEAN:
+				return ValueType.BOOLEAN;
+			case BinaryOutput.TAG_DOUBLE:
+				return ValueType.DOUBLE;
+			case BinaryOutput.TAG_FLOAT:
+				return ValueType.FLOAT;
+			case BinaryOutput.TAG_INT:
+			case BinaryOutput.TAG_POSITIVE_INT:
+			case BinaryOutput.TAG_NEGATIVE_INT:
+				return ValueType.INTEGER;
+			case BinaryOutput.TAG_LONG:
+			case BinaryOutput.TAG_POSITIVE_LONG:
+			case BinaryOutput.TAG_NEGATIVE_LONG:
+				return ValueType.LONG;
+			case BinaryOutput.TAG_NULL:
+				return ValueType.NULL;
+			case BinaryOutput.TAG_STRING:
+				return ValueType.STRING;
+			case BinaryOutput.TAG_BYTE_ARRAY:
+				return ValueType.BYTES;
+			default:
+				throw raiseException("Unexpected value type, no idea what to do (read byte was " + b + ")");
+		}
 	}
 }

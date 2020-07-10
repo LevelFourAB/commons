@@ -50,11 +50,11 @@ public class CompactDynamicSerializer
 		}
 		else
 		{
-			namespace = in.getString();
+			namespace = in.readString();
 		}
 
 		in.next(Token.VALUE);
-		String name = in.getString();
+		String name = in.readString();
 
 		Object result = null;
 
