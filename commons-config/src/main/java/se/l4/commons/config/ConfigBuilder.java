@@ -7,12 +7,12 @@ import java.nio.file.Path;
 import javax.validation.ValidatorFactory;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.Serializers;
 
 /**
  * Builder for instances of {@link Config}. Makes it easy to create a
  * configuration over several files. When creating a configuration one can opt
- * to use a {@link #withSerializerCollection(SerializerCollection) custom serializer collection}
+ * to use a {@link #withSerializers(Serializers) custom serializer collection}
  * and its possible to activate validation via {@link #withValidatorFactory(ValidatorFactory)}.
  *
  * @author Andreas Holstenson
@@ -21,14 +21,14 @@ import se.l4.commons.serialization.SerializerCollection;
 public interface ConfigBuilder
 {
 	/**
-	 * Set the the {@link SerializerCollection} to use when reading the
+	 * Set the the {@link Serializers} to use when reading the
 	 * configuration files.
 	 *
 	 * @param serializers
 	 * @return
 	 */
 	@NonNull
-	ConfigBuilder withSerializerCollection(@NonNull SerializerCollection serializers);
+	ConfigBuilder withSerializers(@NonNull Serializers serializers);
 
 	/**
 	 * Set the {@link ValidatorFactory} to use when validating loaded

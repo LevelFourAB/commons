@@ -18,7 +18,7 @@ import com.google.common.primitives.Primitives;
 import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.Factory;
 import se.l4.commons.serialization.SerializationException;
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.types.InstanceException;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.ParameterRef;
@@ -52,7 +52,7 @@ public class FactoryDefinition<T>
 	}
 
 	public static <T> FactoryDefinition<T> resolve(
-		SerializerCollection collection,
+		Serializers collection,
 		TypeRef parentType,
 		Map<String, FieldDefinition> fields,
 		Map<String, FieldDefinition> nonRenamed,
@@ -410,7 +410,7 @@ public class FactoryDefinition<T>
 	{
 		private final Supplier<?> supplier;
 
-		public InjectedArgument(SerializerCollection collection, Type type, Annotation[] annotations)
+		public InjectedArgument(Serializers collection, Type type, Annotation[] annotations)
 		{
 			supplier = collection.getInstanceFactory().supplier(type, annotations);
 		}

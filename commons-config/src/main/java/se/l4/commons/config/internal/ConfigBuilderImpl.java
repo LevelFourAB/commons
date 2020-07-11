@@ -16,8 +16,8 @@ import se.l4.commons.config.Config;
 import se.l4.commons.config.ConfigBuilder;
 import se.l4.commons.config.ConfigException;
 import se.l4.commons.io.Bytes;
-import se.l4.commons.serialization.DefaultSerializerCollection;
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.DefaultSerializers;
+import se.l4.commons.serialization.Serializers;
 
 /**
  * Builder for configuration instances.
@@ -30,7 +30,7 @@ public class ConfigBuilderImpl implements ConfigBuilder
 	private final Map<String, Object> keys;
 	private final List<Bytes> suppliers;
 
-	private SerializerCollection collection;
+	private Serializers collection;
 	private ValidatorFactory validatorFactory;
 
 	private File root;
@@ -38,13 +38,13 @@ public class ConfigBuilderImpl implements ConfigBuilder
 	public ConfigBuilderImpl()
 	{
 		suppliers = new ArrayList<>();
-		collection = new DefaultSerializerCollection();
+		collection = new DefaultSerializers();
 
 		keys = new HashMap<String, Object>();
 	}
 
 	@Override
-	public ConfigBuilder withSerializerCollection(SerializerCollection serializers)
+	public ConfigBuilder withSerializers(Serializers serializers)
 	{
 		this.collection = serializers;
 		return this;

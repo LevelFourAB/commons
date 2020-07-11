@@ -19,13 +19,13 @@ import se.l4.commons.types.Types;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
- * Default implementation of {@link SerializerCollection}.
+ * Default implementation of {@link Serializers}.
  *
  * @author Andreas Holstenson
  *
  */
-public abstract class AbstractSerializerCollection
-	implements SerializerCollection
+public abstract class AbstractSerializers
+	implements Serializers
 {
 	private static final ThreadLocal<Set<TypeRef>> stack = new ThreadLocal<Set<TypeRef>>();
 
@@ -33,7 +33,7 @@ public abstract class AbstractSerializerCollection
 	private final Map<Serializer<?>, QualifiedName> serializerToName;
 	private final Map<CacheKey, Serializer<?>> serializers;
 
-	public AbstractSerializerCollection()
+	public AbstractSerializers()
 	{
 		nameToSerializer = new ConcurrentHashMap<QualifiedName, Serializer<?>>();
 		serializerToName = new ConcurrentHashMap<Serializer<?>, QualifiedName>();
@@ -50,7 +50,7 @@ public abstract class AbstractSerializerCollection
 	}
 
 	@Override
-	public SerializerCollection bind(Class<?> type)
+	public Serializers bind(Class<?> type)
 	{
 		find(type);
 
@@ -58,7 +58,7 @@ public abstract class AbstractSerializerCollection
 	}
 
 	@Override
-	public <T> SerializerCollection bind(Class<T> type, Serializer<T> serializer)
+	public <T> Serializers bind(Class<T> type, Serializer<T> serializer)
 	{
 		bind(type, new StaticSerializerResolver<T>(serializer));
 
@@ -98,10 +98,8 @@ public abstract class AbstractSerializerCollection
 		}
 
 		// Locate the resolver to use
-		SerializerResolver<?> resolver = getResolver(type.getErasedType())
-			.orElseThrow(() -> new SerializationException("Unable to retrieve serializer for " + type + "; Type does not appear serializable"));
-
-		return createVia(resolver, type, hints);
+		return getResolver(type.getErasedType())
+			.flatMap(r -> createVia(r, type, hints));
 	}
 
 	@Override

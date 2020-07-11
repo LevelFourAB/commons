@@ -31,23 +31,23 @@ import se.l4.commons.types.DefaultInstanceFactory;
 import se.l4.commons.types.InstanceFactory;
 
 /**
- * Default implementation of {@link SerializerCollection}.
+ * Default implementation of {@link Serializers}.
  *
  * @author Andreas Holstenson
  *
  */
-public class DefaultSerializerCollection
-	extends AbstractSerializerCollection
+public class DefaultSerializers
+	extends AbstractSerializers
 {
 	private final InstanceFactory instanceFactory;
 	private final SerializerResolverRegistry resolverRegistry;
 
-	public DefaultSerializerCollection()
+	public DefaultSerializers()
 	{
 		this(new DefaultInstanceFactory());
 	}
 
-	public DefaultSerializerCollection(InstanceFactory instanceFactory)
+	public DefaultSerializers(InstanceFactory instanceFactory)
 	{
 		this.instanceFactory = instanceFactory;
 
@@ -58,7 +58,7 @@ public class DefaultSerializerCollection
 				@Override
 				public void registerIfNamed(Class<?> from, Serializer<?> serializer)
 				{
-					DefaultSerializerCollection.this.registerIfNamed(from, serializer);
+					DefaultSerializers.this.registerIfNamed(from, serializer);
 				}
 			}
 		);
@@ -97,7 +97,7 @@ public class DefaultSerializerCollection
 	}
 
 	@Override
-	public <T> SerializerCollection bind(Class<T> type, SerializerResolver<? extends T> resolver)
+	public <T> Serializers bind(Class<T> type, SerializerResolver<? extends T> resolver)
 	{
 		resolverRegistry.bind(type, resolver);
 

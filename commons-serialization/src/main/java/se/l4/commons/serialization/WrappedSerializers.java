@@ -12,19 +12,19 @@ import se.l4.commons.serialization.spi.SerializerResolverRegistry;
 import se.l4.commons.types.InstanceFactory;
 
 /**
- * Implementation of {@link SerializerCollection} that wraps another
+ * Implementation of {@link Serializers} that wraps another
  * collection.
  *
  * @author Andreas Holstenson
  *
  */
-public class WrappedSerializerCollection
-	extends AbstractSerializerCollection
+public class WrappedSerializers
+	extends AbstractSerializers
 {
 	private final SerializerResolverRegistry resolverRegistry;
-	private final SerializerCollection other;
+	private final Serializers other;
 
-	public WrappedSerializerCollection(SerializerCollection other)
+	public WrappedSerializers(Serializers other)
 	{
 		this.other = other;
 		resolverRegistry = new SerializerResolverRegistry(
@@ -34,7 +34,7 @@ public class WrappedSerializerCollection
 				@Override
 				public void registerIfNamed(Class<?> from, Serializer<?> serializer)
 				{
-					WrappedSerializerCollection.this.registerIfNamed(from, serializer);
+					WrappedSerializers.this.registerIfNamed(from, serializer);
 				}
 			}
 		);
@@ -47,7 +47,7 @@ public class WrappedSerializerCollection
 	}
 
 	@Override
-	public <T> SerializerCollection bind(Class<T> type, SerializerResolver<? extends T> resolver)
+	public <T> Serializers bind(Class<T> type, SerializerResolver<? extends T> resolver)
 	{
 		resolverRegistry.bind(type, resolver);
 

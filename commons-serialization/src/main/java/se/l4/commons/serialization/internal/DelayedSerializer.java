@@ -5,8 +5,8 @@ import java.lang.annotation.Annotation;
 
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerCollection;
 import se.l4.commons.serialization.SerializerFormatDefinition;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
 import se.l4.commons.types.reflect.TypeRef;
@@ -24,7 +24,7 @@ public class DelayedSerializer<T>
 {
 	private volatile Serializer<T> instance;
 
-	public DelayedSerializer(SerializerCollection collection, TypeRef type, Annotation[] hints)
+	public DelayedSerializer(Serializers collection, TypeRef type, Annotation[] hints)
 	{
 		instance = new Serializer<T>()
 		{

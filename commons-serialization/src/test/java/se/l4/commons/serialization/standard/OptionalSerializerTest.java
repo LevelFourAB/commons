@@ -11,9 +11,9 @@ import org.junit.Test;
 
 import se.l4.commons.io.Bytes;
 import se.l4.commons.io.StreamingCodec;
-import se.l4.commons.serialization.DefaultSerializerCollection;
+import se.l4.commons.serialization.DefaultSerializers;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.format.StreamingFormat;
 import se.l4.commons.types.Types;
 
@@ -67,7 +67,7 @@ public class OptionalSerializerTest
 	public void testViaCollection()
 		throws IOException
 	{
-		SerializerCollection collection = new DefaultSerializerCollection();
+		Serializers collection = new DefaultSerializers();
 		Serializer<Optional<String>> s = (Serializer) collection.find(
 			Types.reference(Optional.class, String.class)
 		).get();

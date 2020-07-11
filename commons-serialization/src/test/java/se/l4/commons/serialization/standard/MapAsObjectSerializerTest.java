@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import se.l4.commons.serialization.DefaultSerializerCollection;
+import se.l4.commons.serialization.DefaultSerializers;
 import se.l4.commons.serialization.SerializationTestHelper;
 import se.l4.commons.serialization.collections.MapAsObjectSerializer;
 import se.l4.commons.serialization.collections.MapSerializerResolver;
@@ -42,7 +42,7 @@ public class MapAsObjectSerializerTest
 	@Test
 	public void testMapWithDynamicSerializer()
 	{
-		DefaultSerializerCollection collection = new DefaultSerializerCollection();
+		DefaultSerializers collection = new DefaultSerializers();
 		MapAsObjectSerializer<Object> serializer = new MapAsObjectSerializer<>(new DynamicSerializer(collection));
 		Map<String, Object> map = new HashMap<>();
 

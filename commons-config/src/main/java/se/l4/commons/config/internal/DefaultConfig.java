@@ -27,8 +27,8 @@ import se.l4.commons.config.ConfigKey;
 import se.l4.commons.config.Value;
 import se.l4.commons.config.internal.streaming.MapInput;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerCollection;
-import se.l4.commons.serialization.WrappedSerializerCollection;
+import se.l4.commons.serialization.Serializers;
+import se.l4.commons.serialization.WrappedSerializers;
 import se.l4.commons.serialization.format.StreamingInput;
 
 /**
@@ -40,16 +40,16 @@ import se.l4.commons.serialization.format.StreamingInput;
 public class DefaultConfig
 	implements Config
 {
-	private final SerializerCollection collection;
+	private final Serializers collection;
 	private final Map<String, Object> data;
 	private final ValidatorFactory validatorFactory;
 
-	public DefaultConfig(SerializerCollection collection,
+	public DefaultConfig(Serializers collection,
 			ValidatorFactory validatorFactory,
 			File root,
 			Map<String, Object> data)
 	{
-		this.collection = new WrappedSerializerCollection(collection);
+		this.collection = new WrappedSerializers(collection);
 		this.validatorFactory = validatorFactory;
 		this.data = data;
 

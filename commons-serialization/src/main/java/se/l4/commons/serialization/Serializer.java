@@ -16,7 +16,7 @@ import se.l4.commons.serialization.format.Token;
 /**
  * Serializer for a specific class. A serializer is used to read and write
  * objects and is usually bound to a specific class. Serializers are retrieved
- * via a {@link SerializerCollection}.
+ * via a {@link Serializers}.
  *
  * @author Andreas Holstenson
  *

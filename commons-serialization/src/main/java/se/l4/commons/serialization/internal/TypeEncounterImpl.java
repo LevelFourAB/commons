@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
 
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.spi.TypeEncounter;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -17,11 +17,11 @@ import se.l4.commons.types.reflect.TypeRef;
 public class TypeEncounterImpl
 	implements TypeEncounter
 {
-	private final SerializerCollection collection;
+	private final Serializers collection;
 	private final TypeRef type;
 	private final List<Annotation> annotations;
 
-	public TypeEncounterImpl(SerializerCollection collection,
+	public TypeEncounterImpl(Serializers collection,
 			TypeRef type,
 			List<Annotation> annotations)
 	{
@@ -31,7 +31,7 @@ public class TypeEncounterImpl
 	}
 
 	@Override
-	public SerializerCollection getCollection()
+	public Serializers getCollection()
 	{
 		return collection;
 	}

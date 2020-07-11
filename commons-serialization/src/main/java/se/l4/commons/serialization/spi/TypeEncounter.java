@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
@@ -22,7 +22,7 @@ public interface TypeEncounter
 	 * @return
 	 */
 	@NonNull
-	SerializerCollection getCollection();
+	Serializers getCollection();
 
 	/**
 	 * Get the type encountered.

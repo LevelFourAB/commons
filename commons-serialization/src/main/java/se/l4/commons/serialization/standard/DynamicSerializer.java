@@ -6,8 +6,8 @@ import java.util.Optional;
 import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerCollection;
 import se.l4.commons.serialization.SerializerFormatDefinition;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
 import se.l4.commons.serialization.format.Token;
@@ -23,10 +23,10 @@ import se.l4.commons.serialization.format.ValueType;
 public class DynamicSerializer
 	implements Serializer<Object>
 {
-	private final SerializerCollection collection;
+	private final Serializers collection;
 	private final SerializerFormatDefinition formatDefinition;
 
-	public DynamicSerializer(SerializerCollection collection)
+	public DynamicSerializer(Serializers collection)
 	{
 		this.collection = collection;
 

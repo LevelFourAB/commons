@@ -12,11 +12,11 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
-import se.l4.commons.serialization.DefaultSerializerCollection;
+import se.l4.commons.serialization.DefaultSerializers;
 import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.ReflectionSerializer;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerCollection;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.format.JsonInput;
 import se.l4.commons.serialization.format.JsonOutput;
 import se.l4.commons.serialization.internal.TypeEncounterImpl;
@@ -24,12 +24,12 @@ import se.l4.commons.types.Types;
 
 public class ReflectionConstructorTest
 {
-	private SerializerCollection collection;
+	private Serializers collection;
 
 	@Before
 	public void beforeTests()
 	{
-		collection = new DefaultSerializerCollection();
+		collection = new DefaultSerializers();
 	}
 
 	@Test

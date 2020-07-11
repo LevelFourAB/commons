@@ -15,7 +15,7 @@ import se.l4.commons.types.reflect.TypeRef;
  * @author Andreas Holstenson
  *
  */
-public interface SerializerCollection
+public interface Serializers
 {
 	/**
 	 * Get the current instance factory.
@@ -32,7 +32,7 @@ public interface SerializerCollection
 	 * @param type
 	 */
 	@NonNull
-	SerializerCollection bind(@NonNull Class<?> type);
+	Serializers bind(@NonNull Class<?> type);
 
 	/**
 	 * Bind a given type to the specified serializer.
@@ -42,7 +42,7 @@ public interface SerializerCollection
 	 * @param serializer
 	 */
 	@NonNull
-	<T> SerializerCollection bind(@NonNull Class<T> type, @NonNull Serializer<T> serializer);
+	<T> Serializers bind(@NonNull Class<T> type, @NonNull Serializer<T> serializer);
 
 	/**
 	 * Bind a given type to the specified resolver. The resolver will be
@@ -53,7 +53,7 @@ public interface SerializerCollection
 	 * @param resolver
 	 */
 	@NonNull
-	<T> SerializerCollection bind(@NonNull Class<T> type, @NonNull SerializerResolver<? extends T> resolver);
+	<T> Serializers bind(@NonNull Class<T> type, @NonNull SerializerResolver<? extends T> resolver);
 
 	/**
 	 * Find a serializer suitable for the specific type.

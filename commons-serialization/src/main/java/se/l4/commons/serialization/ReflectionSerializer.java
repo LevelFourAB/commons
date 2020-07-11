@@ -50,7 +50,7 @@ public class ReflectionSerializer<T>
 	public Optional<Serializer<T>> find(TypeEncounter encounter)
 	{
 		TypeRef type = encounter.getType();
-		SerializerCollection collection = encounter.getCollection();
+		Serializers collection = encounter.getCollection();
 
 		ImmutableMap.Builder<String, FieldDefinition> builder = ImmutableMap.builder();
 		ImmutableMap.Builder<String, FieldDefinition> nonRenamedFields = ImmutableMap.builder();
