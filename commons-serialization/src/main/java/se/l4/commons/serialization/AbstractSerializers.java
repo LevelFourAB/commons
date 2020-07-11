@@ -153,8 +153,6 @@ public abstract class AbstractSerializers
 	 */
 	protected Optional<? extends Serializer<?>> createVia(SerializerResolver<?> resolver, TypeRef type, Annotation... hints)
 	{
-		Set<TypeRef> s = stack.get();
-
 		// Only expose the hints that the resolver has declared
 		Set<Class<? extends Annotation>> hintsUsed = resolver.getHints();
 		List<Annotation> hintsActive;
@@ -183,6 +181,7 @@ public abstract class AbstractSerializers
 		}
 
 		// Stack to keep track of circular dependencies
+		Set<TypeRef> s = stack.get();
 		if(s == null)
 		{
 			s = new HashSet<>();
@@ -196,14 +195,23 @@ public abstract class AbstractSerializers
 			// Find a serializer to use
 			TypeEncounterImpl encounter = new TypeEncounterImpl(this, type, hintsActive);
 
-			serializer = resolver.find(encounter)
+			SerializerOrResolver<?> serializerOrResolver = resolver.find(encounter)
 				.orElseThrow(() -> new SerializationException("Unable to find serializer for " + type + " using " + resolver.getClass()));
 
-			registerIfNamed(type.getErasedType(), serializer);
+			if(serializerOrResolver instanceof Serializer)
+			{
+				serializer = (Serializer) serializerOrResolver;
 
-			// Store the found serializer in the cache
-			serializers.put(key, serializer);
-			return Optional.of(serializer);
+				registerIfNamed(type.getErasedType(), serializer);
+
+				// Store the found serializer in the cache
+				serializers.put(key, serializer);
+				return Optional.of(serializer);
+			}
+			else
+			{
+				return createVia((SerializerResolver) serializerOrResolver, type, hints);
+			}
 		}
 		finally
 		{

@@ -32,7 +32,7 @@ public interface SerializerResolver<T>
 	 * @return
 	 */
 	@NonNull
-	Optional<Serializer<T>> find(@NonNull TypeEncounter encounter);
+	Optional<? extends SerializerOrResolver<T>> find(@NonNull TypeEncounter encounter);
 
 	/**
 	 * Get the hints this resolver uses.
