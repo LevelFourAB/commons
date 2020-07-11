@@ -11,6 +11,7 @@ import se.l4.commons.serialization.collections.ListSerializerResolver;
 import se.l4.commons.serialization.collections.MapSerializerResolver;
 import se.l4.commons.serialization.collections.SetSerializerResolver;
 import se.l4.commons.serialization.enums.EnumSerializerResolver;
+import se.l4.commons.serialization.internal.UseSerializerResolver;
 import se.l4.commons.serialization.spi.NamingCallback;
 import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.serialization.spi.SerializerResolverRegistry;
@@ -88,6 +89,8 @@ public class DefaultSerializers
 		bind(Optional.class, new OptionalSerializerResolver());
 
 		bind(Bytes.class, new BytesSerializer());
+
+		bind(Object.class, new UseSerializerResolver(instanceFactory));
 	}
 
 	@Override
