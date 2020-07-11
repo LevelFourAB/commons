@@ -54,7 +54,7 @@ public class RawFormatReader
 		throws IOException
 	{
 		Token next = input.peek();
-		if(next == null) return Collections.emptyMap();
+		if(next == Token.END_OF_STREAM) return Collections.emptyMap();
 
 		switch(next)
 		{
@@ -90,7 +90,7 @@ public class RawFormatReader
 
 		Token t;
 		Map<String, Object> result = new HashMap<String, Object>();
-		while((t = input.peek()) != Token.OBJECT_END && t != null)
+		while((t = input.peek()) != Token.OBJECT_END && t != Token.END_OF_STREAM)
 		{
 			// Read the key
 			input.next(Token.KEY);

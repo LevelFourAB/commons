@@ -590,7 +590,7 @@ public class ConfigJsonInput
 		while(true)
 		{
 			// Loop until no more tokens or if we stopped and the level has been reset
-			if(next == null)
+			if(next == Token.END_OF_STREAM)
 			{
 				throw new IOException("No more tokens, but end of skipped value not found");
 			}

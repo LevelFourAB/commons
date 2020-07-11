@@ -170,9 +170,9 @@ public class DefaultConfigTest
 	public static class Thumbnails
 	{
 		@Expose @Valid
-		private Size medium;
+		public Size medium;
 		@Expose @Valid
-		private Size large;
+		public Size large;
 	}
 
 	@Use(ReflectionSerializer.class)
@@ -180,10 +180,10 @@ public class DefaultConfigTest
 	{
 		@Min(1) @Max(1000)
 		@Expose
-		private int width;
+		public int width;
 
 		@Min(1) @Max(1000)
 		@Expose
-		private int height;
+		public int height;
 	}
 }
