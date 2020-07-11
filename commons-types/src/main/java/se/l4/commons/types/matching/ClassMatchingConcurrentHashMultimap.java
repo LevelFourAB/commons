@@ -1,40 +1,48 @@
 package se.l4.commons.types.matching;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiPredicate;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 
 import se.l4.commons.types.internal.TypeHierarchy;
 
-/**
- * Abstract implementation of {@link ClassMatchingMap} that implements all of
- * the matching methods on top any {@link Map} implementation.
- */
-public abstract class AbstractClassMatchingMultimap<T, D>
+public class ClassMatchingConcurrentHashMultimap<T, D>
 	implements ClassMatchingMultimap<T, D>
 {
 	private final SetMultimap<Class<? extends T>, D> backingMap;
+	private final ReadWriteLock lock;
 
-	protected AbstractClassMatchingMultimap(SetMultimap<Class<? extends T>, D> backingMap)
+	public ClassMatchingConcurrentHashMultimap()
 	{
-		this.backingMap = backingMap;
+		backingMap = HashMultimap.create();
+		lock = new ReentrantReadWriteLock();
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<MatchedType<T, D>> entries()
 	{
-		return backingMap.entries()
-			.stream()
-			.map(e -> new DefaultMatchedType<T, D>((Class) e.getKey(), e.getValue()))
-			.collect(ImmutableList.toImmutableList());
+		lock.readLock().lock();
+		try
+		{
+			return backingMap.entries()
+				.stream()
+				.map(e -> new DefaultMatchedType<T, D>((Class) e.getKey(), e.getValue()))
+				.collect(ImmutableList.toImmutableList());
+		}
+		finally
+		{
+			lock.readLock().unlock();
+		}
 	}
 
 	@Override
@@ -43,7 +51,15 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(data);
 
-		backingMap.put(type, data);
+		lock.writeLock().lock();
+		try
+		{
+			backingMap.put(type, data);
+		}
+		finally
+		{
+			lock.writeLock().unlock();;
+		}
 	}
 
 	@Override
@@ -51,7 +67,15 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	{
 		Objects.requireNonNull(type);
 
-		return backingMap.get(type);
+		lock.readLock().lock();
+		try
+		{
+			return backingMap.get(type);
+		}
+		finally
+		{
+			lock.readLock().unlock();
+		}
 	}
 
 	@Override
@@ -59,7 +83,7 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	{
 		Objects.requireNonNull(type);
 
-		Set<D> result = new LinkedHashSet<>();
+		Set<D> result = new HashSet<>();
 		findMatching(type, (t, d) -> {
 			result.addAll(d);
 
@@ -97,14 +121,21 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	protected void findMatching(Class<? extends T> type, BiPredicate<Class<? extends T>, Set<D>> predicate)
 	{
 		TypeHierarchy.visitHierarchy(type, t -> {
-			if(backingMap.containsKey(t))
+			lock.readLock().lock();
+			try
 			{
-				Set<D> data = backingMap.get((Class) t);
-				return predicate.test((Class) t, data);
-			}
+				if(backingMap.containsKey(t))
+				{
+					Set<D> data = backingMap.get((Class) t);
+					return predicate.test((Class) t, data);
+				}
 
-			return true;
+				return true;
+			}
+			finally
+			{
+				lock.readLock().unlock();
+			}
 		});
 	}
-
 }
