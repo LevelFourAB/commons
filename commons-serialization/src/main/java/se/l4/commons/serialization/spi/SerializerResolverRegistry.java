@@ -1,29 +1,25 @@
 package se.l4.commons.serialization.spi;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 
 import se.l4.commons.serialization.SerializationException;
-import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerCollection;
-import se.l4.commons.serialization.SerializerOrResolver;
-import se.l4.commons.serialization.Use;
+import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.collections.ArraySerializerResolver;
 import se.l4.commons.types.InstanceFactory;
+import se.l4.commons.types.matching.ClassMatchingConcurrentHashMultimap;
+import se.l4.commons.types.matching.ClassMatchingMultimap;
 
 /**
  * Finder of {@link SerializerResolver}s, used when implementing a
- * {@link SerializerCollection}.
+ * {@link Serializers}.
  *
  * @author Andreas Holstenson
  *
@@ -35,7 +31,7 @@ public class SerializerResolverRegistry
 	private final InstanceFactory instanceFactory;
 	private final NamingCallback naming;
 
-	private final Map<Class<?>, SerializerResolver<?>> boundTypeToResolver;
+	private final ClassMatchingMultimap<Object, SerializerResolver<?>> boundTypeToResolver;
 	private final LoadingCache<Class<?>, Optional<SerializerResolver<?>>> typeToResolverCache;
 
 	public SerializerResolverRegistry(InstanceFactory instanceFactory, NamingCallback naming)
@@ -43,7 +39,7 @@ public class SerializerResolverRegistry
 		this.instanceFactory = instanceFactory;
 		this.naming = naming;
 
-		boundTypeToResolver = new ConcurrentHashMap<>();
+		boundTypeToResolver = new ClassMatchingConcurrentHashMultimap<>();
 		typeToResolverCache = CacheBuilder.newBuilder()
 			.build(new CacheLoader<Class<?>, Optional<SerializerResolver<?>>>()
 			{
@@ -94,7 +90,6 @@ public class SerializerResolverRegistry
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected SerializerResolver<?> findOrCreateSerializerResolver(Class<?> from)
 	{
 		SerializerResolver<?> resolver = createViaUse(from);
@@ -109,8 +104,7 @@ public class SerializerResolverRegistry
 			return ARRAY_RESOLVER;
 		}
 
-		Set<SerializerResolver<?>> resolvers = Sets.newLinkedHashSet();
-		findSerializerResolver(from, resolvers);
+		Set<SerializerResolver<?>> resolvers = boundTypeToResolver.getBest(from);
 		if(resolvers.isEmpty())
 		{
 			return null;
@@ -124,53 +118,9 @@ public class SerializerResolverRegistry
 		return new SerializerResolverChain(resolvers);
 	}
 
-	protected void findSerializerResolver(Class<?> type, Set<SerializerResolver<?>> resolvers)
-	{
-		Class<?> parent = type;
-		while(parent != null)
-		{
-			SerializerResolver<?> resolver = boundTypeToResolver.get(parent);
-			if(resolver != null) resolvers.add(resolver);
-
-			findSerializerResolverViaInterfaces(parent, resolvers);
-
-			parent = parent.getSuperclass();
-		}
-	}
-
-	protected void findSerializerResolverViaInterfaces(Class<?> type, Set<SerializerResolver<?>> resolvers)
-	{
-		Class<?>[] interfaces = type.getInterfaces();
-		for(Class<?> intf : interfaces)
-		{
-			SerializerResolver<?> resolver = boundTypeToResolver.get(intf);
-			if(resolver != null) resolvers.add(resolver);
-		}
-
-		for(Class<?> intf : interfaces)
-		{
-			findSerializerResolverViaInterfaces(intf, resolvers);
-		}
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected SerializerResolver<?> createViaUse(Class<?> from)
 	{
-		if(from.isAnnotationPresent(Use.class))
-		{
-			// A specific serializer should be used
-			Use annotation = from.getAnnotation(Use.class);
-			final Class<? extends SerializerOrResolver> value = annotation.value();
-			if(SerializerResolver.class.isAssignableFrom(value))
-			{
-				return (SerializerResolver<?>) instanceFactory.create(value);
-			}
-
-			Serializer serializer = instanceFactory.create((Class<? extends Serializer>) value);
-			naming.registerIfNamed(from, serializer);
-			return new StaticSerializerResolver(serializer);
-		}
-
 		return null;
 	}
 }
