@@ -18,12 +18,4 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AllowSimpleTypes
 {
-	/**
-	 * Deprecated value for compact serialization that was never used.
-	 *
-	 * @deprecated
-	 * @return
-	 */
-	@Deprecated
-	boolean compact() default false;
 }
