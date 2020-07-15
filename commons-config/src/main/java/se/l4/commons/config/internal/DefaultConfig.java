@@ -283,11 +283,7 @@ public class DefaultConfig
 		Objects.requireNonNull(path);
 		Objects.requireNonNull(type);
 
-		Optional<? extends Serializer<T>> serializer = collection.find(type);
-		if(! serializer.isPresent())
-		{
-			throw new ConfigException("Unable to find a serializer suitable for " + type);
-		}
+		Serializer<T> serializer = collection.find(type);
 
 		Object data = get(path);
 		if(data == null)
@@ -298,7 +294,7 @@ public class DefaultConfig
 		StreamingInput input = MapInput.resolveInput(path, data);
 		try
 		{
-			T instance = serializer.get().read(input);
+			T instance = serializer.read(input);
 
 			validateInstance(path, instance);
 

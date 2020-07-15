@@ -75,8 +75,7 @@ public class CompactDynamicSerializer
 	public void write(Object object, String name, StreamingOutput stream)
 		throws IOException
 	{
-		Serializer serializer = collection.find(object.getClass())
-			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but no serializer could be found"));
+		Serializer serializer = collection.find(object.getClass());
 
 		QualifiedName qname = collection.findName(serializer)
 			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));

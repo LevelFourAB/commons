@@ -70,7 +70,7 @@ public class OptionalSerializerTest
 		Serializers collection = new DefaultSerializers();
 		Serializer<Optional<String>> s = (Serializer) collection.find(
 			Types.reference(Optional.class, String.class)
-		).get();
+		);
 
 		assertThat("serializer can be resolved", s, notNullValue());
 

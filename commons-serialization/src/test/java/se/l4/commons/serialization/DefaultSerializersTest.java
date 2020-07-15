@@ -16,12 +16,33 @@ public class DefaultSerializersTest
 	@Test
 	public void testUseAnnotation()
 	{
-		serializers.find(ClassWithUse.class)
-			.orElseThrow(() -> new AssertionError("Could not find serializer"));
+		serializers.find(ClassWithUse.class);
 	}
+
+	@Test
+	public void testUseAnnotationExtension()
+	{
+		try
+		{
+			serializers.find(ClassExtendingUse.class);
+		}
+		catch(SerializationException e)
+		{
+			return;
+		}
+
+		throw new AssertionError("Should not be able to resolve sub-class serializer without @Use");
+	}
+
 
 	@Use(ReflectionSerializer.class)
 	public static class ClassWithUse
 	{
+	}
+
+	public static class ClassExtendingUse
+		extends ClassWithUse
+	{
+
 	}
 }

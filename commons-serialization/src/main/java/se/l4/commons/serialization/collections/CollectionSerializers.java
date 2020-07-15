@@ -18,11 +18,11 @@ public class CollectionSerializers
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Optional<? extends Serializer<?>> resolveSerializer(TypeEncounter encounter, TypeRef type)
+	public static Serializer<?> resolveSerializer(TypeEncounter encounter, TypeRef type)
 	{
 		if(encounter.getHint(AllowAnyItem.class) != null)
 		{
-			return Optional.of(new DynamicSerializer(encounter.getCollection()));
+			return new DynamicSerializer(encounter.getCollection());
 		}
 
 		Optional<Item> item = encounter.getHint(Item.class);

@@ -29,6 +29,11 @@ public class MapSerializerResolver
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Optional<Serializer<Map<?, ?>>> find(TypeEncounter encounter)
 	{
+		if(! encounter.getType().isErasedType(Map.class))
+		{
+			return Optional.empty();
+		}
+
 		TypeRef type = encounter.getType()
 			.getTypeParameter(1)
 			.orElseGet(() -> Types.reference(Object.class));
@@ -36,8 +41,9 @@ public class MapSerializerResolver
 		Optional<StringKey> key = encounter.getHint(StringKey.class);
 		if(key.isPresent())
 		{
-			return CollectionSerializers.resolveSerializer(encounter, type)
-				.map(itemSerializer -> new MapAsObjectSerializer(itemSerializer));
+			return Optional.of(new MapAsObjectSerializer(
+				CollectionSerializers.resolveSerializer(encounter, type)
+			));
 		}
 
 		return Optional.empty();

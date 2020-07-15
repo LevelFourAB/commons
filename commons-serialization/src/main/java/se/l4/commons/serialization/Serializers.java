@@ -63,7 +63,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	<T> Optional<? extends Serializer<T>> find(@NonNull Class<T> type);
+	<T> Serializer<T> find(@NonNull Class<T> type);
 
 	/**
 	 * Find a serializer suitable for the specific type.
@@ -73,7 +73,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	<T> Optional<? extends Serializer<T>> find(@NonNull Class<T> type, @NonNull Annotation... hints);
+	<T> Serializer<T> find(@NonNull Class<T> type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -82,7 +82,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	Optional<? extends Serializer<?>> find(@NonNull TypeRef type);
+	Serializer<?> find(@NonNull TypeRef type);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -91,7 +91,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	Optional<? extends Serializer<?>> find(@NonNull TypeRef type, @NonNull Annotation... hints);
+	Serializer<?> find(@NonNull TypeRef type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer based on its registered name.
@@ -129,7 +129,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	<T> Optional<? extends Serializer<T>> findVia(
+	<T> Serializer<T> findVia(
 		@NonNull Class<? extends SerializerOrResolver<T>> resolver,
 		@NonNull Class<T> type,
 		@NonNull Annotation... hints
@@ -143,7 +143,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	Optional<? extends Serializer<?>> findVia(
+	Serializer<?> findVia(
 		@NonNull Class<? extends SerializerOrResolver<?>> resolver,
 		@NonNull TypeRef type,
 		@NonNull Annotation... hints

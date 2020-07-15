@@ -68,8 +68,7 @@ public class ReflectionSerializer<T>
 			{
 				// Serializer has been set to a specific type
 				Use annotation = field.getAnnotation(Use.class).get();
-				serializer = collection.findVia((Class<SerializerOrResolver<?>>) annotation.value(), field.getType(), field.getAnnotations())
-					.orElseThrow(() -> new SerializationException("Could not locate serializer for " + field.getType().toTypeDescription()));
+				serializer = collection.findVia((Class<SerializerOrResolver<?>>) annotation.value(), field.getType(), field.getAnnotations());
 			}
 			else if(field.hasAnnotation(AllowAny.class))
 			{
@@ -85,8 +84,7 @@ public class ReflectionSerializer<T>
 			else
 			{
 				// Dynamically find a suitable type
-				serializer = collection.find(field.getType(), field.getAnnotations())
-					.orElseThrow(() -> new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType()));
+				serializer = collection.find(field.getType(), field.getAnnotations());
 			}
 
 			if(serializer == null)

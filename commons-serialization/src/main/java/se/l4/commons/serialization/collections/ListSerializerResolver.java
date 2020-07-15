@@ -23,12 +23,18 @@ public class ListSerializerResolver
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Optional<Serializer<List<?>>> find(TypeEncounter encounter)
 	{
+		if(! encounter.getType().isErasedType(List.class))
+		{
+			return Optional.empty();
+		}
+
 		TypeRef type = encounter.getType()
 			.getTypeParameter(0)
 			.orElseGet(() -> Types.reference(Object.class));
 
-		return CollectionSerializers.resolveSerializer(encounter, type)
-			.map(itemSerializer -> new ListSerializer(itemSerializer));
+		return Optional.of(new ListSerializer(
+			CollectionSerializers.resolveSerializer(encounter, type)
+		));
 	}
 
 	@Override

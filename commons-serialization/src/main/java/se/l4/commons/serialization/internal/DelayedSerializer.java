@@ -3,7 +3,6 @@ package se.l4.commons.serialization.internal;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.Serializers;
@@ -31,9 +30,13 @@ public class DelayedSerializer<T>
 			@SuppressWarnings("unchecked")
 			private void ensureSerializer()
 			{
-				instance = (Serializer<T>) collection.find(type, hints)
-					.filter(instance -> ! (instance instanceof DelayedSerializer))
-					.orElseThrow(() -> new SerializationException("Could not resolve serialization loop"));
+				Serializer<T> resolved = (Serializer<T>) collection.find(type, hints);
+				if(resolved instanceof DelayedSerializer)
+				{
+					return;
+				}
+
+				instance = resolved;
 			}
 
 			@Override

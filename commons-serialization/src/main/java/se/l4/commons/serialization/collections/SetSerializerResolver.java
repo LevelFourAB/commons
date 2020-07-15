@@ -22,12 +22,18 @@ public class SetSerializerResolver
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Optional<Serializer<Set<?>>> find(TypeEncounter encounter)
 	{
+		if(! encounter.getType().isErasedType(Set.class))
+		{
+			return Optional.empty();
+		}
+
 		TypeRef type = encounter.getType()
 			.getTypeParameter(0)
 			.orElseGet(() -> Types.reference(Object.class));
 
-		return CollectionSerializers.resolveSerializer(encounter, type)
-			.map(itemSerializer -> new SetSerializer(itemSerializer));
+		return Optional.of(new SetSerializer(
+			CollectionSerializers.resolveSerializer(encounter, type)
+		));
 	}
 
 	@Override

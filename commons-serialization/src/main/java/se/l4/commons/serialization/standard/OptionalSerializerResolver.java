@@ -34,8 +34,9 @@ public class OptionalSerializerResolver
 			.getTypeParameter(0)
 			.orElseGet(() -> Types.reference(Object.class));
 
-		return CollectionSerializers.resolveSerializer(encounter, type)
-			.map(itemSerializer -> new OptionalSerializer(itemSerializer));
+		return Optional.ofNullable(new OptionalSerializer(
+			CollectionSerializers.resolveSerializer(encounter, type)
+		));
 	}
 
 	@Override
