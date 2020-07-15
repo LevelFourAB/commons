@@ -212,9 +212,9 @@ public class FactoryDefinition<T>
 
 	private static String[] findNamesViaReflection(ConstructorRef c)
 	{
-		return c.getParameters().stream()
-			.map(p -> p.isNamePresent() ? p.getName() : null)
-			.toArray(String[]::new);
+		return c.getParameters()
+			.collect(p -> p.isNamePresent() ? p.getName() : null)
+			.toArray(new String[0]);
 	}
 
 	private static Expose findExpose(Annotation[] annotations)

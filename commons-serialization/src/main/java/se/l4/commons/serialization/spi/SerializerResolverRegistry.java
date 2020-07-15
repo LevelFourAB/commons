@@ -1,7 +1,6 @@
 package se.l4.commons.serialization.spi;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Throwables;
@@ -10,12 +9,14 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 
+import org.eclipse.collections.api.list.ListIterable;
+
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializers;
 import se.l4.commons.serialization.collections.ArraySerializerResolver;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.matching.ClassMatchingConcurrentHashMultimap;
-import se.l4.commons.types.matching.ClassMatchingMultimap;
+import se.l4.commons.types.matching.MutableClassMatchingMultimap;
 
 /**
  * Finder of {@link SerializerResolver}s, used when implementing a
@@ -31,7 +32,7 @@ public class SerializerResolverRegistry
 	private final InstanceFactory instanceFactory;
 	private final NamingCallback naming;
 
-	private final ClassMatchingMultimap<Object, SerializerResolver<?>> boundTypeToResolver;
+	private final MutableClassMatchingMultimap<Object, SerializerResolver<?>> boundTypeToResolver;
 	private final LoadingCache<Class<?>, Optional<SerializerResolver<?>>> typeToResolverCache;
 
 	public SerializerResolverRegistry(InstanceFactory instanceFactory, NamingCallback naming)
@@ -104,7 +105,7 @@ public class SerializerResolverRegistry
 			return ARRAY_RESOLVER;
 		}
 
-		Set<SerializerResolver<?>> resolvers = boundTypeToResolver.getBest(from);
+		ListIterable<SerializerResolver<?>> resolvers = boundTypeToResolver.getBest(from);
 		if(resolvers.isEmpty())
 		{
 			return null;

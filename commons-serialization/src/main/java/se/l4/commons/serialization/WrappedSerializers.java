@@ -1,9 +1,9 @@
 package se.l4.commons.serialization;
 
-import java.util.Collection;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableList;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.ImmutableList;
 
 import se.l4.commons.serialization.spi.NamingCallback;
 import se.l4.commons.serialization.spi.SerializerResolver;
@@ -62,7 +62,7 @@ public class WrappedSerializers
 
 		if(r1.isPresent() && r2.isPresent())
 		{
-			Collection<? extends SerializerResolver<?>> merged = ImmutableList.of(r1.get(), r2.get());
+			ImmutableList<? extends SerializerResolver<?>> merged = Lists.immutable.of(r1.get(), r2.get());
 			return Optional.of(new SerializerResolverChain(merged));
 		}
 		else if(r1.isPresent())

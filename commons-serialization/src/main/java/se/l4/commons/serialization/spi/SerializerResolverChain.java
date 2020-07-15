@@ -1,11 +1,12 @@
 package se.l4.commons.serialization.spi;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
+import org.eclipse.collections.api.RichIterable;
 
 import se.l4.commons.serialization.Serializer;
 
@@ -20,7 +21,7 @@ public class SerializerResolverChain
 	private final Set<Class<? extends Annotation>> hints;
 
 	@SuppressWarnings({ "rawtypes" })
-	public SerializerResolverChain(Collection<? extends SerializerResolver<?>> resolvers)
+	public SerializerResolverChain(RichIterable<? extends SerializerResolver<?>> resolvers)
 	{
 		int i = 0;
 		ImmutableSet.Builder<Class<? extends Annotation>> builder = ImmutableSet.builder();
