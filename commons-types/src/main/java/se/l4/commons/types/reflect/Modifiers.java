@@ -2,10 +2,15 @@ package se.l4.commons.types.reflect;
 
 import java.lang.reflect.Modifier;
 
+/**
+ * Interface used for any element that has modifiers. Provides easier access
+ */
 public interface Modifiers
 {
 	/**
-	 * Get the modifiers of this item.
+	 * Get the modifiers of this item. These modifiers can also be checked via
+	 * methods. If using this directly {@link Modifier} provides static methods
+	 * that can be used to make sense of this value.
 	 */
 	int getModifiers();
 

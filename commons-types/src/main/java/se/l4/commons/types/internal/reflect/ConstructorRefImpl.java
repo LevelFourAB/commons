@@ -3,7 +3,6 @@ package se.l4.commons.types.internal.reflect;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -63,9 +62,8 @@ public class ConstructorRefImpl
 	{
 		return parent.toTypeName() + "(" +
 			getParameterTypes()
-				.stream()
-				.map(t -> t.toTypeName())
-				.collect(Collectors.joining(", "))
+				.collect(t -> t.toTypeName())
+				.makeString(", ")
 			+ ")";
 	}
 }

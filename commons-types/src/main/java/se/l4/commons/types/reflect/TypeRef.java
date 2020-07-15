@@ -4,10 +4,11 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.eclipse.collections.api.list.ListIterable;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -98,7 +99,7 @@ public interface TypeRef
 	 *   list of type variables
 	 */
 	@NonNull
-	List<TypeVariable<?>> getTypeVariables();
+	ListIterable<TypeVariable<?>> getTypeVariables();
 
 	/**
 	 * Get the number of type parameters available in this type.
@@ -111,7 +112,7 @@ public interface TypeRef
 	 * Get all of the parameter names that are available for this type.
 	 */
 	@NonNull
-	List<String> getTypeParameterNames();
+	ListIterable<String> getTypeParameterNames();
 
 	/**
 	 * Get the type parameters. If this type is {@link #isFullyResolved()}
@@ -120,7 +121,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<TypeRef> getTypeParameters();
+	ListIterable<TypeRef> getTypeParameters();
 
 	/**
 	 * Get a type parameter using an index.
@@ -400,7 +401,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<TypeRef> getInterfaces();
+	ListIterable<TypeRef> getInterfaces();
 
 	/**
 	 * Find an interface that this type directly implements.
@@ -451,7 +452,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<FieldRef> getFields();
+	ListIterable<FieldRef> getFields();
 
 	/**
 	 * Get a public field with the given name.
@@ -468,7 +469,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<MethodRef> getMethods();
+	ListIterable<MethodRef> getMethods();
 
 	/**
 	 * Get a public method with the given name and parameter types.
@@ -497,7 +498,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<ConstructorRef> getConstructors();
+	ListIterable<ConstructorRef> getConstructors();
 
 	/**
 	 * Get a public constructor with the given parameter types.
@@ -526,7 +527,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<FieldRef> getDeclaredFields();
+	ListIterable<FieldRef> getDeclaredFields();
 
 	/**
 	 * Get a specific field declared by this type.
@@ -543,7 +544,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<MethodRef> getDeclaredMethods();
+	ListIterable<MethodRef> getDeclaredMethods();
 
 	/**
 	 * Get a specific method declared by this type with the given name and
@@ -574,7 +575,7 @@ public interface TypeRef
 	 * @return
 	 */
 	@NonNull
-	List<ConstructorRef> getDeclaredConstructors();
+	ListIterable<ConstructorRef> getDeclaredConstructors();
 
 	/**
 	 * Get a constructor declared by this this type with the given type

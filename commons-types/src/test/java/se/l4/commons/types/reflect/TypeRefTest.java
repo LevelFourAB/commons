@@ -3,11 +3,12 @@ package se.l4.commons.types.reflect;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 
 import se.l4.commons.types.Types;
@@ -222,5 +223,10 @@ public class TypeRefTest
 
 			is(true)
 		);
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface NonNull
+	{
 	}
 }

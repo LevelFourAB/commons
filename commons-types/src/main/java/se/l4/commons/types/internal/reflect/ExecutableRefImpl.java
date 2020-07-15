@@ -2,11 +2,10 @@ package se.l4.commons.types.internal.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableList;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.ListIterable;
 
 import se.l4.commons.types.reflect.ExecutableRef;
 import se.l4.commons.types.reflect.ParameterRef;
@@ -52,13 +51,13 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
-	public List<String> getTypeParameterNames()
+	public ListIterable<String> getTypeParameterNames()
 	{
 		return typeBindings.getNames();
 	}
 
 	@Override
-	public List<TypeRef> getTypeParameters()
+	public ListIterable<TypeRef> getTypeParameters()
 	{
 		return typeBindings.getResolvedTypeVariables();
 	}
@@ -102,19 +101,17 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
-	public List<TypeRef> getParameterTypes()
+	public ListIterable<TypeRef> getParameterTypes()
 	{
-		return Arrays.stream(executable.getAnnotatedParameterTypes())
-			.map(a -> TypeHelperImpl.resolve(a, typeBindings))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(executable.getAnnotatedParameterTypes())
+			.collect(a -> TypeHelperImpl.resolve(a, typeBindings));
 	}
 
 	@Override
-	public List<ParameterRef> getParameters()
+	public ListIterable<ParameterRef> getParameters()
 	{
-		return Arrays.stream(executable.getParameters())
-			.map(p -> new ParameterRefImpl(this, p, typeBindings))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(executable.getParameters())
+			.collect(p -> new ParameterRefImpl(this, p, typeBindings));
 	}
 
 	@Override
@@ -124,11 +121,10 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
-	public List<TypeRef> getExceptionTypes()
+	public ListIterable<TypeRef> getExceptionTypes()
 	{
-		return Arrays.stream(executable.getAnnotatedExceptionTypes())
-			.map(a -> TypeHelperImpl.resolve(a, typeBindings))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(executable.getAnnotatedExceptionTypes())
+			.collect(a -> TypeHelperImpl.resolve(a, typeBindings));
 	}
 
 	@Override

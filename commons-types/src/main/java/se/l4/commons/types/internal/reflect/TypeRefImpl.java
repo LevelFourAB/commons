@@ -11,10 +11,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -23,7 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import com.google.common.collect.ImmutableList;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.ListIterable;
 
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
@@ -117,7 +116,7 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<TypeVariable<?>> getTypeVariables()
+	public ListIterable<TypeVariable<?>> getTypeVariables()
 	{
 		return typeBindings.getTypeVariables();
 	}
@@ -129,13 +128,13 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<String> getTypeParameterNames()
+	public ListIterable<String> getTypeParameterNames()
 	{
 		return typeBindings.getNames();
 	}
 
 	@Override
-	public List<TypeRef> getTypeParameters()
+	public ListIterable<TypeRef> getTypeParameters()
 	{
 		return typeBindings.getResolvedTypeVariables();
 	}
@@ -331,8 +330,8 @@ public class TypeRefImpl
 	@Override
 	public boolean isAssignableFrom(TypeRef other)
 	{
-		List<TypeRef> thisParameters;
-		List<TypeRef> otherParameters;
+		ListIterable<TypeRef> thisParameters;
+		ListIterable<TypeRef> otherParameters;
 
 		if(this.getErasedType() == other.getErasedType())
 		{
@@ -342,7 +341,7 @@ public class TypeRefImpl
 		else if(this.getErasedType() == Object.class)
 		{
 			// Object are always assignable
-			otherParameters = Collections.emptyList();
+			otherParameters = Lists.immutable.empty();
 		}
 		else if(! this.getErasedType().isAssignableFrom(other.getErasedType()))
 		{
@@ -431,11 +430,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<TypeRef> getInterfaces()
+	public ListIterable<TypeRef> getInterfaces()
 	{
-		return Arrays.stream(erasedType.getAnnotatedInterfaces())
-			.map(t -> TypeHelperImpl.resolve(t, typeBindings))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getAnnotatedInterfaces())
+			.collect(t -> TypeHelperImpl.resolve(t, typeBindings));
 	}
 
 	@Override
@@ -527,11 +525,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<FieldRef> getFields()
+	public ListIterable<FieldRef> getFields()
 	{
-		return Arrays.stream(erasedType.getFields())
-			.map(f -> TypeHelperImpl.resolveField(this, f))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getFields())
+			.collect(f -> TypeHelperImpl.resolveField(this, f));
 	}
 
 	@Override
@@ -549,11 +546,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<MethodRef> getMethods()
+	public ListIterable<MethodRef> getMethods()
 	{
-		return Arrays.stream(erasedType.getMethods())
-			.map(m -> TypeHelperImpl.resolveMethod(this, m))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getMethods())
+			.collect(m -> TypeHelperImpl.resolveMethod(this, m));
 	}
 
 	@Override
@@ -580,11 +576,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<ConstructorRef> getConstructors()
+	public ListIterable<ConstructorRef> getConstructors()
 	{
-		return Arrays.stream(erasedType.getConstructors())
-			.map(m -> TypeHelperImpl.resolveConstructor(this, m))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getConstructors())
+			.collect(m -> TypeHelperImpl.resolveConstructor(this, m));
 	}
 
 	@Override
@@ -611,11 +606,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<FieldRef> getDeclaredFields()
+	public ListIterable<FieldRef> getDeclaredFields()
 	{
-		return Arrays.stream(erasedType.getDeclaredFields())
-			.map(f -> TypeHelperImpl.resolveField(this, f))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getDeclaredFields())
+			.collect(f -> TypeHelperImpl.resolveField(this, f));
 	}
 
 	@Override
@@ -633,11 +627,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<MethodRef> getDeclaredMethods()
+	public ListIterable<MethodRef> getDeclaredMethods()
 	{
-		return Arrays.stream(erasedType.getDeclaredMethods())
-			.map(m -> TypeHelperImpl.resolveMethod(this, m))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getDeclaredMethods())
+			.collect(m -> TypeHelperImpl.resolveMethod(this, m));
 	}
 
 	@Override
@@ -664,11 +657,10 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public List<ConstructorRef> getDeclaredConstructors()
+	public ListIterable<ConstructorRef> getDeclaredConstructors()
 	{
-		return Arrays.stream(erasedType.getDeclaredConstructors())
-			.map(m -> TypeHelperImpl.resolveConstructor(this, m))
-			.collect(ImmutableList.toImmutableList());
+		return Lists.immutable.of(erasedType.getDeclaredConstructors())
+			.collect(m -> TypeHelperImpl.resolveConstructor(this, m));
 	}
 
 	@Override

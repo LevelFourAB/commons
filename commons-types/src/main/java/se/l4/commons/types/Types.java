@@ -3,17 +3,13 @@ package se.l4.commons.types;
 import java.lang.reflect.Type;
 import java.util.function.Predicate;
 
-import com.google.common.reflect.TypeResolver;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.types.internal.TypeHierarchy;
 import se.l4.commons.types.internal.reflect.TypeHelperImpl;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
- * Helpers and utilities related to working with types. This class provides
- * static methods to turn types into {@link ResolvedType}s, provided by
- * the Classmate {@link TypeResolver}.
+ * Helpers and utilities related to working with types.
  */
 public class Types
 {

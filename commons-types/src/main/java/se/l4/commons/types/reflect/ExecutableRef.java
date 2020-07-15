@@ -1,8 +1,9 @@
 package se.l4.commons.types.reflect;
 
 import java.lang.reflect.Executable;
-import java.util.List;
 import java.util.Optional;
+
+import org.eclipse.collections.api.list.ListIterable;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -26,7 +27,7 @@ public interface ExecutableRef
 	 * @return
 	 */
 	@NonNull
-	List<String> getTypeParameterNames();
+	ListIterable<String> getTypeParameterNames();
 
 	/**
 	 * Get the type parameters.
@@ -34,7 +35,7 @@ public interface ExecutableRef
 	 * @return
 	 */
 	@NonNull
-	List<TypeRef> getTypeParameters();
+	ListIterable<TypeRef> getTypeParameters();
 
 	/**
 	 * Get a type parameter using an index.
@@ -59,14 +60,14 @@ public interface ExecutableRef
 	 *
 	 * @return
 	 */
-	List<TypeRef> getParameterTypes();
+	ListIterable<TypeRef> getParameterTypes();
 
 	/**
 	 * Get the parameters of this executable.
 	 *
 	 * @return
 	 */
-	List<ParameterRef> getParameters();
+	ListIterable<ParameterRef> getParameters();
 
 	/**
 	 * Get the number of parameters that are available.
@@ -89,7 +90,7 @@ public interface ExecutableRef
 	/**
 	 * Get the exception types of this executable.
 	 */
-	List<TypeRef> getExceptionTypes();
+	ListIterable<TypeRef> getExceptionTypes();
 
 	/**
 	 * Get if this executable was declared to take a variable number of

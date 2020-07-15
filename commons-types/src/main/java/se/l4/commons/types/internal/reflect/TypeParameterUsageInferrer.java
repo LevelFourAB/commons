@@ -1,8 +1,9 @@
 package se.l4.commons.types.internal.reflect;
 
 import java.lang.reflect.TypeVariable;
-import java.util.List;
 import java.util.Optional;
+
+import org.eclipse.collections.api.list.ListIterable;
 
 import se.l4.commons.types.reflect.TypeInferrer;
 import se.l4.commons.types.reflect.TypeRef;
@@ -80,8 +81,8 @@ public class TypeParameterUsageInferrer
 			}
 		}
 
-		List<TypeRef> patternParameters = pattern.getTypeParameters();
-		List<TypeRef> concreteParameters = concrete.getTypeParameters();
+		ListIterable<TypeRef> patternParameters = pattern.getTypeParameters();
+		ListIterable<TypeRef> concreteParameters = concrete.getTypeParameters();
 		if(patternParameters.size() != concreteParameters.size())
 		{
 			return Optional.empty();

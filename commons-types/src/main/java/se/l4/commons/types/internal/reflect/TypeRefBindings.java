@@ -2,11 +2,12 @@ package se.l4.commons.types.internal.reflect;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableList;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.list.MutableList;
 
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -16,16 +17,16 @@ import se.l4.commons.types.reflect.TypeRef;
 public class TypeRefBindings
 {
 	private static final TypeRefBindings EMPTY = new TypeRefBindings(
-		Collections.emptyList(),
-		Collections.emptyList()
+		Lists.immutable.empty(),
+		Lists.immutable.empty()
 	);
 
-	private final List<TypeVariable<?>> typeVariables;
-	private final List<TypeRef> resolvedTypeVariables;
+	private final ImmutableList<TypeVariable<?>> typeVariables;
+	private final ImmutableList<TypeRef> resolvedTypeVariables;
 
 	private TypeRefBindings(
-		List<TypeVariable<?>> typeVariables,
-		List<TypeRef> resolvedTypeVariables
+		ImmutableList<TypeVariable<?>> typeVariables,
+		ImmutableList<TypeRef> resolvedTypeVariables
 	)
 	{
 		this.typeVariables = typeVariables;
@@ -37,12 +38,12 @@ public class TypeRefBindings
 		return typeVariables.isEmpty();
 	}
 
-	public List<TypeRef> getResolvedTypeVariables()
+	public ListIterable<TypeRef> getResolvedTypeVariables()
 	{
 		return resolvedTypeVariables;
 	}
 
-	public List<TypeVariable<?>> getTypeVariables()
+	public ListIterable<TypeVariable<?>> getTypeVariables()
 	{
 		return typeVariables;
 	}
@@ -95,11 +96,9 @@ public class TypeRefBindings
 		return Optional.empty();
 	}
 
-	public List<String> getNames()
+	public ListIterable<String> getNames()
 	{
-		return typeVariables.stream()
-			.map(tv -> tv.getName())
-			.collect(ImmutableList.toImmutableList());
+		return typeVariables.collect(TypeVariable::getName);
 	}
 
 	public Optional<TypeRefBindings> withParameter(int index, TypeRef ref)
@@ -114,7 +113,7 @@ public class TypeRefBindings
 			return Optional.empty();
 		}
 
-		ImmutableList.Builder<TypeRef> resolved = ImmutableList.builder();
+		MutableList<TypeRef> resolved = Lists.mutable.empty();
 		for(int i=0, n=resolvedTypeVariables.size(); i<n; i++)
 		{
 			if(i == index)
@@ -128,7 +127,7 @@ public class TypeRefBindings
 		}
 
 		return Optional.of(
-			new TypeRefBindings(typeVariables, resolved.build())
+			new TypeRefBindings(typeVariables, resolved.toImmutable())
 		);
 	}
 
@@ -183,9 +182,21 @@ public class TypeRefBindings
 		TypeRef[] resolvedVariables
 	)
 	{
+		MutableList<TypeVariable<?>> newTypeVariables = Lists.mutable.ofAll(this.typeVariables);
+		for(TypeVariable<?> tv : typeVariables)
+		{
+			newTypeVariables.add(tv);
+		}
+
+		MutableList<TypeRef> newResolvedVariables = Lists.mutable.ofAll(this.resolvedTypeVariables);
+		for(TypeRef tr : resolvedVariables)
+		{
+			newResolvedVariables.add(tr);
+		}
+
 		return new TypeRefBindings(
-			ImmutableList.<TypeVariable<?>>builder().addAll(this.typeVariables).add(typeVariables).build(),
-			ImmutableList.<TypeRef>builder().addAll(this.resolvedTypeVariables).add(resolvedVariables).build()
+			newTypeVariables.toImmutable(),
+			newResolvedVariables.toImmutable()
 		);
 	}
 
@@ -193,15 +204,13 @@ public class TypeRefBindings
 		TypeVariable<?>[] typeVariables
 	)
 	{
-		ImmutableList.Builder<TypeRef> resolved = ImmutableList.builder();
-		for(TypeVariable<?> tv : typeVariables)
-		{
-			resolved.add(TypeHelperImpl.reference(tv));
-		}
+		ImmutableList<TypeVariable<?>> newTypeVariables = Lists.immutable.of(typeVariables);
+		ImmutableList<TypeRef> newResolvedVariables = newTypeVariables
+			.collect(TypeHelperImpl::reference);
 
 		return new TypeRefBindings(
-			ImmutableList.copyOf(typeVariables),
-			resolved.build()
+			newTypeVariables,
+			newResolvedVariables
 		);
 	}
 
@@ -211,8 +220,8 @@ public class TypeRefBindings
 	)
 	{
 		return new TypeRefBindings(
-			ImmutableList.copyOf(typeVariables),
-			ImmutableList.copyOf(resolvedVariables)
+			Lists.immutable.of(typeVariables),
+			Lists.immutable.of(resolvedVariables)
 		);
 	}
 

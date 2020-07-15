@@ -1,8 +1,9 @@
 package se.l4.commons.types.internal.reflect;
 
 import java.lang.reflect.TypeVariable;
-import java.util.List;
 import java.util.Optional;
+
+import org.eclipse.collections.api.list.ListIterable;
 
 import se.l4.commons.types.reflect.TypeInferrer;
 import se.l4.commons.types.reflect.TypeRef;
@@ -17,7 +18,7 @@ public class TypeParameterInferrer
 	private final TypeRef patternType;
 	private final TypeVariable<?>[] variables;
 
-	public TypeParameterInferrer(TypeRef patternType, List<TypeVariable<?>> variables)
+	public TypeParameterInferrer(TypeRef patternType, ListIterable<TypeVariable<?>> variables)
 	{
 		this.patternType = patternType;
 		this.variables = variables.toArray(new TypeVariable[variables.size()]);
@@ -58,7 +59,7 @@ public class TypeParameterInferrer
 		{
 			TypeRef modifiedType = pattern;
 
-			List<TypeRef> parameters = pattern.getTypeParameters();
+			ListIterable<TypeRef> parameters = pattern.getTypeParameters();
 			for(int i=0, n=parameters.size(); i<n; i++)
 			{
 				TypeRef parameter = parameters.get(i);
