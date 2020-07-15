@@ -6,13 +6,13 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.types.Types;
-import se.l4.commons.types.matching.ClassMatchingMultimap;
 import se.l4.commons.types.matching.MatchedType;
+import se.l4.commons.types.matching.MutableClassMatchingMultimap;
 import se.l4.commons.types.reflect.TypeRef;
 
 public abstract class AbstractTypeConverter
@@ -20,14 +20,14 @@ public abstract class AbstractTypeConverter
 {
 	private static final ConversionFunction<?, ?> IDENTITY = in -> in;
 
-	protected final ClassMatchingMultimap<Object, Conversion<?, ?>> conversions;
+	protected final MutableClassMatchingMultimap<Object, Conversion<?, ?>> conversions;
 	protected final Cache<CacheKey, Conversion<?, ?>> cached;
 
-	protected AbstractTypeConverter(ClassMatchingMultimap<Object, Conversion<?, ?>> map)
+	protected AbstractTypeConverter(MutableClassMatchingMultimap<Object, Conversion<?, ?>> map)
 	{
 		this.conversions = map;
 
-		cached = CacheBuilder.newBuilder()
+		cached = Caffeine.newBuilder()
 			.maximumSize(100)
 			.build();
 	}
