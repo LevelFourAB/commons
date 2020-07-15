@@ -1,10 +1,14 @@
 module se.l4.commons.types {
 	requires com.github.spotbugs.annotations;
 
-	requires io.github.classgraph;
+	requires transitive org.eclipse.collections.api;
+	requires org.eclipse.collections.impl;
+
+	requires com.github.benmanes.caffeine;
 
 	requires net.bytebuddy;
-	requires com.google.common;
+
+	requires io.github.classgraph;
 
 	exports se.l4.commons.types;
 	exports se.l4.commons.types.proxies;
