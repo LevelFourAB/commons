@@ -2,10 +2,11 @@ package se.l4.commons.types.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
+
+import org.eclipse.collections.api.factory.Sets;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.set.SetIterable;
 
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -31,39 +32,22 @@ public class TypeFinderOverScanResult
 		this.scanResult = scanResult;
 	}
 
-	/**
-	 * Convert a {@link ClassInfoList} into a set of classes.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Set<Class<?>> toClasses(ClassInfoList list)
-	{
-		Set<Class> result = new HashSet<Class>();
-		for(ClassInfo s : list)
-		{
-			result.add(s.loadClass(false));
-		}
-
-		return Collections.unmodifiableSet((Set) result);
-	}
-
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotationType)
+	public SetIterable<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotationType)
 	{
 		Objects.requireNonNull(annotationType);
 
-		return (Set) toClasses(scanResult.getClassesWithAnnotation(annotationType.getName()));
+		return toClasses(scanResult.getClassesWithAnnotation(annotationType.getName()));
 	}
 
 	@Override
-	public Set<? extends Object> getTypesAnnotatedWithAsInstances(Class<? extends Annotation> annotationType)
+	public SetIterable<? extends Object> getTypesAnnotatedWithAsInstances(Class<? extends Annotation> annotationType)
 	{
 		return create(getTypesAnnotatedWith(annotationType));
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type)
+	public <T> SetIterable<Class<? extends T>> getSubTypesOf(Class<T> type)
 	{
 		Objects.requireNonNull(type);
 
@@ -76,13 +60,28 @@ public class TypeFinderOverScanResult
 		{
 			list = scanResult.getSubclasses(type.getName());
 		}
-		return (Set) toClasses(list);
+		return toClasses(list);
 	}
 
 	@Override
-	public <T> Set<? extends T> getSubTypesAsInstances(Class<T> type)
+	public <T> SetIterable<? extends T> getSubTypesAsInstances(Class<T> type)
 	{
 		return create(getSubTypesOf(type));
+	}
+
+	/**
+	 * Convert a {@link ClassInfoList} into a set of classes.
+	 */
+	@SuppressWarnings("unchecked")
+	private <T> SetIterable<Class<? extends T>> toClasses(ClassInfoList list)
+	{
+		MutableSet<Class<? extends T>> result = Sets.mutable.empty();
+		for(ClassInfo s : list)
+		{
+			result.add((Class<? extends T>) s.loadClass(false));
+		}
+
+		return result;
 	}
 
 	/**
@@ -91,9 +90,9 @@ public class TypeFinderOverScanResult
 	 * @param types
 	 * @return
 	 */
-	private <T> Set<? extends T> create(Iterable<Class<? extends T>> types)
+	private <T> SetIterable<? extends T> create(SetIterable<Class<? extends T>> types)
 	{
-		Set<T> result = new HashSet<>();
+		MutableSet<T> result = Sets.mutable.empty();
 
 		for(Class<? extends T> t : types)
 		{
@@ -104,6 +103,6 @@ public class TypeFinderOverScanResult
 			}
 		}
 
-		return Collections.unmodifiableSet(result);
+		return result;
 	}
 }

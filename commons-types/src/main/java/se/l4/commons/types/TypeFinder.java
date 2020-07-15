@@ -1,7 +1,8 @@
 package se.l4.commons.types;
 
 import java.lang.annotation.Annotation;
-import java.util.Set;
+
+import org.eclipse.collections.api.set.SetIterable;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.types.internal.TypeFinderOverScanResultBuilder;
@@ -21,7 +22,7 @@ public interface TypeFinder
 	 * @return
 	 */
 	@NonNull
-	Set<Class<?>> getTypesAnnotatedWith(@NonNull Class<? extends Annotation> annotationType);
+	SetIterable<Class<?>> getTypesAnnotatedWith(@NonNull Class<? extends Annotation> annotationType);
 
 	/**
 	 * Get classes that have the given annotation, automatically creating them.
@@ -30,7 +31,7 @@ public interface TypeFinder
 	 * @return
 	 */
 	@NonNull
-	Set<? extends Object> getTypesAnnotatedWithAsInstances(@NonNull Class<? extends Annotation> annotationType);
+	SetIterable<? extends Object> getTypesAnnotatedWithAsInstances(@NonNull Class<? extends Annotation> annotationType);
 
 	/**
 	 * Get sub types of the given class.
@@ -39,7 +40,7 @@ public interface TypeFinder
 	 * @return
 	 */
 	@NonNull
-	<T> Set<Class<? extends T>> getSubTypesOf(@NonNull Class<T> type);
+	<T> SetIterable<Class<? extends T>> getSubTypesOf(@NonNull Class<T> type);
 
 	/**
 	 * Get sub types of the given class automatically creating them.
@@ -48,7 +49,7 @@ public interface TypeFinder
 	 * @return
 	 */
 	@NonNull
-	<T> Set<? extends T> getSubTypesAsInstances(@NonNull Class<T> type);
+	<T> SetIterable<? extends T> getSubTypesAsInstances(@NonNull Class<T> type);
 
 	/**
 	 * Return a builder to create an instance of {@link TypeFinder}.

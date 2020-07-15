@@ -2,10 +2,9 @@ package se.l4.commons.types;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Set;
-
+import org.eclipse.collections.api.set.SetIterable;
 import org.junit.Test;
 
 public class TypeFinderTest
@@ -18,7 +17,7 @@ public class TypeFinderTest
 			.build();
 
 
-		Set<Class<? extends InstanceFactory>> factories = finder.getSubTypesOf(InstanceFactory.class);
+		SetIterable<Class<? extends InstanceFactory>> factories = finder.getSubTypesOf(InstanceFactory.class);
 
 		assertThat(factories, notNullValue());
 		assertThat(factories.size(), is(1));
