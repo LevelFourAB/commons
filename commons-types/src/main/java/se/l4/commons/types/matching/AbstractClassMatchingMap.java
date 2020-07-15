@@ -1,49 +1,38 @@
 package se.l4.commons.types.matching;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
-import com.google.common.collect.ImmutableList;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MapIterable;
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.types.internal.TypeHierarchy;
 
 /**
  * Abstract implementation of {@link ClassMatchingMap} that implements all of
- * the matching methods on top any {@link Map} implementation.
+ * the matching methods on top any {@link MapIterable} implementation.
  */
 public abstract class AbstractClassMatchingMap<T, D>
 	implements ClassMatchingMap<T, D>
 {
-	private final Map<Class<? extends T>, D> backingMap;
+	protected final MapIterable<Class<? extends T>, D> backingMap;
 
-	protected AbstractClassMatchingMap(Map<Class<? extends T>, D> backingMap)
+	protected AbstractClassMatchingMap(MapIterable<Class<? extends T>, D> backingMap)
 	{
 		this.backingMap = Objects.requireNonNull(backingMap);
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<MatchedType<T, D>> entries()
+	public RichIterable<MatchedType<T, D>> entries()
 	{
-		return backingMap.entrySet()
-			.stream()
-			.map(e -> new DefaultMatchedType<T, D>((Class) e.getKey(), e.getValue()))
-			.collect(ImmutableList.toImmutableList());
-	}
-
-	@Override
-	public void put(Class<? extends T> type, D data)
-	{
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(data);
-
-		backingMap.put(type, data);
+		return backingMap.keyValuesView()
+			.<MatchedType<T, D>>collect((e) -> new DefaultMatchedType<T, D>((Class) e.getOne(), e.getTwo()));
 	}
 
 	@Override
@@ -52,14 +41,6 @@ public abstract class AbstractClassMatchingMap<T, D>
 		Objects.requireNonNull(type);
 
 		return Optional.ofNullable(backingMap.get(type));
-	}
-
-	@Override
-	public Optional<D> get(Class<? extends T> type, Function<Class<? extends T>, D> creator)
-	{
-		Objects.requireNonNull(type);
-
-		return Optional.ofNullable(backingMap.computeIfAbsent(type, creator));
 	}
 
 	@Override
@@ -79,11 +60,11 @@ public abstract class AbstractClassMatchingMap<T, D>
 	}
 
 	@Override
-	public List<MatchedType<T, D>> getAll(Class<? extends T> type)
+	public ImmutableList<MatchedType<T, D>> getAll(Class<? extends T> type)
 	{
 		Objects.requireNonNull(type);
 
-		List<MatchedType<T, D>> result = new ArrayList<>();
+		MutableList<MatchedType<T, D>> result = FastList.newList();
 		findMatching(type, (t, d) -> {
 			result.add(new DefaultMatchedType<>(t, d));
 
@@ -91,7 +72,7 @@ public abstract class AbstractClassMatchingMap<T, D>
 			return true;
 		});
 
-		return result;
+		return result.toImmutable();
 	}
 
 	/**

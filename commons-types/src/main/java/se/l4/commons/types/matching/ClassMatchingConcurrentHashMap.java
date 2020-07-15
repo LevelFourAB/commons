@@ -1,15 +1,29 @@
 package se.l4.commons.types.matching;
 
-import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 
 /**
- * Implementation of {@link ClassMatchingMap} using a {@link ConcurrentHashMap}.
+ * Implementation of {@link MutableClassMatchingMap} using a
+ * {@link ConcurrentHashMap}.
  */
 public class ClassMatchingConcurrentHashMap<T, D>
-	extends AbstractClassMatchingMap<T, D>
+	extends AbstractMutableClassMatchingMap<T, D>
 {
 	public ClassMatchingConcurrentHashMap()
 	{
-		super(new ConcurrentHashMap<>());
+		super(ConcurrentHashMap.newMap());
+	}
+
+	protected ClassMatchingConcurrentHashMap(ConcurrentHashMap<Class<? extends T>, D> map)
+	{
+		super(map);
+	}
+
+	@Override
+	public ClassMatchingConcurrentHashMap<T, D> toMutable()
+	{
+		return new ClassMatchingConcurrentHashMap<T, D>(
+			(ConcurrentHashMap<Class<? extends T>, D>) backingMap.clone()
+		);
 	}
 }

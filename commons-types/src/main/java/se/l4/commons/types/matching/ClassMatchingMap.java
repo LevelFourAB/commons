@@ -1,8 +1,9 @@
 package se.l4.commons.types.matching;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.list.ListIterable;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -13,18 +14,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public interface ClassMatchingMap<T, D>
 {
 	/**
-	 * Associated some data with a type. This will allow matching against
-	 * the type and its subclasses or in the case of interfaces its
-	 * implementors.
-	 *
-	 * @param type
-	 *   the type to associate data with
-	 * @param data
-	 *   the data to store, never {@code null}
-	 */
-	void put(@NonNull Class<? extends T> type, @NonNull D data);
-
-	/**
 	 * Get data directly associated with the given type.
 	 *
 	 * @param type
@@ -34,30 +23,6 @@ public interface ClassMatchingMap<T, D>
 	 */
 	@NonNull
 	Optional<D> get(@NonNull Class<? extends T> type);
-
-	/**
-	 * Get data directly associated with the given type or create it if it
-	 * there is no value present.
-	 *
-	 * @param type
-	 *   the type get data for
-	 * @return
-	 *   optional containing data if there is direct match or empty optional
-	 */
-	@NonNull
-	default Optional<D> get(@NonNull Class<? extends T> type, Function<Class<? extends T>, D> creator)
-	{
-		Optional<D> result = get(type);
-		if(! result.isPresent())
-		{
-			D created = creator.apply(type);
-			put(type, created);
-
-			return Optional.of(created);
-		}
-
-		return result;
-	}
 
 	/**
 	 * Get the best matching data for the given type.
@@ -71,7 +36,9 @@ public interface ClassMatchingMap<T, D>
 	Optional<D> getBest(@NonNull Class<? extends T> type);
 
 	/**
-	 * Get all types and their associated data matching the given type.
+	 * Get all types and their associated data matching the given type. This
+	 * will return an iterable that ordered from the closest matching type to
+	 * the furthest matching type.
 	 *
 	 * @param type
 	 *   the type to match against
@@ -80,16 +47,27 @@ public interface ClassMatchingMap<T, D>
 	 *   available.
 	 */
 	@NonNull
-	List<MatchedType<T, D>> getAll(@NonNull Class<? extends T> type);
+	ListIterable<MatchedType<T, D>> getAll(@NonNull Class<? extends T> type);
 
 	/**
 	 * Get all of the entries in this map without doing any matching.
 	 *
 	 * @return
-	 *   immutable list of all entries registered
+	 *   immutable set of all entries registered
 	 */
-	default List<MatchedType<T, D>> entries()
-	{
-		throw new UnsupportedOperationException("entries() is not supported by this map");
-	}
+	RichIterable<MatchedType<T, D>> entries();
+
+	/**
+	 * Get an immutable copy of this map.
+	 *
+	 * @return
+	 */
+	ClassMatchingMap<T, D> toImmutable();
+
+	/**
+	 * Get a mutable copy of this map.
+	 *
+	 * @return
+	 */
+	MutableClassMatchingMap<T, D> toMutable();
 }

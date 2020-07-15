@@ -1,76 +1,50 @@
 package se.l4.commons.types.matching;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.BiPredicate;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.SetMultimap;
-
-import se.l4.commons.types.internal.TypeHierarchy;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.multimap.list.FastListMultimap;
 
 public class ClassMatchingConcurrentHashMultimap<T, D>
-	implements ClassMatchingMultimap<T, D>
+	extends AbstractMutableClassMatchingMultimap<T, D>
 {
-	private final SetMultimap<Class<? extends T>, D> backingMap;
 	private final ReadWriteLock lock;
 
 	public ClassMatchingConcurrentHashMultimap()
 	{
-		backingMap = HashMultimap.create();
-		lock = new ReentrantReadWriteLock();
+		this(FastListMultimap.newMultimap());
 	}
 
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<MatchedType<T, D>> entries()
+	public ClassMatchingConcurrentHashMultimap(FastListMultimap<Class<? extends T>, D> map)
 	{
-		lock.readLock().lock();
-		try
-		{
-			return backingMap.entries()
-				.stream()
-				.map(e -> new DefaultMatchedType<T, D>((Class) e.getKey(), e.getValue()))
-				.collect(ImmutableList.toImmutableList());
-		}
-		finally
-		{
-			lock.readLock().unlock();
-		}
+		super(map);
+
+		lock = new ReentrantReadWriteLock();
 	}
 
 	@Override
 	public void put(Class<? extends T> type, D data)
 	{
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(data);
-
 		lock.writeLock().lock();
 		try
 		{
-			backingMap.put(type, data);
+			super.put(type, data);
 		}
 		finally
 		{
-			lock.writeLock().unlock();;
+			lock.writeLock().unlock();
 		}
 	}
 
 	@Override
-	public Set<D> get(Class<? extends T> type)
+	public RichIterable<MatchedType<T, D>> entries()
 	{
-		Objects.requireNonNull(type);
-
 		lock.readLock().lock();
 		try
 		{
-			return backingMap.get(type);
+			return super.entries();
 		}
 		finally
 		{
@@ -79,63 +53,52 @@ public class ClassMatchingConcurrentHashMultimap<T, D>
 	}
 
 	@Override
-	public Set<D> getBest(Class<? extends T> type)
+	public ListIterable<D> get(Class<? extends T> type)
 	{
-		Objects.requireNonNull(type);
-
-		Set<D> result = new HashSet<>();
-		findMatching(type, (t, d) -> {
-			result.addAll(d);
-
-			return false;
-		});
-
-		return result;
+		lock.readLock().lock();
+		try
+		{
+			return super.get(type);
+		}
+		finally
+		{
+			lock.readLock().unlock();
+		}
 	}
 
 	@Override
-	public List<MatchedType<T, D>> getAll(Class<? extends T> type)
+	public ListIterable<D> getBest(Class<? extends T> type)
 	{
-		Objects.requireNonNull(type);
-
-		List<MatchedType<T, D>> result = new ArrayList<>();
-		findMatching(type, (t, all) -> {
-			for(D d : all)
-			{
-				result.add(new DefaultMatchedType<>(t, d));
-			}
-
-			// Always continue
-			return true;
-		});
-
-		return result;
+		lock.readLock().lock();
+		try
+		{
+			return super.getBest(type);
+		}
+		finally
+		{
+			lock.readLock().unlock();
+		}
 	}
 
-	/**
-	 * Perform matching against the given type. This will go through the
-	 * hierarchy and interfaces of the type trying to find if this map has
-	 * an entry for them.
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void findMatching(Class<? extends T> type, BiPredicate<Class<? extends T>, Set<D>> predicate)
+	@Override
+	public ListIterable<MatchedType<T, D>> getAll(Class<? extends T> type)
 	{
-		TypeHierarchy.visitHierarchy(type, t -> {
-			lock.readLock().lock();
-			try
-			{
-				if(backingMap.containsKey(t))
-				{
-					Set<D> data = backingMap.get((Class) t);
-					return predicate.test((Class) t, data);
-				}
+		lock.readLock().lock();
+		try
+		{
+			return super.getAll(type);
+		}
+		finally
+		{
+			lock.readLock().unlock();
+		}
+	}
 
-				return true;
-			}
-			finally
-			{
-				lock.readLock().unlock();
-			}
-		});
+	@Override
+	public MutableClassMatchingMultimap<T, D> toMutable()
+	{
+		return new ClassMatchingConcurrentHashMultimap<>(
+			FastListMultimap.newMultimap(backingMap)
+		);
 	}
 }

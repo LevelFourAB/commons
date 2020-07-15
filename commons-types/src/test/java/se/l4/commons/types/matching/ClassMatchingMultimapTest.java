@@ -7,9 +7,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.List;
-import java.util.Set;
-
+import org.eclipse.collections.api.list.ListIterable;
 import org.junit.Test;
 
 public class ClassMatchingMultimapTest
@@ -17,12 +15,12 @@ public class ClassMatchingMultimapTest
 	@Test
 	public void testPutAndGet()
 	{
-		ClassMatchingHashMultimap<Object, String> map = new ClassMatchingHashMultimap<>();
+		ClassMatchingFastListMultimap<Object, String> map = new ClassMatchingFastListMultimap<>();
 		map.put(Object.class, "object1");
 		map.put(Object.class, "object2");
 		map.put(String.class, "string");
 
-		Set<String> matching = map.get(String.class);
+		ListIterable<String> matching = map.get(String.class);
 		assertThat(matching, notNullValue());
 		assertThat(matching.size(), is(1));
 		assertThat(matching, hasItem("string"));
@@ -40,11 +38,11 @@ public class ClassMatchingMultimapTest
 	@Test
 	public void testSimpleHierarchyWithObjectRoot()
 	{
-		ClassMatchingHashMultimap<Object, String> map = new ClassMatchingHashMultimap<>();
+		ClassMatchingFastListMultimap<Object, String> map = new ClassMatchingFastListMultimap<>();
 		map.put(Object.class, "object");
 		map.put(String.class, "string");
 
-		Set<String> matching = map.getBest(String.class);
+		ListIterable<String> matching = map.getBest(String.class);
 		assertThat(matching, notNullValue());
 		assertThat(matching.size(), is(1));
 		assertThat(matching, hasItem("string"));
@@ -63,11 +61,11 @@ public class ClassMatchingMultimapTest
 	@Test
 	public void testInterfaceAndConcreteClass()
 	{
-		ClassMatchingHashMultimap<Object, String> map = new ClassMatchingHashMultimap<>();
+		ClassMatchingFastListMultimap<Object, String> map = new ClassMatchingFastListMultimap<>();
 		map.put(Comparable.class, "comparable");
 		map.put(String.class, "string");
 
-		Set<String> matching = map.getBest(String.class);
+		ListIterable<String> matching = map.getBest(String.class);
 		assertThat(matching, notNullValue());
 		assertThat(matching.size(), is(1));
 		assertThat(matching, hasItem("string"));
@@ -86,12 +84,12 @@ public class ClassMatchingMultimapTest
 	@Test
 	public void testMultipleConcreteClasses()
 	{
-		ClassMatchingHashMultimap<Object, String> map = new ClassMatchingHashMultimap<>();
+		ClassMatchingFastListMultimap<Object, String> map = new ClassMatchingFastListMultimap<>();
 		map.put(Comparable.class, "comparable");
 		map.put(String.class, "string1");
 		map.put(String.class, "string2");
 
-		Set<String> matching = map.getBest(String.class);
+		ListIterable<String> matching = map.getBest(String.class);
 		assertThat(matching, notNullValue());
 		assertThat(matching.size(), is(2));
 		assertThat(matching, hasItems("string1", "string2"));
@@ -105,11 +103,11 @@ public class ClassMatchingMultimapTest
 	@Test
 	public void testInterfaceAndAbstractClass()
 	{
-		ClassMatchingHashMultimap<Object, String> map = new ClassMatchingHashMultimap<>();
+		ClassMatchingFastListMultimap<Object, String> map = new ClassMatchingFastListMultimap<>();
 		map.put(ClassMatchingMap.class, "map");
 		map.put(AbstractClassMatchingMap.class, "abstract");
 
-		Set<String> matching = map.getBest(ClassMatchingHashMap.class);
+		ListIterable<String> matching = map.getBest(ClassMatchingUnifiedMap.class);
 		assertThat(matching, notNullValue());
 		assertThat(matching.size(), is(1));
 		assertThat(matching, hasItem("abstract"));
@@ -123,12 +121,12 @@ public class ClassMatchingMultimapTest
 	@Test
 	public void testAllMatching()
 	{
-		ClassMatchingHashMultimap<Object, String> map = new ClassMatchingHashMultimap<>();
+		ClassMatchingFastListMultimap<Object, String> map = new ClassMatchingFastListMultimap<>();
 		map.put(ClassMatchingMap.class, "map1");
 		map.put(ClassMatchingMap.class, "map2");
 		map.put(AbstractClassMatchingMap.class, "abstract");
 
-		List<MatchedType<Object, String>> all = map.getAll(ClassMatchingHashMap.class);
+		ListIterable<MatchedType<Object, String>> all = map.getAll(ClassMatchingUnifiedMap.class);
 		assertThat(all, notNullValue());
 		assertThat(all.size(), is(3));
 
@@ -145,6 +143,18 @@ public class ClassMatchingMultimapTest
 		public FakeMatchingMap()
 		{
 			super(null);
+		}
+
+		@Override
+		public ClassMatchingMap<D, T> toImmutable()
+		{
+			return null;
+		}
+
+		@Override
+		public MutableClassMatchingMap<D, T> toMutable()
+		{
+			return null;
 		}
 	}
 }

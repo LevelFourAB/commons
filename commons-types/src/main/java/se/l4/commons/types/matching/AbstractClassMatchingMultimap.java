@@ -1,15 +1,13 @@
 package se.l4.commons.types.matching;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiPredicate;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.SetMultimap;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.multimap.list.ListMultimap;
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import se.l4.commons.types.internal.TypeHierarchy;
 
@@ -20,34 +18,23 @@ import se.l4.commons.types.internal.TypeHierarchy;
 public abstract class AbstractClassMatchingMultimap<T, D>
 	implements ClassMatchingMultimap<T, D>
 {
-	private final SetMultimap<Class<? extends T>, D> backingMap;
+	protected final ListMultimap<Class<? extends T>, D> backingMap;
 
-	protected AbstractClassMatchingMultimap(SetMultimap<Class<? extends T>, D> backingMap)
+	protected AbstractClassMatchingMultimap(ListMultimap<Class<? extends T>, D> backingMap)
 	{
 		this.backingMap = backingMap;
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<MatchedType<T, D>> entries()
+	public RichIterable<MatchedType<T, D>> entries()
 	{
-		return backingMap.entries()
-			.stream()
-			.map(e -> new DefaultMatchedType<T, D>((Class) e.getKey(), e.getValue()))
-			.collect(ImmutableList.toImmutableList());
+		return backingMap.keyValuePairsView()
+			.<MatchedType<T, D>>collect((e) -> new DefaultMatchedType<T, D>((Class) e.getOne(), e.getTwo()));
 	}
 
 	@Override
-	public void put(Class<? extends T> type, D data)
-	{
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(data);
-
-		backingMap.put(type, data);
-	}
-
-	@Override
-	public Set<D> get(Class<? extends T> type)
+	public ListIterable<D> get(Class<? extends T> type)
 	{
 		Objects.requireNonNull(type);
 
@@ -55,13 +42,13 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	}
 
 	@Override
-	public Set<D> getBest(Class<? extends T> type)
+	public ListIterable<D> getBest(Class<? extends T> type)
 	{
 		Objects.requireNonNull(type);
 
-		Set<D> result = new LinkedHashSet<>();
+		FastList<D> result = FastList.newList();
 		findMatching(type, (t, d) -> {
-			result.addAll(d);
+			result.addAllIterable(d);
 
 			return false;
 		});
@@ -70,11 +57,11 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	}
 
 	@Override
-	public List<MatchedType<T, D>> getAll(Class<? extends T> type)
+	public ListIterable<MatchedType<T, D>> getAll(Class<? extends T> type)
 	{
 		Objects.requireNonNull(type);
 
-		List<MatchedType<T, D>> result = new ArrayList<>();
+		FastList<MatchedType<T, D>> result = FastList.newList();
 		findMatching(type, (t, all) -> {
 			for(D d : all)
 			{
@@ -94,12 +81,12 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 	 * an entry for them.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void findMatching(Class<? extends T> type, BiPredicate<Class<? extends T>, Set<D>> predicate)
+	protected void findMatching(Class<? extends T> type, BiPredicate<Class<? extends T>, ListIterable<D>> predicate)
 	{
 		TypeHierarchy.visitHierarchy(type, t -> {
 			if(backingMap.containsKey(t))
 			{
-				Set<D> data = backingMap.get((Class) t);
+				ListIterable<D> data = backingMap.get((Class) t);
 				return predicate.test((Class) t, data);
 			}
 

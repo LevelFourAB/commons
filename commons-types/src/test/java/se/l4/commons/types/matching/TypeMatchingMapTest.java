@@ -2,10 +2,9 @@ package se.l4.commons.types.matching;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.List;
-
+import org.eclipse.collections.api.list.ListIterable;
 import org.junit.Test;
 
 import se.l4.commons.types.Types;
@@ -15,7 +14,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testPutAndGet()
 	{
-		TypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
 		map.put(Types.reference(Object.class), "object");
 		map.put(Types.reference(String.class), "string");
 
@@ -27,7 +26,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testSimpleHierarchyWithObjectRoot()
 	{
-		TypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
 		map.put(Types.reference(Object.class), "object");
 		map.put(Types.reference(String.class), "string");
 
@@ -41,7 +40,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testInterfaceAndConcreteClass()
 	{
-		TypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
 		map.put(Types.reference(Comparable.class), "comparable");
 		map.put(Types.reference(String.class), "string");
 
@@ -53,11 +52,11 @@ public class TypeMatchingMapTest
 	@Test
 	public void testInterfaceAndAbstractClass()
 	{
-		TypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
 		map.put(Types.reference(ClassMatchingMap.class), "map");
 		map.put(Types.reference(AbstractClassMatchingMap.class), "abstract");
 
-		assertThat(map.getBest(Types.reference(ClassMatchingHashMap.class)).get(), is("abstract"));
+		assertThat(map.getBest(Types.reference(ClassMatchingUnifiedMap.class)).get(), is("abstract"));
 
 		// The fake map declares the interface closer to the top
 		assertThat(map.getBest(Types.reference(FakeMatchingMap.class)).get(), is("map"));
@@ -66,11 +65,11 @@ public class TypeMatchingMapTest
 	@Test
 	public void testAllMatching()
 	{
-		TypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
 		map.put(Types.reference(ClassMatchingMap.class), "map");
 		map.put(Types.reference(AbstractClassMatchingMap.class), "abstract");
 
-		List<MatchedTypeRef<String>> all = map.getAll(Types.reference(ClassMatchingHashMap.class));
+		ListIterable<MatchedTypeRef<String>> all = map.getAll(Types.reference(ClassMatchingUnifiedMap.class));
 		assertThat(all, notNullValue());
 		assertThat(all.size(), is(2));
 
@@ -86,6 +85,18 @@ public class TypeMatchingMapTest
 		public FakeMatchingMap()
 		{
 			super(null);
+		}
+
+		@Override
+		public ClassMatchingMap<D, T> toImmutable()
+		{
+			return null;
+		}
+
+		@Override
+		public MutableClassMatchingMap<D, T> toMutable()
+		{
+			return null;
 		}
 	}
 }

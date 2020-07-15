@@ -1,6 +1,6 @@
 package se.l4.commons.types.conversion;
 
-import se.l4.commons.types.matching.ClassMatchingHashMultimap;
+import se.l4.commons.types.matching.ClassMatchingFastListMultimap;
 
 /**
  * Standard version of {@link TypeConverter}. Supports registering and finding
@@ -12,7 +12,7 @@ public class StandardTypeConverter
 
 	public StandardTypeConverter()
 	{
-		super(new ClassMatchingHashMultimap<>());
+		super(new ClassMatchingFastListMultimap<>());
 
 		DefaultConversions.register(this::addConversion);
 	}

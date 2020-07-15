@@ -2,10 +2,9 @@ package se.l4.commons.types.matching;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.List;
-
+import org.eclipse.collections.api.list.ListIterable;
 import org.junit.Test;
 
 public class ClassMatchingMapTest
@@ -13,7 +12,7 @@ public class ClassMatchingMapTest
 	@Test
 	public void testPutAndGet()
 	{
-		ClassMatchingMap<Object, String> map = new ClassMatchingHashMap<>();
+		ClassMatchingUnifiedMap<Object, String> map = new ClassMatchingUnifiedMap<>();
 		map.put(Object.class, "object");
 		map.put(String.class, "string");
 
@@ -25,7 +24,7 @@ public class ClassMatchingMapTest
 	@Test
 	public void testSimpleHierarchyWithObjectRoot()
 	{
-		ClassMatchingMap<Object, String> map = new ClassMatchingHashMap<>();
+		ClassMatchingUnifiedMap<Object, String> map = new ClassMatchingUnifiedMap<>();
 		map.put(Object.class, "object");
 		map.put(String.class, "string");
 
@@ -39,7 +38,7 @@ public class ClassMatchingMapTest
 	@Test
 	public void testInterfaceAndConcreteClass()
 	{
-		ClassMatchingMap<Object, String> map = new ClassMatchingHashMap<>();
+		ClassMatchingUnifiedMap<Object, String> map = new ClassMatchingUnifiedMap<>();
 		map.put(Comparable.class, "comparable");
 		map.put(String.class, "string");
 
@@ -51,11 +50,11 @@ public class ClassMatchingMapTest
 	@Test
 	public void testInterfaceAndAbstractClass()
 	{
-		ClassMatchingMap<Object, String> map = new ClassMatchingHashMap<>();
+		ClassMatchingUnifiedMap<Object, String> map = new ClassMatchingUnifiedMap<>();
 		map.put(ClassMatchingMap.class, "map");
 		map.put(AbstractClassMatchingMap.class, "abstract");
 
-		assertThat(map.getBest(ClassMatchingHashMap.class).get(), is("abstract"));
+		assertThat(map.getBest(ClassMatchingUnifiedMap.class).get(), is("abstract"));
 
 		// The fake map declares the interface closer to the top
 		assertThat(map.getBest(FakeMatchingMap.class).get(), is("map"));
@@ -64,11 +63,11 @@ public class ClassMatchingMapTest
 	@Test
 	public void testAllMatching()
 	{
-		ClassMatchingMap<Object, String> map = new ClassMatchingHashMap<>();
+		ClassMatchingUnifiedMap<Object, String> map = new ClassMatchingUnifiedMap<>();
 		map.put(ClassMatchingMap.class, "map");
 		map.put(AbstractClassMatchingMap.class, "abstract");
 
-		List<MatchedType<Object, String>> all = map.getAll(ClassMatchingHashMap.class);
+		ListIterable<MatchedType<Object, String>> all = map.getAll(ClassMatchingUnifiedMap.class);
 		assertThat(all, notNullValue());
 		assertThat(all.size(), is(2));
 
@@ -84,6 +83,18 @@ public class ClassMatchingMapTest
 		public FakeMatchingMap()
 		{
 			super(null);
+		}
+
+		@Override
+		public ClassMatchingMap<D, T> toImmutable()
+		{
+			return null;
+		}
+
+		@Override
+		public MutableClassMatchingMap<D, T> toMutable()
+		{
+			return null;
 		}
 	}
 }

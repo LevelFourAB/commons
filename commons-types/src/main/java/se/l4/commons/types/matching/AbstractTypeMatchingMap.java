@@ -1,15 +1,15 @@
 package se.l4.commons.types.matching;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
-import com.google.common.collect.ImmutableList;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.multimap.set.SetMultimap;
+import org.eclipse.collections.api.set.SetIterable;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.types.reflect.TypeRef;
@@ -22,42 +22,20 @@ import se.l4.commons.types.reflect.TypeRef;
 public abstract class AbstractTypeMatchingMap<D>
 	implements TypeMatchingMap<D>
 {
-	private final Map<Class<?>, Map<TypeRef, D>> backingMap;
-	private final Supplier<Map<TypeRef, D>> subMapSupplier;
+	private final SetMultimap<Class<?>, TypeRefHolder<D>> backingMap;
 
 	protected AbstractTypeMatchingMap(
-		Map<Class<?>, Map<TypeRef, D>> backingMap,
-		Supplier<Map<TypeRef, D>> subMapSupplier
+		SetMultimap<Class<?>, TypeRefHolder<D>> backingMap
 	)
 	{
 		this.backingMap = Objects.requireNonNull(backingMap);
-		this.subMapSupplier = subMapSupplier;
 	}
 
 	@Override
-	public List<MatchedTypeRef<D>> entries()
+	public RichIterable<MatchedTypeRef<D>> entries()
 	{
-		ImmutableList.Builder<MatchedTypeRef<D>> builder = ImmutableList.builder();
-
-		for(Map<TypeRef, D> map : backingMap.values())
-		{
-			for(Map.Entry<TypeRef, D> e : map.entrySet())
-			{
-				builder.add(new DefaultMatchedTypeRef<>(e.getKey(), e.getValue()));
-			}
-		}
-
-		return builder.build();
-	}
-
-	@Override
-	public void put(TypeRef type, D data)
-	{
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(data);
-
-		Map<TypeRef, D> types = backingMap.computeIfAbsent(type.getErasedType(), t -> subMapSupplier.get());
-		types.put(type, data);
+		return backingMap.keyValuePairsView()
+			.<MatchedTypeRef<D>>collect((e) -> new DefaultMatchedTypeRef<D>(e.getTwo().ref, e.getTwo().data));
 	}
 
 	@Override
@@ -65,22 +43,15 @@ public abstract class AbstractTypeMatchingMap<D>
 	{
 		Objects.requireNonNull(type);
 
-		Map<TypeRef, D> types = backingMap.get(type.getErasedType());
-		if(types == null)
+		TypeRefHolder<D> value = backingMap.get(type.getErasedType())
+			.detect(p -> p.ref.isAssignableFrom(type));
+
+		if(value == null)
 		{
 			return Optional.empty();
 		}
 
-		return Optional.ofNullable(types.get(type));
-	}
-
-	@Override
-	public Optional<D> get(TypeRef type, Function<TypeRef, D> creator)
-	{
-		Objects.requireNonNull(type);
-
-		Map<TypeRef, D> types = backingMap.computeIfAbsent(type.getErasedType(), t -> subMapSupplier.get());
-		return Optional.ofNullable(types.computeIfAbsent(type, creator));
+		return Optional.of(value.data);
 	}
 
 	@Override
@@ -100,11 +71,11 @@ public abstract class AbstractTypeMatchingMap<D>
 	}
 
 	@Override
-	public List<MatchedTypeRef< D>> getAll(TypeRef type)
+	public ListIterable<MatchedTypeRef<D>> getAll(TypeRef type)
 	{
 		Objects.requireNonNull(type);
 
-		List<MatchedTypeRef<D>> result = new ArrayList<>();
+		MutableList<MatchedTypeRef<D>> result = Lists.mutable.empty();
 		findMatching(type, (t, d) -> {
 			result.add(new DefaultMatchedTypeRef<>(t, d));
 
@@ -123,20 +94,42 @@ public abstract class AbstractTypeMatchingMap<D>
 	protected void findMatching(TypeRef type, BiPredicate<TypeRef, D> predicate)
 	{
 		type.visitHierarchy(t -> {
-			Map<TypeRef, D> types = backingMap.get(t.getErasedType());
-			if(types != null)
+			SetIterable<TypeRefHolder<D>> types = backingMap.get(t.getErasedType());
+			for(TypeRefHolder<D> e : types)
 			{
-				for(Map.Entry<TypeRef, D> e : types.entrySet())
+				if(e.ref.isAssignableFrom(t))
 				{
-					if(e.getKey().isAssignableFrom(t))
-					{
-						return predicate.test(e.getKey(), e.getValue());
-					}
+					boolean c = predicate.test(e.ref, e.data);
+					if(! c) return false;
 				}
 			}
 
 			return true;
 		});
+	}
+
+	public static class TypeRefHolder<D>
+	{
+		public final TypeRef ref;
+		public final D data;
+
+		public TypeRefHolder(TypeRef ref, D data)
+		{
+			this.ref = ref;
+			this.data = data;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return ref.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			return ref.equals(((TypeRefHolder<?>) obj).ref);
+		}
 	}
 
 	private static class MutableHolder
