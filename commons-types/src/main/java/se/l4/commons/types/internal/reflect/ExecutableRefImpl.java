@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.util.Optional;
 
+import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
 
@@ -39,9 +40,9 @@ public abstract class ExecutableRefImpl
 	}
 
 	@Override
-	public Annotation[] getAnnotations()
+	public RichIterable<Annotation> getAnnotations()
 	{
-		return executable.getAnnotations();
+		return Lists.immutable.of(executable.getAnnotations());
 	}
 
 	@Override

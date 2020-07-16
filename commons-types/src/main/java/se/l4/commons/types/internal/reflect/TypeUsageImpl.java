@@ -2,11 +2,14 @@ package se.l4.commons.types.internal.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
 
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.TypeUsage;
 
 /**
@@ -15,25 +18,25 @@ import se.l4.commons.types.reflect.TypeUsage;
 public class TypeUsageImpl
 	implements TypeUsage
 {
-	private static final TypeUsage EMPTY = new TypeUsageImpl(new Annotation[0]);
+	private static final TypeUsage EMPTY = new TypeUsageImpl(Lists.immutable.empty());
 
-	private final Annotation[] annotations;
+	private final RichIterable<Annotation> annotations;
 
-	public TypeUsageImpl(Annotation[] annotations)
+	public TypeUsageImpl(RichIterable<Annotation> annotations)
 	{
 		this.annotations = annotations;
 	}
 
 	@Override
-	public Annotation[] getAnnotations()
+	public RichIterable<Annotation> getAnnotations()
 	{
-		return Arrays.copyOf(annotations, annotations.length);
+		return annotations;
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public <T extends Annotation> Optional<T> findAnnotation(AnnotationLocator<T> locator)
 	{
-		return getAnnotation(annotationClass);
+		return getAnnotation(locator);
 	}
 
 	@Override
@@ -44,13 +47,13 @@ public class TypeUsageImpl
 			return false;
 		}
 
-		return Arrays.equals(this.annotations, ((TypeUsageImpl) obj).annotations);
+		return this.annotations.equals(((TypeUsageImpl) obj).annotations);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Arrays.hashCode(this.annotations);
+		return this.annotations.hashCode();
 	}
 
 	@Override
@@ -78,18 +81,18 @@ public class TypeUsageImpl
 
 	public static TypeUsageImpl forAnnotatedType(AnnotatedType type)
 	{
-		return new TypeUsageImpl(type.getAnnotations());
+		return new TypeUsageImpl(Lists.immutable.of(type.getAnnotations()));
 	}
 
-	public static TypeUsageImpl forAnnotatedType(AnnotatedType type, Annotation[] extra)
+	public static TypeUsageImpl forAnnotatedType(AnnotatedType type, RichIterable<Annotation> extra)
 	{
-		if(extra == null)
+		if(extra == null || extra.isEmpty())
 		{
 			return forAnnotatedType(type);
 		}
 
 		return new TypeUsageImpl(mergeAnnotations(
-			type.getAnnotations(),
+			Lists.immutable.of(type.getAnnotations()),
 			extra
 		));
 	}
@@ -102,9 +105,12 @@ public class TypeUsageImpl
 		));
 	}
 
-	private static Annotation[] mergeAnnotations(Annotation[] annotations1, Annotation[] annotations2)
+	private static RichIterable<Annotation> mergeAnnotations(
+		RichIterable<Annotation> annotations1,
+		RichIterable<Annotation> annotations2
+	)
 	{
-		Set<Annotation> annotations = new LinkedHashSet<>();
+		MutableSet<Annotation> annotations = UnifiedSet.newSet();
 		for(Annotation a : annotations1)
 		{
 			annotations.add(a);
@@ -115,6 +121,6 @@ public class TypeUsageImpl
 			annotations.add(a);
 		}
 
-		return annotations.toArray(new Annotation[annotations.size()]);
+		return annotations;
 	}
 }

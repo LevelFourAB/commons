@@ -5,6 +5,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Optional;
 
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.factory.Lists;
+
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -49,9 +53,9 @@ public class FieldRefImpl
 	}
 
 	@Override
-	public Annotation[] getAnnotations()
+	public RichIterable<Annotation> getAnnotations()
 	{
-		return field.getAnnotations();
+		return Lists.immutable.of(field.getAnnotations());
 	}
 
 	@Override
@@ -61,9 +65,9 @@ public class FieldRefImpl
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public <T extends Annotation> Optional<T> findAnnotation(AnnotationLocator<T> locator)
 	{
-		return getAnnotation(annotationClass);
+		return getAnnotation(locator);
 	}
 
 	@Override

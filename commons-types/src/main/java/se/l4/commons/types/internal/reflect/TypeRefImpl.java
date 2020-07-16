@@ -21,9 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
 
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
@@ -199,9 +201,9 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public Annotation[] getAnnotations()
+	public RichIterable<Annotation> getAnnotations()
 	{
-		return erasedType.getAnnotations();
+		return Lists.immutable.of(erasedType.getAnnotations());
 	}
 
 	@Override
@@ -211,9 +213,9 @@ public class TypeRefImpl
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public <T extends Annotation> Optional<T> findAnnotation(AnnotationLocator<T> locator)
 	{
-		return find(tr -> tr.getAnnotation(annotationClass));
+		return find(tr -> tr.getAnnotation(locator));
 	}
 
 	@Override

@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.collections.api.RichIterable;
+
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.MethodRef;
@@ -143,7 +145,7 @@ public class TypeHelperImpl
 	public static TypeRef resolve(
 		AnnotatedType type,
 		TypeRefBindings bindings,
-		Annotation[] usageAnnotations
+		RichIterable<Annotation> usageAnnotations
 	)
 	{
 		if(type instanceof AnnotatedTypeVariable)

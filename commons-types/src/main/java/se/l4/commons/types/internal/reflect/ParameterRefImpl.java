@@ -4,6 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
 
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.factory.Lists;
+
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.ExecutableRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -37,15 +41,15 @@ public class ParameterRefImpl
 	}
 
 	@Override
-	public Annotation[] getAnnotations()
+	public RichIterable<Annotation> getAnnotations()
 	{
-		return parameter.getAnnotations();
+		return Lists.immutable.of(parameter.getAnnotations());
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public <T extends Annotation> Optional<T> findAnnotation(AnnotationLocator<T> locator)
 	{
-		return getAnnotation(annotationClass);
+		return getAnnotation(locator);
 	}
 
 	@Override

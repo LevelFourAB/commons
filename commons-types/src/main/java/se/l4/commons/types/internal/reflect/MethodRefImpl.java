@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Optional;
 
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.MethodRef;
 import se.l4.commons.types.reflect.TypeRef;
 import se.l4.commons.types.reflect.TypeSpecificity;
@@ -47,14 +48,14 @@ public class MethodRefImpl
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public <T extends Annotation> Optional<T> findAnnotation(AnnotationLocator<T> locator)
 	{
 		return parent.find(type -> {
 			Optional<MethodRef> method = findIn(type, TypeSpecificity.LESS);
 
 			if(! method.isPresent()) return Optional.empty();
 
-			return method.get().getAnnotation(annotationClass);
+			return method.get().getAnnotation(locator);
 		});
 	}
 

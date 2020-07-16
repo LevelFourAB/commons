@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
 
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -40,9 +41,9 @@ public class ConstructorRefImpl
 	}
 
 	@Override
-	public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass)
+	public <T extends Annotation> Optional<T> findAnnotation(AnnotationLocator<T> locator)
 	{
-		return getAnnotation(annotationClass);
+		return getAnnotation(locator);
 	}
 
 	@Override
