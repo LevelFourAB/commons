@@ -21,7 +21,7 @@ public interface Annotated
 	 * @see AnnotatedElement#getAnnotations()
 	 */
 	@NonNull
-	RichIterable<Annotation> getAnnotations();
+	RichIterable<? extends Annotation> getAnnotations();
 
 	/**
 	 * Get if an annotation of the specific type is present.

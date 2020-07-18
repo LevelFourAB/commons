@@ -20,15 +20,15 @@ public class TypeUsageImpl
 {
 	private static final TypeUsage EMPTY = new TypeUsageImpl(Lists.immutable.empty());
 
-	private final RichIterable<Annotation> annotations;
+	private final RichIterable<? extends Annotation> annotations;
 
-	public TypeUsageImpl(RichIterable<Annotation> annotations)
+	public TypeUsageImpl(RichIterable<? extends Annotation> annotations)
 	{
-		this.annotations = annotations;
+		this.annotations = Lists.immutable.ofAll(annotations);
 	}
 
 	@Override
-	public RichIterable<Annotation> getAnnotations()
+	public RichIterable<? extends Annotation> getAnnotations()
 	{
 		return annotations;
 	}
@@ -105,9 +105,9 @@ public class TypeUsageImpl
 		));
 	}
 
-	private static RichIterable<Annotation> mergeAnnotations(
-		RichIterable<Annotation> annotations1,
-		RichIterable<Annotation> annotations2
+	private static RichIterable<? extends Annotation> mergeAnnotations(
+		RichIterable<? extends Annotation> annotations1,
+		RichIterable<? extends Annotation> annotations2
 	)
 	{
 		MutableSet<Annotation> annotations = UnifiedSet.newSet();
