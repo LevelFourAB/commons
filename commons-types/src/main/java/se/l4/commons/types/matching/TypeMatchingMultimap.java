@@ -1,7 +1,5 @@
 package se.l4.commons.types.matching;
 
-import java.util.Optional;
-
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.list.ListIterable;
 
@@ -12,7 +10,7 @@ import se.l4.commons.types.reflect.TypeRef;
  * Specialized map to associated classes and interfaces with data. This map
  * supports matching against the type hierarchy to fetch data.
  */
-public interface TypeMatchingMap<D>
+public interface TypeMatchingMultimap<D>
 {
 	/**
 	 * Get data directly associated with the given type.
@@ -23,18 +21,7 @@ public interface TypeMatchingMap<D>
 	 *   optional containing data if there is direct match or empty optional
 	 */
 	@NonNull
-	Optional<D> get(@NonNull TypeRef type);
-
-	/**
-	 * Get the best matching data for the given type.
-	 *
-	 * @param type
-	 *   class to match against
-	 * @return
-	 *   optional with data or empty optional
-	 */
-	@NonNull
-	Optional<D> getBest(@NonNull TypeRef type);
+	ListIterable<D> get(@NonNull TypeRef type);
 
 	/**
 	 * Get all types and their associated data matching the given type.
@@ -61,12 +48,12 @@ public interface TypeMatchingMap<D>
 	 *
 	 * @return
 	 */
-	TypeMatchingMap<D> toImmutable();
+	TypeMatchingMultimap<D> toImmutable();
 
 	/**
 	 * Get a mutable copy of this map.
 	 *
 	 * @return
 	 */
-	MutableTypeMatchingMap<D> toMutable();
+	MutableTypeMatchingMultimap<D> toMutable();
 }

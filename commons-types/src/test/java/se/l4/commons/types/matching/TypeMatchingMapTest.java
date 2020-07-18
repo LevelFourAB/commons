@@ -14,7 +14,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testPutAndGet()
 	{
-		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingUnifiedSetMap<>();
 		map.put(Types.reference(Object.class), "object");
 		map.put(Types.reference(String.class), "string");
 
@@ -26,7 +26,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testSimpleHierarchyWithObjectRoot()
 	{
-		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingUnifiedSetMap<>();
 		map.put(Types.reference(Object.class), "object");
 		map.put(Types.reference(String.class), "string");
 
@@ -40,7 +40,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testInterfaceAndConcreteClass()
 	{
-		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingUnifiedSetMap<>();
 		map.put(Types.reference(Comparable.class), "comparable");
 		map.put(Types.reference(String.class), "string");
 
@@ -52,7 +52,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testInterfaceAndAbstractClass()
 	{
-		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingUnifiedSetMap<>();
 		map.put(Types.reference(ClassMatchingMap.class), "map");
 		map.put(Types.reference(AbstractClassMatchingMap.class), "abstract");
 
@@ -65,7 +65,7 @@ public class TypeMatchingMapTest
 	@Test
 	public void testAllMatching()
 	{
-		MutableTypeMatchingMap<String> map = new TypeMatchingHashMap<>();
+		MutableTypeMatchingMap<String> map = new TypeMatchingUnifiedSetMap<>();
 		map.put(Types.reference(ClassMatchingMap.class), "map");
 		map.put(Types.reference(AbstractClassMatchingMap.class), "abstract");
 

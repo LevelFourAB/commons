@@ -63,10 +63,7 @@ public abstract class AbstractClassMatchingMultimap<T, D>
 
 		FastList<MatchedType<T, D>> result = FastList.newList();
 		findMatching(type, (t, all) -> {
-			for(D d : all)
-			{
-				result.add(new DefaultMatchedType<>(t, d));
-			}
+			all.forEach(d -> result.add(new DefaultMatchedType<>(t, d)));
 
 			// Always continue
 			return true;

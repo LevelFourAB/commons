@@ -1,31 +1,28 @@
 package se.l4.commons.types.matching;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.multimap.set.SetMultimap;
-import org.eclipse.collections.api.set.SetIterable;
+import org.eclipse.collections.api.multimap.list.ListMultimap;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
- * Abstract implementation of {@link TypeMatchingMap}.
+ * Abstract implementation of {@link TypeMatchingMultimap}.
  *
  * @param <D>
  */
-public abstract class AbstractTypeMatchingMap<D>
-	implements TypeMatchingMap<D>
+public abstract class AbstractTypeMatchingMultimap<D>
+	implements TypeMatchingMultimap<D>
 {
-	protected final SetMultimap<Class<?>, TypeRefHolder<D>> backingMap;
+	protected final ListMultimap<Class<?>, TypeRefHolder<D>> backingMap;
 
-	protected AbstractTypeMatchingMap(
-		SetMultimap<Class<?>, TypeRefHolder<D>> backingMap
+	protected AbstractTypeMatchingMultimap(
+		ListMultimap<Class<?>, TypeRefHolder<D>> backingMap
 	)
 	{
 		this.backingMap = Objects.requireNonNull(backingMap);
@@ -39,35 +36,13 @@ public abstract class AbstractTypeMatchingMap<D>
 	}
 
 	@Override
-	public Optional<D> get(TypeRef type)
+	public ListIterable<D> get(TypeRef type)
 	{
 		Objects.requireNonNull(type);
 
-		TypeRefHolder<D> value = backingMap.get(type.getErasedType())
-			.detect(p -> p.ref.isAssignableFrom(type));
-
-		if(value == null)
-		{
-			return Optional.empty();
-		}
-
-		return Optional.of(value.data);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Optional<D> getBest(TypeRef type)
-	{
-		Objects.requireNonNull(type);
-
-		MutableHolder holder = new MutableHolder();
-		findMatching(type, (t, d) -> {
-			holder.data = d;
-
-			return false;
-		});
-
-		return Optional.ofNullable((D) holder.data);
+		return backingMap.get(type.getErasedType())
+			.select(p -> p.ref.isAssignableFrom(type))
+			.collect(p -> p.data);
 	}
 
 	@Override
@@ -94,17 +69,18 @@ public abstract class AbstractTypeMatchingMap<D>
 	protected void findMatching(TypeRef type, BiPredicate<TypeRef, D> predicate)
 	{
 		type.visitHierarchy(t -> {
-			SetIterable<TypeRefHolder<D>> types = backingMap.get(t.getErasedType());
-			for(TypeRefHolder<D> e : types)
-			{
+			ListIterable<TypeRefHolder<D>> types = backingMap.get(t.getErasedType());
+			boolean shouldStop = types.anySatisfy(e -> {
 				if(e.ref.isAssignableFrom(t))
 				{
 					boolean c = predicate.test(e.ref, e.data);
-					if(! c) return false;
+					if(! c) return true;
 				}
-			}
 
-			return true;
+				return false;
+			});
+
+			return ! shouldStop;
 		});
 	}
 
@@ -130,11 +106,5 @@ public abstract class AbstractTypeMatchingMap<D>
 		{
 			return ref.equals(((TypeRefHolder<?>) obj).ref);
 		}
-	}
-
-	private static class MutableHolder
-	{
-		@Nullable
-		private Object data;
 	}
 }

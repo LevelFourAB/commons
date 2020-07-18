@@ -6,7 +6,7 @@ import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 
 import se.l4.commons.types.reflect.TypeRef;
 
-public class AbstractMutableTypeMatchingMap<D>
+public abstract class AbstractMutableTypeMatchingMap<D>
 	extends AbstractTypeMatchingMap<D>
 	implements MutableTypeMatchingMap<D>
 {
@@ -26,5 +26,13 @@ public class AbstractMutableTypeMatchingMap<D>
 		Objects.requireNonNull(data);
 
 		backingMap.put(type.getErasedType(), new TypeRefHolder<>(type, data));
+	}
+
+	@Override
+	public TypeMatchingMap<D> toImmutable()
+	{
+		return new ImmutableTypeMatchingMap<>(
+			backingMap.toImmutable()
+		);
 	}
 }
