@@ -1,11 +1,11 @@
 package se.l4.commons.types;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Factory for instances, used to support dependency injection if available.
@@ -44,14 +44,9 @@ public interface InstanceFactory
 	 */
 	@NonNull
 	@SuppressWarnings("unchecked")
-	default <T> T create(@NonNull Type type)
+	default <T> T create(@NonNull TypeRef type)
 	{
-		if(! (type instanceof Class))
-		{
-			throw new InstanceException("Can not create " + type + ", generics are unsupported by this factory");
-		}
-
-		return create((Class<T>) type);
+		return create((Class<T>) type.getErasedType());
 	}
 
 	/**
@@ -70,7 +65,7 @@ public interface InstanceFactory
 	 *   if unable to create the given instance
 	 */
 	@NonNull
-	default <T> T create(@NonNull Type type, @NonNull Annotation[] annotations)
+	default <T> T create(@NonNull TypeRef type, @NonNull Iterable<? extends Annotation> annotations)
 	{
 		// Default implementation ignores the annotations
 		return create(type);
@@ -100,7 +95,7 @@ public interface InstanceFactory
 	 *   supplier that when invoked will create the given type
 	 */
 	@NonNull
-	default <T> Supplier<T> supplier(@NonNull Type type)
+	default <T> Supplier<T> supplier(@NonNull TypeRef type)
 	{
 		Objects.requireNonNull(type);
 		return () -> create(type);
@@ -118,7 +113,7 @@ public interface InstanceFactory
 	 *   supplier that will create the type based on the type and annotations
 	 */
 	@NonNull
-	default <T> Supplier<T> supplier(@NonNull Type type, @NonNull Annotation[] annotations)
+	default <T> Supplier<T> supplier(@NonNull TypeRef type, @NonNull Iterable<? extends Annotation> annotations)
 	{
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(annotations);

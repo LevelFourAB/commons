@@ -1,7 +1,6 @@
 package se.l4.commons.guice;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.function.Supplier;
 
 import com.google.inject.Inject;
@@ -13,6 +12,7 @@ import com.google.inject.internal.Annotations;
 
 import se.l4.commons.types.InstanceException;
 import se.l4.commons.types.InstanceFactory;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Implementation of {@link InstanceFactory} that delegates all work to an
@@ -45,41 +45,41 @@ public class GuiceInstanceFactory
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public <T> T create(Type type)
+	public <T> T create(TypeRef type)
 	{
-		return (T) injector.getInstance(Key.get(type));
+		return (T) injector.getInstance(Key.get(type.getType()));
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public <T> Supplier<T> supplier(Type type)
+	public <T> Supplier<T> supplier(TypeRef type)
 	{
-		Provider<T> provider = injector.getProvider((Key<T>) Key.get(type));
+		Provider<T> provider = injector.getProvider((Key<T>) Key.get(type.getType()));
 		return provider::get;
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <T> T create(Type type, Annotation[] annotations)
+	public <T> T create(TypeRef type, Iterable<? extends Annotation> annotations)
 	{
 		Annotation bindingAnnotation = findBindingAnnotation(annotations);
-		Key key = bindingAnnotation == null ? Key.get(type) : Key.get(type, bindingAnnotation);
+		Key key = bindingAnnotation == null ? Key.get(type.getType()) : Key.get(type.getType(), bindingAnnotation);
 
 		return (T) injector.getInstance(key);
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <T> Supplier<T> supplier(Type type, Annotation[] annotations)
+	public <T> Supplier<T> supplier(TypeRef type, Iterable<? extends Annotation> annotations)
 	{
 		Annotation bindingAnnotation = findBindingAnnotation(annotations);
-		Key key = bindingAnnotation == null ? Key.get(type) : Key.get(type, bindingAnnotation);
+		Key key = bindingAnnotation == null ? Key.get(type.getErasedType()) : Key.get(type.getErasedType(), bindingAnnotation);
 		Provider<T> provider = injector.getProvider(key);
 
 		return provider::get;
 	}
 
-	private Annotation findBindingAnnotation(Annotation[] annotations)
+	private Annotation findBindingAnnotation(Iterable<? extends Annotation> annotations)
 	{
 		Annotation result = null;
 		for(Annotation a : annotations)
