@@ -384,6 +384,20 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public boolean isErasedType(TypeRef type)
+	{
+		return erasedType == type.getErasedType();
+	}
+
+	@Override
+	public boolean isSameType(TypeRef obj)
+	{
+		TypeRefImpl other = (TypeRefImpl) obj;
+		return TypeHelperImpl.typeEquals(type, other.type)
+			&& typeBindings.equals(other.typeBindings);
+	}
+
+	@Override
 	public Optional<TypeRef> getComponentType()
 	{
 		if(! erasedType.isArray())

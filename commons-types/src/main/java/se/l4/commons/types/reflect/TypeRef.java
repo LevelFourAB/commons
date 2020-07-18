@@ -350,7 +350,7 @@ public interface TypeRef
 	 * @param other
 	 * @return
 	 */
-	boolean isAssignableFrom(TypeRef other);
+	boolean isAssignableFrom(@NonNull TypeRef other);
 
 	/**
 	 * Get the {@link Class} this type is when type information has been erased.
@@ -366,7 +366,25 @@ public interface TypeRef
 	 * @param type
 	 * @return
 	 */
-	boolean isErasedType(Class<?> type);
+	boolean isErasedType(@NonNull Class<?> type);
+
+	/**
+	 * Check if this type has the same erased type as another {@link TypeRef}.
+	 *
+	 * @param type
+	 * @return
+	 */
+	boolean isErasedType(@NonNull TypeRef type);
+
+	/**
+	 * Check if this type, including it's generic arguments, is the same as
+	 * another type.
+	 *
+	 * @param other
+	 * @return
+	 */
+	boolean isSameType(@NonNull TypeRef other);
+
 
 	/**
 	 * Get the super class of this type.
