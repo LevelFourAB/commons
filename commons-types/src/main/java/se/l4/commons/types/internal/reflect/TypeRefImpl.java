@@ -398,6 +398,37 @@ public class TypeRefImpl
 	}
 
 	@Override
+	public TypeRef wrap()
+	{
+		if(getErasedType().isPrimitive())
+		{
+			return new TypeRefImpl(
+				Primitives.wrap(getErasedType()),
+				typeBindings,
+				usage
+			);
+		}
+
+		return this;
+	}
+
+	@Override
+	public TypeRef unwrap()
+	{
+		Class<?> unwrapped = Primitives.unwrap(getErasedType());
+		if(unwrapped == getErasedType())
+		{
+			return this;
+		}
+
+		return new TypeRefImpl(
+			unwrapped,
+			typeBindings,
+			usage
+		);
+	}
+
+	@Override
 	public Optional<TypeRef> getComponentType()
 	{
 		if(! erasedType.isArray())

@@ -385,6 +385,22 @@ public interface TypeRef
 	 */
 	boolean isSameType(@NonNull TypeRef other);
 
+	/**
+	 * If this type is a primitive type wrap it, otherwise return the same type.
+	 *
+	 * @return
+	 */
+	@NonNull
+	TypeRef wrap();
+
+	/**
+	 * If this type is a wrapped primitive unwrap it, otherwise return the same
+	 * type.
+	 *
+	 * @return
+	 */
+	@NonNull
+	TypeRef unwrap();
 
 	/**
 	 * Get the super class of this type.
