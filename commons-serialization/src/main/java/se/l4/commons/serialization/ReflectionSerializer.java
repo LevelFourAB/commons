@@ -13,11 +13,7 @@ import se.l4.commons.serialization.internal.reflection.ReflectionNonStreamingSer
 import se.l4.commons.serialization.internal.reflection.ReflectionOnlySingleFactorySerializer;
 import se.l4.commons.serialization.internal.reflection.ReflectionStreamingSerializer;
 import se.l4.commons.serialization.internal.reflection.TypeInfo;
-import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.TypeEncounter;
-import se.l4.commons.serialization.standard.CompactDynamicSerializer;
-import se.l4.commons.serialization.standard.DynamicSerializer;
-import se.l4.commons.serialization.standard.SimpleTypeSerializer;
+import se.l4.commons.types.reflect.AnnotationLocator;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.FieldRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -63,36 +59,8 @@ public class ReflectionSerializer<T>
 			}
 
 			// Resolve the serializer to use for the field
-			Serializer<?> serializer;
-			if(field.hasAnnotation(Use.class))
-			{
-				// Serializer has been set to a specific type
-				Use annotation = field.getAnnotation(Use.class).get();
-				serializer = collection.findVia((Class<SerializerOrResolver<?>>) annotation.value(), field.getType(), field.getAnnotations());
-			}
-			else if(field.hasAnnotation(AllowAny.class))
-			{
-				AllowAny allowAny = field.getAnnotation(AllowAny.class).get();
-				serializer = allowAny.compact()
-					? new CompactDynamicSerializer(collection)
-					: new DynamicSerializer(collection);
-			}
-			else if(field.hasAnnotation(AllowSimpleTypes.class))
-			{
-				serializer = new SimpleTypeSerializer();
-			}
-			else
-			{
-				// Dynamically find a suitable type
-				serializer = collection.find(field.getType(), field.getAnnotations());
-			}
-
-			if(serializer == null)
-			{
-				throw new SerializationException("Could not resolve " + field.getName() + " for " + type.getErasedType() + "; No serializer found");
-			}
-
-			boolean skipIfDefault = field.hasAnnotation(SkipDefaultValue.class);
+			Serializer<?> serializer = collection.find(field.getType());
+			boolean skipIfDefault = field.getAnnotation(AnnotationLocator.meta(SkipDefaultValue.class)).isPresent();
 
 			// Force the field to be accessible
 			Field reflectiveField = field.getField();
@@ -131,7 +99,13 @@ public class ReflectionSerializer<T>
 		FactoryDefinition<T>[] factoryCache = factories.toArray(new FactoryDefinition[factories.size()]);
 
 		// Create the actual serializer to use
-		TypeInfo<T> typeInfo = new TypeInfo<T>((Class) type.getErasedType(), factoryCache, fields, fieldsCache);
+		TypeInfo<T> typeInfo = new TypeInfo<T>(
+			(Class) type.getErasedType(),
+			resolveQualifiedName(type),
+			factoryCache,
+			fields,
+			fieldsCache
+		);
 
 		if(hasSerializerInFactory)
 		{
@@ -164,5 +138,12 @@ public class ReflectionSerializer<T>
 		}
 
 		return field.getName();
+	}
+
+	private static QualifiedName resolveQualifiedName(TypeRef type)
+	{
+		return type.getAnnotation(Named.class)
+			.map(n -> new QualifiedName(n.namespace(), n.name()))
+			.orElse(null);
 	}
 }

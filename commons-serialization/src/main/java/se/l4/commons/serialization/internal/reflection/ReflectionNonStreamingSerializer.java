@@ -3,7 +3,9 @@ package se.l4.commons.serialization.internal.reflection;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -27,6 +29,12 @@ public class ReflectionNonStreamingSerializer<T>
 	{
 		this.type = type;
 		this.size = type.getAllFields().length;
+	}
+
+	@Override
+	public Optional<QualifiedName> getName()
+	{
+		return Optional.ofNullable(type.getName());
 	}
 
 	@Override

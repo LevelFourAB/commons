@@ -3,10 +3,12 @@ package se.l4.commons.serialization.internal.reflection;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import com.google.common.base.Defaults;
 
+import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -70,6 +72,12 @@ public class ReflectionOnlySingleFactorySerializer<T>
 		this.names = names;
 		this.fields = fields;
 		this.mapping = mapping;
+	}
+
+	@Override
+	public Optional<QualifiedName> getName()
+	{
+		return Optional.ofNullable(type.getName());
 	}
 
 	@Override

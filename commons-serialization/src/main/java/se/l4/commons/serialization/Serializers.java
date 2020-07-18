@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import se.l4.commons.serialization.spi.SerializerResolver;
 import se.l4.commons.types.InstanceFactory;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -73,7 +72,7 @@ public interface Serializers
 	 * @return
 	 */
 	@NonNull
-	<T> Serializer<T> find(@NonNull Class<T> type, @NonNull Annotation... hints);
+	<T> Serializer<T> find(@NonNull Class<T> type, @NonNull Iterable<? extends Annotation> hints);
 
 	/**
 	 * Find a serializer suitable for the specified type.
@@ -83,15 +82,6 @@ public interface Serializers
 	 */
 	@NonNull
 	Serializer<?> find(@NonNull TypeRef type);
-
-	/**
-	 * Find a serializer suitable for the specified type.
-	 *
-	 * @param type
-	 * @return
-	 */
-	@NonNull
-	Serializer<?> find(@NonNull TypeRef type, @NonNull Annotation... hints);
 
 	/**
 	 * Find a serializer based on its registered name.
@@ -122,57 +112,10 @@ public interface Serializers
 	Optional<? extends Serializer<?>> find(@NonNull String namespace, @NonNull String name);
 
 	/**
-	 * Find a serializer using a specific {@link SerializerResolver}.
-	 *
-	 * @param resolver
-	 * @param type
-	 * @return
-	 */
-	@NonNull
-	<T> Serializer<T> findVia(
-		@NonNull Class<? extends SerializerOrResolver<T>> resolver,
-		@NonNull Class<T> type,
-		@NonNull Annotation... hints
-	);
-
-	/**
-	 * Find a serializer using a specific {@link SerializerResolver}.
-	 *
-	 * @param sOrR
-	 * @param type
-	 * @return
-	 */
-	@NonNull
-	Serializer<?> findVia(
-		@NonNull Class<? extends SerializerOrResolver<?>> resolver,
-		@NonNull TypeRef type,
-		@NonNull Annotation... hints
-	);
-
-	/**
-	 * Get the resolver this collection would use to resolve a serializer
-	 * for the given type.
-	 *
-	 * @param type
-	 * @return
-	 */
-	@NonNull
-	Optional<? extends SerializerResolver<?>> getResolver(@NonNull Class<?> type);
-
-	/**
 	 * Get if the given type can be serialized.
 	 *
 	 * @param type
 	 * @return
 	 */
 	boolean isSupported(@NonNull Class<?> type);
-
-	/**
-	 * Find the name of the given serializer (if any).
-	 *
-	 * @param serializer
-	 * @return
-	 */
-	@NonNull
-	Optional<QualifiedName> findName(@NonNull Serializer<?> serializer);
 }

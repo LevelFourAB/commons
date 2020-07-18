@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import se.l4.commons.serialization.standard.SimpleTypeSerializer;
+
 /**
  * Indicate that a field may contain any simple type, which is all primtive
  * types and {@link String}, the field may not contain any object.
@@ -16,6 +18,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
 @Documented
+@Use(SimpleTypeSerializer.class)
 public @interface AllowSimpleTypes
 {
 }

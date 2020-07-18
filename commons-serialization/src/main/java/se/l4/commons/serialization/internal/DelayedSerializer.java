@@ -23,14 +23,14 @@ public class DelayedSerializer<T>
 {
 	private volatile Serializer<T> instance;
 
-	public DelayedSerializer(Serializers collection, TypeRef type, Annotation[] hints)
+	public DelayedSerializer(Serializers collection, TypeRef type)
 	{
 		instance = new Serializer<T>()
 		{
 			@SuppressWarnings("unchecked")
 			private void ensureSerializer()
 			{
-				Serializer<T> resolved = (Serializer<T>) collection.find(type, hints);
+				Serializer<T> resolved = (Serializer<T>) collection.find(type);
 				if(resolved instanceof DelayedSerializer)
 				{
 					return;

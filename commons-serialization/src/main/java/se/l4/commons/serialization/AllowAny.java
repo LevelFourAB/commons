@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import se.l4.commons.serialization.standard.DynamicSerializer;
+
 /**
  * Indicate that a field may contain any type that is compatible with the
  * declaration. This will cause the library to use dynamic serialization based
@@ -28,14 +30,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
 @Documented
+@Use(DynamicSerializer.class)
 public @interface AllowAny
 {
-	/**
-	 * Set if this should use the compact format or not. The compact format
-	 * will write the container as a list, while the non-compact format is
-	 * an object with the keys {@code namespace}, {@code name}, {@code value}.
-	 *
-	 * @return
-	 */
-	boolean compact() default false;
 }

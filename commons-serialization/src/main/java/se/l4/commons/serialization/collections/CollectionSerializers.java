@@ -3,7 +3,7 @@ package se.l4.commons.serialization.collections;
 import java.util.Optional;
 
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.spi.TypeEncounter;
+import se.l4.commons.serialization.TypeEncounter;
 import se.l4.commons.serialization.standard.DynamicSerializer;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -28,11 +28,11 @@ public class CollectionSerializers
 		Optional<Item> item = encounter.getHint(Item.class);
 		if(item.isPresent())
 		{
-			return encounter.getCollection().findVia((Class) item.get().value(), type);
+			return encounter.find((Class) item.get().value(), type);
 		}
 		else
 		{
-			return encounter.getCollection().find(type);
+			return encounter.find(type);
 		}
 	}
 }

@@ -1,17 +1,14 @@
 package se.l4.commons.serialization.enums;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
-import java.util.Set;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableSet;
 
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.TypeEncounter;
+import se.l4.commons.serialization.SerializerResolver;
+import se.l4.commons.serialization.TypeEncounter;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
@@ -24,9 +21,6 @@ import se.l4.commons.types.reflect.TypeRef;
 public class EnumSerializerResolver
 	implements SerializerResolver<Enum<?>>
 {
-	private static final Set<Class<? extends Annotation>> HINTS =
-		ImmutableSet.<Class<? extends Annotation>>of(MapEnumVia.class);
-
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Optional<Serializer<Enum<?>>> find(TypeEncounter encounter)
@@ -84,11 +78,5 @@ public class EnumSerializerResolver
 		}
 
 		throw new SerializationException("Constructor that takes Enum is required (for " + translator + ")");
-	}
-
-	@Override
-	public Set<Class<? extends Annotation>> getHints()
-	{
-		return HINTS;
 	}
 }

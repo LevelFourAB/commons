@@ -1,7 +1,9 @@
 package se.l4.commons.serialization.standard;
 
 import java.io.IOException;
+import java.util.Optional;
 
+import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -23,6 +25,12 @@ public class ShortSerializer
 	public ShortSerializer()
 	{
 		formatDefinition = SerializerFormatDefinition.forValue(ValueType.SHORT);
+	}
+
+	@Override
+	public Optional<QualifiedName> getName()
+	{
+		return Optional.of(new QualifiedName("", "short"));
 	}
 
 	@Override

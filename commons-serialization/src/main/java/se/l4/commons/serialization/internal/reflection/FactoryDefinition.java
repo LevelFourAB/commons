@@ -157,11 +157,9 @@ public class FactoryDefinition<T>
 					}
 				}
 
-				Type javaType = parameter.getType().getType();
-
 				try
 				{
-					args.add(new InjectedArgument(collection, javaType, parameter.getAnnotations()));
+					args.add(new InjectedArgument(collection, parameter.getType(), parameter.getAnnotations()));
 				}
 				catch(Exception e)
 				{
@@ -215,19 +213,6 @@ public class FactoryDefinition<T>
 		return c.getParameters()
 			.collect(p -> p.isNamePresent() ? p.getName() : null)
 			.toArray(new String[0]);
-	}
-
-	private static Expose findExpose(Annotation[] annotations)
-	{
-		for(Annotation a : annotations)
-		{
-			if(a instanceof Expose)
-			{
-				return (Expose) a;
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -410,7 +395,7 @@ public class FactoryDefinition<T>
 	{
 		private final Supplier<?> supplier;
 
-		public InjectedArgument(Serializers collection, Type type, Annotation[] annotations)
+		public InjectedArgument(Serializers collection, TypeRef type, Iterable<? extends Annotation> annotations)
 		{
 			supplier = collection.getInstanceFactory().supplier(type, annotations);
 		}

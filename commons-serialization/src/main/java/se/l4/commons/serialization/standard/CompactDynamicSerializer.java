@@ -75,9 +75,9 @@ public class CompactDynamicSerializer
 	public void write(Object object, String name, StreamingOutput stream)
 		throws IOException
 	{
-		Serializer serializer = collection.find(object.getClass());
+		Serializer<?> serializer = collection.find(object.getClass());
 
-		QualifiedName qname = collection.findName(serializer)
+		QualifiedName qname = serializer.getName()
 			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
 
 		stream.writeListStart(name);
@@ -93,7 +93,7 @@ public class CompactDynamicSerializer
 
 		stream.write("name", qname.getName());
 
-		serializer.write(object, "value", stream);
+		((Serializer) serializer).write(object, "value", stream);
 
 		stream.writeListEnd(name);
 	}

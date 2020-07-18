@@ -1,13 +1,8 @@
-package se.l4.commons.serialization.spi;
+package se.l4.commons.serialization;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.SerializerOrResolver;
 
 /**
  * Resolver for a specific {@link Serializer}. This is used to support
@@ -33,15 +28,4 @@ public interface SerializerResolver<T>
 	 */
 	@NonNull
 	Optional<? extends SerializerOrResolver<T>> find(@NonNull TypeEncounter encounter);
-
-	/**
-	 * Get the hints this resolver uses.
-	 *
-	 * @return
-	 */
-	@NonNull
-	default Set<Class<? extends Annotation>> getHints()
-	{
-		return Collections.emptySet();
-	}
 }

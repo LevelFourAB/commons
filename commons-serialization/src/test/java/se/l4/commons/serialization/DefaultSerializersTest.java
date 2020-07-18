@@ -34,6 +34,11 @@ public class DefaultSerializersTest
 		throw new AssertionError("Should not be able to resolve sub-class serializer without @Use");
 	}
 
+	@Test
+	public void testString()
+	{
+		Serializer<String> string = serializers.find(String.class);
+	}
 
 	@Use(ReflectionSerializer.class)
 	public static class ClassWithUse

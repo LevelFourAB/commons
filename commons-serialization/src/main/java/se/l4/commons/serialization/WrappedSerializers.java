@@ -1,15 +1,8 @@
 package se.l4.commons.serialization;
 
-import java.util.Optional;
-
-import org.eclipse.collections.api.factory.Lists;
-import org.eclipse.collections.api.list.ImmutableList;
-
-import se.l4.commons.serialization.spi.NamingCallback;
-import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.SerializerResolverChain;
-import se.l4.commons.serialization.spi.SerializerResolverRegistry;
 import se.l4.commons.types.InstanceFactory;
+import se.l4.commons.types.mapping.Mapped;
+import se.l4.commons.types.reflect.TypeRef;
 
 /**
  * Implementation of {@link Serializers} that wraps another
@@ -21,23 +14,11 @@ import se.l4.commons.types.InstanceFactory;
 public class WrappedSerializers
 	extends AbstractSerializers
 {
-	private final SerializerResolverRegistry resolverRegistry;
 	private final Serializers other;
 
 	public WrappedSerializers(Serializers other)
 	{
 		this.other = other;
-		resolverRegistry = new SerializerResolverRegistry(
-			other.getInstanceFactory(),
-			new NamingCallback()
-			{
-				@Override
-				public void registerIfNamed(Class<?> from, Serializer<?> serializer)
-				{
-					WrappedSerializers.this.registerIfNamed(from, serializer);
-				}
-			}
-		);
 	}
 
 	@Override
@@ -47,35 +28,15 @@ public class WrappedSerializers
 	}
 
 	@Override
-	public <T> Serializers bind(Class<T> type, SerializerResolver<? extends T> resolver)
+	public Serializer<?> find(TypeRef type)
 	{
-		resolverRegistry.bind(type, resolver);
-
-		return this;
-	}
-
-	@Override
-	public Optional<? extends SerializerResolver<?>> getResolver(Class<?> type)
-	{
-		Optional<? extends SerializerResolver<?>> r1 = resolverRegistry.getResolver(type);
-		Optional<? extends SerializerResolver<?>> r2 = other.getResolver(type);
-
-		if(r1.isPresent() && r2.isPresent())
+		try
 		{
-			ImmutableList<? extends SerializerResolver<?>> merged = Lists.immutable.of(r1.get(), r2.get());
-			return Optional.of(new SerializerResolverChain(merged));
+			return super.find(type);
 		}
-		else if(r1.isPresent())
+		catch(SerializationException e)
 		{
-			return r1;
-		}
-		else if(r2.isPresent())
-		{
-			return r2;
-		}
-		else
-		{
-			return Optional.empty();
+			return other.find(type);
 		}
 	}
 }

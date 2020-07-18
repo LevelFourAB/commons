@@ -1,15 +1,11 @@
 package se.l4.commons.serialization.collections;
 
-import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.TypeEncounter;
+import se.l4.commons.serialization.SerializerResolver;
+import se.l4.commons.serialization.TypeEncounter;
 import se.l4.commons.types.Types;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -22,9 +18,6 @@ import se.l4.commons.types.reflect.TypeRef;
 public class MapSerializerResolver
 	implements SerializerResolver<Map<?, ?>>
 {
-	private static final Set<Class<? extends Annotation>> HINTS =
-		ImmutableSet.of(AllowAnyItem.class, Item.class, StringKey.class);
-
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Optional<Serializer<Map<?, ?>>> find(TypeEncounter encounter)
@@ -47,11 +40,5 @@ public class MapSerializerResolver
 		}
 
 		return Optional.empty();
-	}
-
-	@Override
-	public Set<Class<? extends Annotation>> getHints()
-	{
-		return HINTS;
 	}
 }

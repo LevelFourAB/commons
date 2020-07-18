@@ -3,6 +3,8 @@ package se.l4.commons.serialization.collections;
 import java.util.Optional;
 
 import se.l4.commons.serialization.Serializer;
+import se.l4.commons.serialization.SerializerResolver;
+import se.l4.commons.serialization.TypeEncounter;
 import se.l4.commons.serialization.collections.array.BooleanArraySerializer;
 import se.l4.commons.serialization.collections.array.CharArraySerializer;
 import se.l4.commons.serialization.collections.array.DoubleArraySerializer;
@@ -10,8 +12,6 @@ import se.l4.commons.serialization.collections.array.FloatArraySerializer;
 import se.l4.commons.serialization.collections.array.IntArraySerializer;
 import se.l4.commons.serialization.collections.array.LongArraySerializer;
 import se.l4.commons.serialization.collections.array.ShortArraySerializer;
-import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.TypeEncounter;
 import se.l4.commons.types.reflect.TypeRef;
 
 /**
@@ -28,6 +28,11 @@ public class ArraySerializerResolver
 	@Override
 	public Optional<Serializer<?>> find(TypeEncounter encounter)
 	{
+		if(! encounter.getType().getComponentType().isPresent())
+		{
+			return Optional.empty();
+		}
+
 		TypeRef componentType = encounter.getType().getComponentType()
 			.get();
 

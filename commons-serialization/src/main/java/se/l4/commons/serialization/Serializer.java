@@ -3,6 +3,7 @@ package se.l4.commons.serialization;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -52,6 +53,16 @@ public interface Serializer<T>
 	 */
 	void write(@UnknownNullness T object, @NonNull String name, @NonNull StreamingOutput out)
 		throws IOException;
+
+	/**
+	 * Get the name of this serializer.
+	 *
+	 * @return
+	 */
+	default Optional<QualifiedName> getName()
+	{
+		return Optional.empty();
+	}
 
 	/**
 	 * Get the definition that describes what this serializer can

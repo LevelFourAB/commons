@@ -11,10 +11,6 @@ import se.l4.commons.serialization.collections.ListSerializerResolver;
 import se.l4.commons.serialization.collections.MapSerializerResolver;
 import se.l4.commons.serialization.collections.SetSerializerResolver;
 import se.l4.commons.serialization.enums.EnumSerializerResolver;
-import se.l4.commons.serialization.internal.UseSerializerResolver;
-import se.l4.commons.serialization.spi.NamingCallback;
-import se.l4.commons.serialization.spi.SerializerResolver;
-import se.l4.commons.serialization.spi.SerializerResolverRegistry;
 import se.l4.commons.serialization.standard.BooleanSerializer;
 import se.l4.commons.serialization.standard.ByteArraySerializer;
 import se.l4.commons.serialization.standard.ByteSerializer;
@@ -41,7 +37,6 @@ public class DefaultSerializers
 	extends AbstractSerializers
 {
 	private final InstanceFactory instanceFactory;
-	private final SerializerResolverRegistry resolverRegistry;
 
 	public DefaultSerializers()
 	{
@@ -52,30 +47,18 @@ public class DefaultSerializers
 	{
 		this.instanceFactory = instanceFactory;
 
-		resolverRegistry = new SerializerResolverRegistry(
-			instanceFactory,
-			new NamingCallback()
-			{
-				@Override
-				public void registerIfNamed(Class<?> from, Serializer<?> serializer)
-				{
-					DefaultSerializers.this.registerIfNamed(from, serializer);
-				}
-			}
-		);
-
 		// Standard types
-		bind(Boolean.class, new BooleanSerializer(), "", "boolean");
-		bind(Byte.class, new ByteSerializer(), "", "byte");
-		bind(Character.class, new CharacterSerializer(), "", "char");
-		bind(Double.class, new DoubleSerializer(), "", "double");
-		bind(Float.class, new FloatSerializer(), "", "float");
-		bind(Integer.class, new IntSerializer(), "", "integer");
-		bind(Long.class, new LongSerializer(), "", "long");
-		bind(Short.class, new ShortSerializer(), "", "short");
-		bind(String.class, new StringSerializer(), "", "string");
-		bind(byte[].class, new ByteArraySerializer(), "", "byte[]");
-		bind(UUID.class, new UuidSerializer(), "", "uuid");
+		bind(Boolean.class, new BooleanSerializer());
+		bind(Byte.class, new ByteSerializer());
+		bind(Character.class, new CharacterSerializer());
+		bind(Double.class, new DoubleSerializer());
+		bind(Float.class, new FloatSerializer());
+		bind(Integer.class, new IntSerializer());
+		bind(Long.class, new LongSerializer());
+		bind(Short.class, new ShortSerializer());
+		bind(String.class, new StringSerializer());
+		bind(byte[].class, new ByteArraySerializer());
+		bind(UUID.class, new UuidSerializer());
 
 		// Collections
 		bind(List.class, new ListSerializerResolver());
@@ -89,26 +72,11 @@ public class DefaultSerializers
 		bind(Optional.class, new OptionalSerializerResolver());
 
 		bind(Bytes.class, new BytesSerializer());
-
-		bind(Object.class, new UseSerializerResolver(instanceFactory));
 	}
 
 	@Override
 	public InstanceFactory getInstanceFactory()
 	{
 		return instanceFactory;
-	}
-
-	@Override
-	public <T> Serializers bind(Class<T> type, SerializerResolver<? extends T> resolver)
-	{
-		resolverRegistry.bind(type, resolver);
-
-		return this;
-	}
-
-	public Optional<SerializerResolver<?>> getResolver(Class<?> type)
-	{
-		return resolverRegistry.getResolver(type);
 	}
 }

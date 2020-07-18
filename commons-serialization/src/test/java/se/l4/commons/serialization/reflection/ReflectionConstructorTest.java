@@ -6,8 +6,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.annotation.Annotation;
-import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +19,7 @@ import se.l4.commons.serialization.format.JsonInput;
 import se.l4.commons.serialization.format.JsonOutput;
 import se.l4.commons.serialization.internal.TypeEncounterImpl;
 import se.l4.commons.types.Types;
+import se.l4.commons.types.mapping.OutputDeduplicator;
 
 public class ReflectionConstructorTest
 {
@@ -36,7 +35,7 @@ public class ReflectionConstructorTest
 	public void testDefaultConstructor()
 	{
 		Serializer<A> serializer = new ReflectionSerializer<A>()
-			.find(new TypeEncounterImpl(collection, Types.reference(A.class), Collections.<Annotation>emptyList()))
+			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(A.class)))
 			.get();
 
 		A instance = new A();
@@ -48,7 +47,7 @@ public class ReflectionConstructorTest
 	public void testMultipleConstructors()
 	{
 		Serializer<B> serializer = new ReflectionSerializer<B>()
-			.find(new TypeEncounterImpl(collection, Types.reference(B.class), Collections.<Annotation>emptyList()))
+			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(B.class)))
 			.get();
 
 		B instance = new B("test", "value");
@@ -59,7 +58,7 @@ public class ReflectionConstructorTest
 	public void testSingleConstructor()
 	{
 		Serializer<C> serializer = new ReflectionSerializer<C>()
-			.find(new TypeEncounterImpl(collection, Types.reference(C.class), Collections.<Annotation>emptyList()))
+			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(C.class)))
 			.get();
 
 		C instance = new C("test value");
@@ -70,7 +69,7 @@ public class ReflectionConstructorTest
 	public void testSingleConstructorMixedTypes()
 	{
 		Serializer<D> serializer = new ReflectionSerializer<D>()
-			.find(new TypeEncounterImpl(collection, Types.reference(D.class), Collections.<Annotation>emptyList()))
+			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(D.class)))
 			.get();
 
 		D instance = new D(2, "test value");

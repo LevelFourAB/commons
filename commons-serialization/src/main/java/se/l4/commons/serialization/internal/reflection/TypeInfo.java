@@ -2,6 +2,7 @@ package se.l4.commons.serialization.internal.reflection;
 
 import java.util.Map;
 
+import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.ReflectionSerializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 
@@ -13,18 +14,23 @@ import se.l4.commons.serialization.SerializerFormatDefinition;
  */
 public class TypeInfo<T>
 {
-	private final FieldDefinition[] fields;
 	private final Class<T> type;
+	private final QualifiedName name;
+	private final FieldDefinition[] fields;
 	private final Map<String, FieldDefinition> fieldMap;
 	private final FactoryDefinition<T>[] factories;
 	private final SerializerFormatDefinition formatDefinition;
 
-	public TypeInfo(Class<T> type,
-			FactoryDefinition<T>[] factories,
-			Map<String, FieldDefinition> fieldMap,
-			FieldDefinition[] fields)
+	public TypeInfo(
+		Class<T> type,
+		QualifiedName qualifiedName,
+		FactoryDefinition<T>[] factories,
+		Map<String, FieldDefinition> fieldMap,
+		FieldDefinition[] fields
+	)
 	{
 		this.type = type;
+		this.name = qualifiedName;
 		this.factories = factories;
 		this.fieldMap = fieldMap;
 		this.fields = fields;
@@ -43,6 +49,11 @@ public class TypeInfo<T>
 	public Class<T> getType()
 	{
 		return type;
+	}
+
+	public QualifiedName getName()
+	{
+		return name;
 	}
 
 	public FieldDefinition[] getAllFields()
