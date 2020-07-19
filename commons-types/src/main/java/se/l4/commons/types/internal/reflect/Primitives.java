@@ -22,6 +22,18 @@ public class Primitives
 
 	private static final ImmutableMap<Class<?>, Class<?>> WRAP_TO_PRIM = PRIM_TO_WRAP.flipUniqueValues();
 
+	private static final ImmutableMap<Class<?>, Object> DEFAULTS =
+		Maps.mutable.<Class<?>, Object>empty()
+			.withKeyValue(byte.class, Byte.valueOf((byte) 0))
+			.withKeyValue(short.class, Short.valueOf((short) 0))
+			.withKeyValue(int.class, Integer.valueOf(0))
+			.withKeyValue(long.class, Long.valueOf(0))
+			.withKeyValue(float.class, Float.valueOf(0f))
+			.withKeyValue(double.class, Double.valueOf(0d))
+			.withKeyValue(char.class, Character.valueOf('\0'))
+			.withKeyValue(boolean.class, Boolean.FALSE)
+			.toImmutable();
+
 	private Primitives()
 	{
 	}
@@ -34,5 +46,10 @@ public class Primitives
 	public static Class<?> unwrap(Class<?> type)
 	{
 		return WRAP_TO_PRIM.getIfAbsentValue(type, type);
+	}
+
+	public static Object defaultValue(Class<?> type)
+	{
+		return DEFAULTS.get(type);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import se.l4.commons.types.internal.TypeHierarchy;
+import se.l4.commons.types.internal.reflect.Primitives;
 import se.l4.commons.types.internal.reflect.TypeHelperImpl;
 import se.l4.commons.types.reflect.TypeRef;
 
@@ -32,8 +33,43 @@ public class Types
 	 *   continue visiting other parts of the hierarchy and {@code false} to
 	 *   abort the visiting
 	 */
-	public static void visitHierarchy(Class<?> type, Predicate<Class<?>> visitor)
+	public static void visitHierarchy(@NonNull Class<?> type, @NonNull Predicate<Class<?>> visitor)
 	{
 		TypeHierarchy.visitHierarchy(type, visitor);
+	}
+
+	/**
+	 * Wrap the given class if it's a primitive, will return the same class if
+	 * not a primitive.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public static Class<?> wrap(Class<?> type)
+	{
+		return Primitives.wrap(type);
+	}
+
+	/**
+	 * Unwrap the given class if it's a wrapped primitive, will return the same
+	 * class if not a primitive.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public static Class<?> unwrap(Class<?> type)
+	{
+		return Primitives.unwrap(type);
+	}
+
+	/**
+	 * Get the default value for the given type.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public static Object defaultValue(Class<?> type)
+	{
+		return Primitives.defaultValue(type);
 	}
 }
