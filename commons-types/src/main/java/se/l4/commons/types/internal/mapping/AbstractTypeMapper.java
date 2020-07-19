@@ -3,8 +3,8 @@ package se.l4.commons.types.internal.mapping;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
@@ -35,7 +35,7 @@ public abstract class AbstractTypeMapper<I extends ResolutionEncounter<O>, O>
 	private final TypeMatchingMultimap<Resolver<I, O>> resolvers;
 	private final ListIterable<Resolver<I, O>> annotationResolvers;
 
-	private final LoadingCache<TypeRef, Mapped<O>> cache;
+	private final Cache<TypeRef, Mapped<O>> cache;
 	private final OutputDeduplicator<O> deduplicator;
 
 	public AbstractTypeMapper(
@@ -55,7 +55,7 @@ public abstract class AbstractTypeMapper<I extends ResolutionEncounter<O>, O>
 
 		cache = Caffeine.newBuilder()
 			.maximumSize(cachingSize)
-			.build(this::resolve);
+			.build();
 	}
 
 	@Override
@@ -67,7 +67,14 @@ public abstract class AbstractTypeMapper<I extends ResolutionEncounter<O>, O>
 	@Override
 	public Mapped<O> get(TypeRef type)
 	{
-		return cache.get(type);
+		Mapped<O> mapped = cache.getIfPresent(type);
+		if(mapped == null)
+		{
+			mapped = resolve(type);
+			cache.put(type, mapped);
+		}
+
+		return mapped;
 	}
 
 	private Mapped<O> resolve(TypeRef type)
