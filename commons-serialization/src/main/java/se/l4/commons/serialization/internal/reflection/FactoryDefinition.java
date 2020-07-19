@@ -4,22 +4,20 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.google.common.base.Defaults;
-import com.google.common.base.MoreObjects;
-import com.google.common.primitives.Primitives;
+import org.eclipse.collections.api.map.MapIterable;
 
 import se.l4.commons.serialization.Expose;
 import se.l4.commons.serialization.Factory;
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializers;
 import se.l4.commons.types.InstanceException;
+import se.l4.commons.types.Types;
 import se.l4.commons.types.reflect.ConstructorRef;
 import se.l4.commons.types.reflect.ParameterRef;
 import se.l4.commons.types.reflect.TypeRef;
@@ -54,8 +52,8 @@ public class FactoryDefinition<T>
 	public static <T> FactoryDefinition<T> resolve(
 		Serializers collection,
 		TypeRef parentType,
-		Map<String, FieldDefinition> fields,
-		Map<String, FieldDefinition> nonRenamed,
+		MapIterable<String, FieldDefinition> fields,
+		MapIterable<String, FieldDefinition> nonRenamed,
 		ConstructorRef constructor
 	)
 	{
@@ -132,7 +130,7 @@ public class FactoryDefinition<T>
 							"constructor but there was no such field declared" +
 							" (for " + parentType.getErasedType() + ")");
 				}
-				else if(Primitives.wrap(def.getType()) != Primitives.wrap(parameter.getType().getErasedType()))
+				else if(Types.wrap(def.getType()) != Types.wrap(parameter.getType().getErasedType()))
 				{
 					throw new SerializationException(expose + " was used on a " +
 						"constructor but the type of the argument was different " +
@@ -383,7 +381,7 @@ public class FactoryDefinition<T>
 			Object value = data.get(name);
 			if(value == null && type.isPrimitive())
 			{
-				return Defaults.defaultValue(type);
+				return Types.defaultValue(type);
 			}
 
 			return value;
@@ -417,8 +415,6 @@ public class FactoryDefinition<T>
 	@Override
 	public String toString()
 	{
-		return MoreObjects.toStringHelper(this)
-			.add("constructor", raw)
-			.toString();
+		return getClass().getSimpleName() + "{constructor=" + raw + "}";
 	}
 }

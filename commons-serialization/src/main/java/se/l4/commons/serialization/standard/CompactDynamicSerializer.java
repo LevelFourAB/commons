@@ -1,13 +1,17 @@
 package se.l4.commons.serialization.standard;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
+import se.l4.commons.serialization.SerializerOrResolver;
+import se.l4.commons.serialization.SerializerResolver;
 import se.l4.commons.serialization.Serializers;
+import se.l4.commons.serialization.TypeEncounter;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
 import se.l4.commons.serialization.format.Token;
@@ -21,86 +25,115 @@ import se.l4.commons.serialization.internal.SerializerFormatDefinitionBuilderImp
  *
  */
 public class CompactDynamicSerializer
-	implements Serializer<Object>
+	implements SerializerResolver<Object>
 {
-	private final Serializers collection;
-	private final SerializerFormatDefinition formatDefinition;
-
-	public CompactDynamicSerializer(Serializers collection)
+	@Override
+	public Optional<? extends SerializerOrResolver<Object>> find(TypeEncounter encounter)
 	{
-		this.collection = collection;
-
-		formatDefinition = new SerializerFormatDefinitionBuilderImpl()
-			.list(SerializerFormatDefinition.any())
-			.build();
+		return Optional.of(new Impl(encounter.getCollection()));
 	}
 
-	@Override
-	public Object read(StreamingInput in)
-		throws IOException
+	public static class Impl
+		implements Serializer<Object>
 	{
-		// Read start of object
-		in.next(Token.LIST_START);
+		private final Serializers collection;
+		private final SerializerFormatDefinition formatDefinition;
 
-		in.next(in.peek() == Token.NULL ? Token.NULL : Token.VALUE);
-		String namespace;
-		if(in.current() == Token.NULL)
+		public Impl(Serializers collection)
 		{
-			namespace = "";
-		}
-		else
-		{
-			namespace = in.readString();
+			this.collection = collection;
+
+			formatDefinition = new SerializerFormatDefinitionBuilderImpl()
+				.list(SerializerFormatDefinition.any())
+				.build();
 		}
 
-		in.next(Token.VALUE);
-		String name = in.readString();
-
-		Object result = null;
-
-		Optional<? extends Serializer<?>> serializer = collection.find(namespace, name);
-		if(! serializer.isPresent())
+		@Override
+		public Object read(StreamingInput in)
+			throws IOException
 		{
-			throw new SerializationException("No serializer found for `" + name + (namespace != null ? "` in `" + namespace + "`" : "`"));
+			// Read start of object
+			in.next(Token.LIST_START);
+
+			in.next(in.peek() == Token.NULL ? Token.NULL : Token.VALUE);
+			String namespace;
+			if(in.current() == Token.NULL)
+			{
+				namespace = "";
+			}
+			else
+			{
+				namespace = in.readString();
+			}
+
+			in.next(Token.VALUE);
+			String name = in.readString();
+
+			Object result = null;
+
+			Optional<? extends Serializer<?>> serializer = collection.find(namespace, name);
+			if(! serializer.isPresent())
+			{
+				throw new SerializationException("No serializer found for `" + name + (namespace != null ? "` in `" + namespace + "`" : "`"));
+			}
+
+			result = serializer.get().read(in);
+
+			in.next(Token.LIST_END);
+			return result;
 		}
 
-		result = serializer.get().read(in);
-
-		in.next(Token.LIST_END);
-		return result;
-	}
-
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void write(Object object, String name, StreamingOutput stream)
-		throws IOException
-	{
-		Serializer<?> serializer = collection.find(object.getClass());
-
-		QualifiedName qname = serializer.getName()
-			.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
-
-		stream.writeListStart(name);
-
-		if(! qname.getNamespace().equals(""))
+		@Override
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		public void write(Object object, String name, StreamingOutput stream)
+			throws IOException
 		{
-			stream.write("namespace", qname.getNamespace());
+			Serializer<?> serializer = collection.find(object.getClass());
+
+			QualifiedName qname = serializer.getName()
+				.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
+
+			stream.writeListStart(name);
+
+			if(! qname.getNamespace().equals(""))
+			{
+				stream.write("namespace", qname.getNamespace());
+			}
+			else
+			{
+				stream.writeNull("namespace");
+			}
+
+			stream.write("name", qname.getName());
+
+			((Serializer) serializer).write(object, "value", stream);
+
+			stream.writeListEnd(name);
 		}
-		else
+
+		@Override
+		public SerializerFormatDefinition getFormatDefinition()
 		{
-			stream.writeNull("namespace");
+			return formatDefinition;
 		}
 
-		stream.write("name", qname.getName());
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(collection);
+		}
 
-		((Serializer) serializer).write(object, "value", stream);
-
-		stream.writeListEnd(name);
-	}
-
-	@Override
-	public SerializerFormatDefinition getFormatDefinition()
-	{
-		return formatDefinition;
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Impl other = (Impl) obj;
+			return Objects.equals(collection, other.collection);
+		}
 	}
 }

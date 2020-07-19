@@ -1,42 +1,17 @@
 package se.l4.commons.serialization.reflection;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import org.junit.Before;
 import org.junit.Test;
 
-import se.l4.commons.serialization.DefaultSerializers;
 import se.l4.commons.serialization.Expose;
-import se.l4.commons.serialization.ReflectionSerializer;
 import se.l4.commons.serialization.Serializer;
-import se.l4.commons.serialization.Serializers;
-import se.l4.commons.serialization.format.JsonInput;
-import se.l4.commons.serialization.format.JsonOutput;
-import se.l4.commons.serialization.internal.TypeEncounterImpl;
-import se.l4.commons.types.Types;
-import se.l4.commons.types.mapping.OutputDeduplicator;
 
 public class ReflectionConstructorTest
+	extends ReflectionTest
 {
-	private Serializers collection;
-
-	@Before
-	public void beforeTests()
-	{
-		collection = new DefaultSerializers();
-	}
-
 	@Test
 	public void testDefaultConstructor()
 	{
-		Serializer<A> serializer = new ReflectionSerializer<A>()
-			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(A.class)))
-			.get();
+		Serializer<A> serializer = resolve(A.class);
 
 		A instance = new A();
 		instance.field = "test value";
@@ -46,9 +21,7 @@ public class ReflectionConstructorTest
 	@Test
 	public void testMultipleConstructors()
 	{
-		Serializer<B> serializer = new ReflectionSerializer<B>()
-			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(B.class)))
-			.get();
+		Serializer<B> serializer =  resolve(B.class);
 
 		B instance = new B("test", "value");
 		testSymmetry(serializer, instance);
@@ -57,9 +30,7 @@ public class ReflectionConstructorTest
 	@Test
 	public void testSingleConstructor()
 	{
-		Serializer<C> serializer = new ReflectionSerializer<C>()
-			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(C.class)))
-			.get();
+		Serializer<C> serializer =  resolve(C.class);
 
 		C instance = new C("test value");
 		testSymmetry(serializer, instance);
@@ -68,9 +39,7 @@ public class ReflectionConstructorTest
 	@Test
 	public void testSingleConstructorMixedTypes()
 	{
-		Serializer<D> serializer = new ReflectionSerializer<D>()
-			.find(new TypeEncounterImpl(collection, OutputDeduplicator.none(), Types.reference(D.class)))
-			.get();
+		Serializer<D> serializer =  resolve(D.class);
 
 		D instance = new D(2, "test value");
 		testSymmetry(serializer, instance);
@@ -254,27 +223,6 @@ public class ReflectionConstructorTest
 			if(field2 != other.field2)
 				return false;
 			return true;
-		}
-	}
-
-	private <T> void testSymmetry(Serializer<T> serializer, T instance)
-	{
-		try
-		{
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			JsonOutput jsonOut = new JsonOutput(out);
-			serializer.write(instance, "", jsonOut);
-			jsonOut.flush();
-
-			ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-			JsonInput jsonIn = new JsonInput(new InputStreamReader(in));
-			T read = serializer.read(jsonIn);
-
-			assertEquals("Deserialized instance does not match", instance, read);
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException(e);
 		}
 	}
 }

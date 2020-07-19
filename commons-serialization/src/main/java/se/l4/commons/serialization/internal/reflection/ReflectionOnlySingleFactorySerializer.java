@@ -6,14 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import com.google.common.base.Defaults;
-
 import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
 import se.l4.commons.serialization.format.Token;
+import se.l4.commons.types.Types;
 
 /**
  * Serializer that uses a smarter mapping creating instances using a single factory.
@@ -49,7 +48,7 @@ public class ReflectionOnlySingleFactorySerializer<T>
 
 				String name = serializedArg.name;
 				tempMapping.put(name, i);
-				defaultArguments[i] = Defaults.defaultValue(serializedArg.type);
+				defaultArguments[i] = Types.defaultValue(serializedArg.type);
 
 			}
 		}

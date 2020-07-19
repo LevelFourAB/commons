@@ -1,11 +1,13 @@
 package se.l4.commons.serialization;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.factory.Maps;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.map.MutableMap;
 
 import se.l4.commons.serialization.internal.reflection.FactoryDefinition;
 import se.l4.commons.serialization.internal.reflection.FieldDefinition;
@@ -48,8 +50,8 @@ public class ReflectionSerializer<T>
 		TypeRef type = encounter.getType();
 		Serializers collection = encounter.getCollection();
 
-		ImmutableMap.Builder<String, FieldDefinition> builder = ImmutableMap.builder();
-		ImmutableMap.Builder<String, FieldDefinition> nonRenamedFields = ImmutableMap.builder();
+		MutableMap<String, FieldDefinition> builder = Maps.mutable.empty();
+		MutableMap<String, FieldDefinition> nonRenamedFields = Maps.mutable.empty();
 
 		for(FieldRef field : type.getDeclaredFields())
 		{
@@ -74,13 +76,13 @@ public class ReflectionSerializer<T>
 		}
 
 		// Create field map and cache
-		ImmutableMap<String, FieldDefinition> fields = builder.build();
-		ImmutableMap<String, FieldDefinition> nonRenamed = nonRenamedFields.build();
-		FieldDefinition[] fieldsCache = fields.values().toArray(new FieldDefinition[0]);
+		ImmutableMap<String, FieldDefinition> fields = builder.toImmutable();
+		ImmutableMap<String, FieldDefinition> nonRenamed = nonRenamedFields.toImmutable();
+		FieldDefinition[] fieldsCache = fields.valuesView().toArray(new FieldDefinition[fields.size()]);
 
 		// Get all of the factories
 		boolean hasSerializerInFactory = false;
-		List<FactoryDefinition<T>> factories = Lists.newArrayList();
+		MutableList<FactoryDefinition<T>> factories = Lists.mutable.empty();
 
 		for(ConstructorRef constructor : type.getConstructors())
 		{

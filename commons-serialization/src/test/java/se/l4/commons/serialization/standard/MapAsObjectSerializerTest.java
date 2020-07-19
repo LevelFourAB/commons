@@ -43,7 +43,7 @@ public class MapAsObjectSerializerTest
 	public void testMapWithDynamicSerializer()
 	{
 		DefaultSerializers collection = new DefaultSerializers();
-		MapAsObjectSerializer<Object> serializer = new MapAsObjectSerializer<>(new DynamicSerializer(collection));
+		MapAsObjectSerializer<Object> serializer = new MapAsObjectSerializer<>(new DynamicSerializer.Impl(collection));
 		Map<String, Object> map = new HashMap<>();
 
 		map.put("hello", "cookie");

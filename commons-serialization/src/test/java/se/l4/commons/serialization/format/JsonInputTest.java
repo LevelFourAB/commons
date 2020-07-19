@@ -9,8 +9,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-
-import com.google.common.base.Charsets;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
@@ -118,7 +117,7 @@ public class JsonInputTest
 		try(StreamingInput in = createInput(v))
 		{
 			in.next(Token.VALUE);
-			assertThat(in.readByteArray(), is("kaka".getBytes(Charsets.UTF_8)));
+			assertThat(in.readByteArray(), is("kaka".getBytes(StandardCharsets.UTF_8)));
 			in.next(Token.END_OF_STREAM);
 		}
 	}
@@ -726,7 +725,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("", "kaka".getBytes(Charsets.UTF_8));
+		out.write("", "kaka".getBytes(StandardCharsets.UTF_8));
 
 		assertStream(out, "\"a2FrYQ==\"");
 	}

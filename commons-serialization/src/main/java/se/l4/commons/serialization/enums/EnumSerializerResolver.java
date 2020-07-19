@@ -3,8 +3,6 @@ package se.l4.commons.serialization.enums;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
 
-import com.google.common.base.Throwables;
-
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.SerializerResolver;
@@ -66,7 +64,10 @@ public class EnumSerializerResolver
 				}
 				catch(InstantiationException e)
 				{
-					Throwables.throwIfInstanceOf(e.getCause(), SerializationException.class);
+					if(e.getCause() instanceof SerializationException)
+					{
+						throw (SerializationException) e.getCause();
+					}
 
 					throw new SerializationException("Unable to create; " + e.getCause().getMessage(), e.getCause());
 				}

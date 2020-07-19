@@ -5,8 +5,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.google.common.io.ByteStreams;
-
 import se.l4.commons.io.Bytes;
 
 /**
@@ -222,7 +220,17 @@ public class BinaryInput
 	{
 		int length = readRawInteger();
 		byte[] buffer = new byte[length];
-		ByteStreams.readFully(in, buffer);
+
+		int n = 0;
+		while(n < length)
+		{
+			int count = in.read(buffer, n, length - n);
+			if(count < 0)
+			{
+				throw new EOFException("Expected to read " + length + " bytes, but could only read " + n);
+			}
+			n += count;
+		}
 
 		return buffer;
 	}

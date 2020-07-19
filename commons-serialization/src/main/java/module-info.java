@@ -4,8 +4,6 @@ module se.l4.commons.serialization {
 	requires transitive se.l4.commons.types;
 	requires transitive se.l4.commons.io;
 
-	requires com.google.common;
-
 	exports se.l4.commons.serialization;
 	exports se.l4.commons.serialization.collections;
 	exports se.l4.commons.serialization.enums;

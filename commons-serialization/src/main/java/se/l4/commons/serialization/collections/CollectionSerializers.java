@@ -22,7 +22,7 @@ public class CollectionSerializers
 	{
 		if(encounter.getHint(AllowAnyItem.class) != null)
 		{
-			return new DynamicSerializer(encounter.getCollection());
+			return new DynamicSerializer.Impl(encounter.getCollection());
 		}
 
 		Optional<Item> item = encounter.getHint(Item.class);

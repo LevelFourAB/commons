@@ -6,14 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 
-import com.google.common.base.Defaults;
-import com.google.common.base.Throwables;
-
 import se.l4.commons.serialization.SerializationException;
 import se.l4.commons.serialization.Serializer;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.StreamingOutput;
 import se.l4.commons.serialization.format.Token;
+import se.l4.commons.types.Types;
 
 /**
  * Definition of a field within a reflection serializer.
@@ -81,7 +79,7 @@ public class FieldDefinition
 
 			// Consume and return null
 			in.next();
-			return Defaults.defaultValue(type);
+			return Types.defaultValue(type);
 		}
 
 		return serializer.read(in);
@@ -100,15 +98,13 @@ public class FieldDefinition
 		{
 			if(value == null && type.isPrimitive())
 			{
-				value = Defaults.defaultValue(type);
+				value = Types.defaultValue(type);
 			}
 
 			field.set(target, value);
 		}
 		catch(Exception e)
 		{
-			Throwables.throwIfUnchecked(e);
-
 			throw new SerializationException("Unable to read object; " + e.getMessage(), e);
 		}
 	}
@@ -138,7 +134,7 @@ public class FieldDefinition
 
 		if(skipIfDefault)
 		{
-			Object defaultValue = Defaults.defaultValue(type);
+			Object defaultValue = Types.defaultValue(type);
 			if(Objects.equals(defaultValue, value))
 			{
 				// Write nothing as the default value and our value matches

@@ -2,6 +2,8 @@ package se.l4.commons.serialization.internal.reflection;
 
 import java.util.Map;
 
+import org.eclipse.collections.api.map.MapIterable;
+
 import se.l4.commons.serialization.QualifiedName;
 import se.l4.commons.serialization.ReflectionSerializer;
 import se.l4.commons.serialization.SerializerFormatDefinition;
@@ -17,7 +19,7 @@ public class TypeInfo<T>
 	private final Class<T> type;
 	private final QualifiedName name;
 	private final FieldDefinition[] fields;
-	private final Map<String, FieldDefinition> fieldMap;
+	private final MapIterable<String, FieldDefinition> fieldMap;
 	private final FactoryDefinition<T>[] factories;
 	private final SerializerFormatDefinition formatDefinition;
 
@@ -25,7 +27,7 @@ public class TypeInfo<T>
 		Class<T> type,
 		QualifiedName qualifiedName,
 		FactoryDefinition<T>[] factories,
-		Map<String, FieldDefinition> fieldMap,
+		MapIterable<String, FieldDefinition> fieldMap,
 		FieldDefinition[] fields
 	)
 	{

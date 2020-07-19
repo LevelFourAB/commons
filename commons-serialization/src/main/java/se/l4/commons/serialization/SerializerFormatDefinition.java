@@ -1,12 +1,14 @@
 package se.l4.commons.serialization;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.factory.Maps;
+import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.map.MutableMap;
 
 import se.l4.commons.serialization.format.ValueType;
 import se.l4.commons.serialization.internal.SerializerFormatDefinitionBuilderImpl;
@@ -41,13 +43,13 @@ public class SerializerFormatDefinition
 
 	public SerializerFormatDefinition(int type, ValueType valueType, Iterable<FieldDefinition> definitions)
 	{
-		ImmutableMap.Builder<String, FieldDefinition> builder = ImmutableMap.builder();
+		MutableMap<String, FieldDefinition> builder = Maps.mutable.empty();
 		for(FieldDefinition fd : definitions)
 		{
 			builder.put(fd.getName(), fd);
 		}
 
-		this.fields = builder.build();
+		this.fields = builder.toImmutable();
 
 		this.type = type;
 		this.valueType = valueType;
@@ -58,9 +60,9 @@ public class SerializerFormatDefinition
 		return fields.get(fieldName);
 	}
 
-	public Collection<FieldDefinition> getFields()
+	public RichIterable<FieldDefinition> getFields()
 	{
-		return fields.values();
+		return fields.valuesView();
 	}
 
 	public ValueType getValueType()

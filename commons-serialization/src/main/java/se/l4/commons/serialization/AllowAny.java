@@ -28,7 +28,7 @@ import se.l4.commons.serialization.standard.DynamicSerializer;
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD })
+@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE_USE })
 @Documented
 @Use(DynamicSerializer.class)
 public @interface AllowAny
