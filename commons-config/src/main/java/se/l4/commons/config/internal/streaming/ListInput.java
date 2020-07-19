@@ -2,9 +2,12 @@ package se.l4.commons.config.internal.streaming;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
 
+import org.eclipse.collections.api.IntIterable;
+import org.eclipse.collections.api.iterator.IntIterator;
+
+import se.l4.commons.config.sources.ConfigKeys;
+import se.l4.commons.config.sources.ConfigSource;
 import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.format.AbstractStreamingInput;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -27,21 +30,22 @@ public class ListInput
 		DONE
 	}
 
+	private final ConfigSource source;
+	private final IntIterator iterator;
+	private final String key;
+
 	private State state;
 	private State previousState;
 
-	private Iterator<Object> iterator;
-	private Object object;
-
 	private StreamingInput subInput;
-	private String key;
 
-	public ListInput(String key, List<Object> root)
+	public ListInput(ConfigSource source, String key, IntIterable indexes)
 	{
+		this.source = source;
 		this.key = key;
 		state = State.START;
 
-		iterator = root.iterator();
+		this.iterator = indexes.intIterator();
 	}
 
 	@Override
@@ -125,8 +129,8 @@ public class ListInput
 	{
 		if(iterator.hasNext())
 		{
-			object = iterator.next();
-			subInput = MapInput.resolveInput(key, object);
+			int idx = iterator.next();
+			subInput = MapInput.resolveInput(source, key + ConfigKeys.PATH_DELIMITER + idx);
 			setState(State.VALUE);
 		}
 		else

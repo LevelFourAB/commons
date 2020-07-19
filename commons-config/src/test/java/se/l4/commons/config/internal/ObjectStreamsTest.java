@@ -15,20 +15,35 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.collections.api.factory.Maps;
 import org.junit.Test;
 
 import se.l4.commons.config.internal.streaming.MapInput;
+import se.l4.commons.config.sources.ConfigSource;
+import se.l4.commons.config.sources.MapBasedConfigSource;
 import se.l4.commons.serialization.format.StreamingInput;
 import se.l4.commons.serialization.format.Token;
 
 /**
  * Tests for {@link MapInput}.
- *
- * @author Andreas Holstenson
- *
  */
 public class ObjectStreamsTest
 {
+	protected ConfigSource resolve(Map<String, Object> map)
+	{
+		return new MapBasedConfigSource(Maps.mutable.ofMap(map));
+	}
+
+	protected Map<String, Object> createMap()
+	{
+		return new LinkedHashMap<String, Object>();
+	}
+
+	protected StreamingInput createInput(ConfigSource source)
+	{
+		return MapInput.resolveInput(source, "");
+	}
+
 	@Test
 	public void testSingleString()
 		throws Exception
@@ -36,8 +51,10 @@ public class ObjectStreamsTest
 		Map<String, Object> data = createMap();
 		data.put("key", "value");
 
-		assertStream(createInput(data), OBJECT_START, KEY, VALUE, OBJECT_END);
-		assertStreamValues(createInput(data), "key", "value");
+		ConfigSource source = resolve(data);
+
+		assertStream(createInput(source), OBJECT_START, KEY, VALUE, OBJECT_END);
+		assertStreamValues(createInput(source), "key", "value");
 	}
 
 	@Test
@@ -47,48 +64,36 @@ public class ObjectStreamsTest
 		Map<String, Object> data = createMap();
 		data.put("key", 12.0);
 
-		assertStream(createInput(data), OBJECT_START, KEY, VALUE, OBJECT_END);
-		assertStreamValues(createInput(data), "key", 12.0);
+		ConfigSource source = resolve(data);
+
+		assertStream(createInput(source), OBJECT_START, KEY, VALUE, OBJECT_END);
+		assertStreamValues(createInput(source), "key", 12.0);
 	}
 
 	@Test
-	public void testMultipleValues()
+	public void testSubObject()
 		throws Exception
 	{
 		Map<String, Object> data = createMap();
-		data.put("key1", "value1");
-		data.put("key2", "value2");
+		data.put("key.sub", "value1");
 
-		assertStream(createInput(data), OBJECT_START, KEY, VALUE, KEY, VALUE, OBJECT_END);
-		assertStreamValues(createInput(data), "key1", "value1", "key2", "value2");
+		ConfigSource source = resolve(data);
+
+		assertStream(createInput(source), OBJECT_START, KEY, OBJECT_START, KEY, VALUE, OBJECT_END, OBJECT_END);
+		assertStreamValues(createInput(source), "key", "sub", "value1");
 	}
 
 	@Test
 	public void testList()
 		throws Exception
 	{
-		List<Object> data = new ArrayList<Object>();
-		data.add("value1");
-		data.add("value2");
-
-		assertStream(createInput(data), LIST_START, VALUE, VALUE, LIST_END);
-		assertStreamValues(createInput(data), "value1", "value2");
-	}
-
-	@Test
-	public void testListInMap()
-		throws Exception
-	{
-		List<Object> list = new ArrayList<Object>();
-		list.add("value1");
-		list.add("value2");
-
 		Map<String, Object> data = createMap();
-		data.put("key1", list);
+		data.put("sub.0", "value1");
 
+		ConfigSource source = resolve(data);
 
-		assertStream(createInput(data), OBJECT_START, KEY, LIST_START, VALUE, VALUE, LIST_END, OBJECT_END);
-		assertStreamValues(createInput(data), "key1", "value1", "value2");
+		assertStream(createInput(source), OBJECT_START, KEY, LIST_START, VALUE, LIST_END, OBJECT_END);
+		assertStreamValues(createInput(source), "sub", "value1");
 	}
 
 	/**
@@ -155,15 +160,5 @@ public class ObjectStreamsTest
 		{
 			fail("Did not read all values, expected " + values.length + " but only read " + i);
 		}
-	}
-
-	protected StreamingInput createInput(Object in)
-	{
-		return MapInput.resolveInput("", in);
-	}
-
-	protected Map<String, Object> createMap()
-	{
-		return new LinkedHashMap<String, Object>();
 	}
 }

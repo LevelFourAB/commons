@@ -3,9 +3,12 @@ package se.l4.commons.config.internal.streaming;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
+import org.eclipse.collections.api.IntIterable;
+import org.eclipse.collections.api.RichIterable;
+
+import se.l4.commons.config.sources.ConfigKeys;
+import se.l4.commons.config.sources.ConfigSource;
 import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.format.AbstractStreamingInput;
 import se.l4.commons.serialization.format.StreamingInput;
@@ -29,22 +32,25 @@ public class MapInput
 		DONE
 	}
 
+	private final String key;
+	private final ConfigSource source;
+	private final Iterator<String> iterator;
+
+	private String currentKey;
+
 	private State state;
 	private State previousState;
 	private Token token;
 
-	private Map.Entry<String, Object> entry;
-	private Iterator<Map.Entry<String, Object>> iterator;
-
 	private StreamingInput subInput;
-	private String key;
 
-	public MapInput(String key, Map<String, Object> root)
+	public MapInput(ConfigSource source, String key)
 	{
 		this.key = key;
 		state = State.START;
 
-		iterator = root.entrySet().iterator();
+		this.source = source;
+		this.iterator = source.getKeys(key).iterator();
 	}
 
 	@Override
@@ -54,31 +60,35 @@ public class MapInput
 		// Nothing to close
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static StreamingInput resolveInput(String key, Object data)
+	public static StreamingInput resolveInput(ConfigSource source, String key)
 	{
-		if(data instanceof Map)
+		RichIterable<String> keys = source.getKeys(key);
+		if(keys.size() > 0)
 		{
-			return new MapInput(key, (Map) data);
+			IntIterable indexes = ConfigKeys.toList(keys);
+			if(indexes.size() > 0)
+			{
+				return new ListInput(source, key, indexes);
+			}
+
+			return new MapInput(source, key);
 		}
-		else if(data instanceof List)
-		{
-			return new ListInput(key, (List) data);
-		}
-		else if(data == null)
+
+		Object value = source.getValue(key);
+		if(value == null)
 		{
 			return new NullInput(key);
 		}
 		else
 		{
-			return new ValueInput(key, data);
+			return new ValueInput(key, value);
 		}
 	}
 
 	private StreamingInput resolveInput()
 	{
-		String newKey = key.isEmpty() ? entry.getKey() : key + '.' + entry.getKey();
-		return resolveInput(newKey, entry.getValue());
+		String newKey = key.isEmpty() ? currentKey : key + ConfigKeys.PATH_DELIMITER + currentKey;
+		return resolveInput(source, newKey);
 	}
 
 	@Override
@@ -161,7 +171,7 @@ public class MapInput
 	{
 		if(iterator.hasNext())
 		{
-			entry = iterator.next();
+			currentKey = iterator.next();
 			setState(State.KEY);
 		}
 		else
@@ -183,7 +193,7 @@ public class MapInput
 		switch(previousState)
 		{
 			case KEY:
-				return entry.getKey();
+				return currentKey;
 			case VALUE:
 				return subInput.readDynamic();
 		}
@@ -198,7 +208,7 @@ public class MapInput
 		switch(previousState)
 		{
 			case KEY:
-				return entry.getKey();
+				return currentKey;
 			case VALUE:
 				return subInput.readString();
 			default:

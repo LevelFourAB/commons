@@ -1,21 +1,28 @@
 package se.l4.commons.config.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.ValidatorFactory;
 
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.factory.Maps;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MutableMap;
+
 import se.l4.commons.config.Config;
-import se.l4.commons.config.ConfigBuilder;
 import se.l4.commons.config.ConfigException;
-import se.l4.commons.io.Bytes;
+import se.l4.commons.config.Config.Builder;
+import se.l4.commons.config.sources.ConfigSource;
+import se.l4.commons.config.sources.EnvironmentConfigSource;
+import se.l4.commons.config.sources.FileConfigSource;
+import se.l4.commons.config.sources.MapBasedConfigSource;
+import se.l4.commons.config.sources.MergingConfigSource;
+import se.l4.commons.io.IOSupplier;
 import se.l4.commons.serialization.DefaultSerializers;
 import se.l4.commons.serialization.Serializers;
 
@@ -25,10 +32,11 @@ import se.l4.commons.serialization.Serializers;
  * @author Andreas Holstenson
  *
  */
-public class ConfigBuilderImpl implements ConfigBuilder
+public class ConfigBuilderImpl
+	implements Config.Builder
 {
-	private final Map<String, Object> keys;
-	private final List<Bytes> suppliers;
+	private final MutableMap<String, Object> keys;
+	private final List<IOSupplier<ConfigSource>> suppliers;
 
 	private Serializers collection;
 	private ValidatorFactory validatorFactory;
@@ -40,37 +48,37 @@ public class ConfigBuilderImpl implements ConfigBuilder
 		suppliers = new ArrayList<>();
 		collection = new DefaultSerializers();
 
-		keys = new HashMap<String, Object>();
+		keys = Maps.mutable.empty();
 	}
 
 	@Override
-	public ConfigBuilder withSerializers(Serializers serializers)
+	public Config.Builder withSerializers(Serializers serializers)
 	{
 		this.collection = serializers;
 		return this;
 	}
 
 	@Override
-	public ConfigBuilder withValidatorFactory(ValidatorFactory validation)
+	public Config.Builder withValidatorFactory(ValidatorFactory validation)
 	{
 		this.validatorFactory = validation;
 		return this;
 	}
 
 	@Override
-	public ConfigBuilder withRoot(String root)
+	public Config.Builder withRoot(String root)
 	{
 		return withRoot(new File(root));
 	}
 
 	@Override
-	public ConfigBuilder withRoot(Path path)
+	public Config.Builder withRoot(Path path)
 	{
 		return withRoot(path.toFile());
 	}
 
 	@Override
-	public ConfigBuilder withRoot(File root)
+	public Config.Builder withRoot(File root)
 	{
 		this.root = root;
 
@@ -78,26 +86,26 @@ public class ConfigBuilderImpl implements ConfigBuilder
 	}
 
 	@Override
-	public ConfigBuilder addFile(String path)
+	public Config.Builder addFile(String path)
 	{
 		return addFile(new File(path));
 	}
 
 	@Override
-	public ConfigBuilder addFile(Path path)
+	public Config.Builder addFile(Path path)
 	{
 		return addFile(path.toFile());
 	}
 
 	@Override
-	public ConfigBuilder addFile(File file)
+	public Config.Builder addFile(File file)
 	{
 		if(root == null)
 		{
 			root = file.getParentFile();
 		}
 
-		suppliers.add(Bytes.create(() -> {
+		suppliers.add(() -> {
 			if(! file.exists())
 			{
 				throw new ConfigException("The file " + file + " does not exist");
@@ -111,21 +119,28 @@ public class ConfigBuilderImpl implements ConfigBuilder
 				throw new ConfigException("Can not read " + file + ", check permissions");
 			}
 
-			return new FileInputStream(file);
-		}));
+			return FileConfigSource.read(file);
+		});
 
 		return this;
 	}
 
 	@Override
-	public ConfigBuilder addStream(final InputStream stream)
+	public Config.Builder addStream(InputStream stream)
 	{
-		suppliers.add(Bytes.create(() -> stream));
+		suppliers.add(() -> FileConfigSource.read(stream));
 		return this;
 	}
 
 	@Override
-	public ConfigBuilder with(String key, Object value)
+	public Builder addSource(ConfigSource source)
+	{
+		suppliers.add(() -> source);
+		return this;
+	}
+
+	@Override
+	public Config.Builder with(String key, Object value)
 	{
 		this.keys.put(key, value);
 		return this;
@@ -134,15 +149,14 @@ public class ConfigBuilderImpl implements ConfigBuilder
 	@Override
 	public Config build()
 	{
-		Map<String, Object> data = new HashMap<>();
-		ConfigResolver.resolveTo(this.keys, data);
+		MutableList<ConfigSource> sources = Lists.mutable.empty();
+		sources.add(new MapBasedConfigSource(keys.toImmutable()));
 
-		for(Bytes bytes : suppliers)
+		for(IOSupplier<ConfigSource> supplier : suppliers)
 		{
-			try(InputStream in = bytes.asInputStream())
+			try
 			{
-				Map<String, Object> readConfig = RawFormatReader.read(in);
-				ConfigResolver.resolveTo(readConfig, data);
+				sources.add(supplier.get());
 			}
 			catch(IOException e)
 			{
@@ -150,6 +164,9 @@ public class ConfigBuilderImpl implements ConfigBuilder
 			}
 		}
 
-		return new DefaultConfig(collection, validatorFactory, root, data);
+		sources.add(new EnvironmentConfigSource());
+
+		ConfigSource source = new MergingConfigSource(sources.toReversed());
+		return new DefaultConfig(collection, validatorFactory, source, root);
 	}
 }
