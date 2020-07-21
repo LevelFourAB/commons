@@ -62,17 +62,17 @@ public class ReflectionStreamingSerializer<T>
 	}
 
 	@Override
-	public void write(T object, String name, StreamingOutput stream)
+	public void write(T object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.writeObjectStart(name);
+		stream.writeObjectStart();
 
 		for(FieldDefinition def : type.getAllFields())
 		{
 			def.write(object, stream);
 		}
 
-		stream.writeObjectEnd(name);
+		stream.writeObjectEnd();
 	}
 
 	@Override

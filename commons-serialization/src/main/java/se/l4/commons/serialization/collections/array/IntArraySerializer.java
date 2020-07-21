@@ -42,15 +42,15 @@ public class IntArraySerializer
 	}
 
 	@Override
-	public void write(int[] object, String name, StreamingOutput out)
+	public void write(int[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(int v : object)
 		{
-			out.write("item", v);
+			out.writeInt(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

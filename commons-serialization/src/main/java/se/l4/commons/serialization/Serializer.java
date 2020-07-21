@@ -44,14 +44,12 @@ public interface Serializer<T>
 	 *   object to write, if the serializer implements {@link NullHandling}
 	 *   this may be {@code null}, if not the serializer can assume it is not
 	 *   {@code null}
-	 * @param name
-	 * 	 the name the object should have, should be passed along to the output
 	 * @param out
 	 * 	 the stream to use for writing
 	 * @throws IOException
 	 *   if unable to write the object
 	 */
-	void write(@UnknownNullness T object, @NonNull String name, @NonNull StreamingOutput out)
+	void write(@UnknownNullness T object, @NonNull StreamingOutput out)
 		throws IOException;
 
 	/**
@@ -115,11 +113,11 @@ public interface Serializer<T>
 				{
 					if(item == null && ! (this instanceof NullHandling))
 					{
-						streamingOut.writeNull("root");
+						streamingOut.writeNull();
 					}
 					else
 					{
-						Serializer.this.write(item, "root", streamingOut);
+						Serializer.this.write(item, streamingOut);
 					}
 				}
 			}

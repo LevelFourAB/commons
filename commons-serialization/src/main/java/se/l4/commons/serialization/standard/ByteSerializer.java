@@ -42,10 +42,10 @@ public class ByteSerializer
 	}
 
 	@Override
-	public void write(Byte object, String name, StreamingOutput stream)
+	public void write(Byte object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeByte(object);
 	}
 
 	@Override

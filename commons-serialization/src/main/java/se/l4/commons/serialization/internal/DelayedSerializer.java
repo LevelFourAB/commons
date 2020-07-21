@@ -49,12 +49,12 @@ public class DelayedSerializer<T>
 
 
 			@Override
-			public void write(T object, String name, StreamingOutput stream)
+			public void write(T object, StreamingOutput stream)
 				throws IOException
 			{
 				ensureSerializer();
 
-				instance.write(object, name, stream);
+				instance.write(object, stream);
 			}
 
 			@Override
@@ -77,10 +77,10 @@ public class DelayedSerializer<T>
 
 
 	@Override
-	public void write(T object, String name, StreamingOutput stream)
+	public void write(T object, StreamingOutput stream)
 		throws IOException
 	{
-		instance.write(object, name, stream);
+		instance.write(object, stream);
 	}
 
 	@Override

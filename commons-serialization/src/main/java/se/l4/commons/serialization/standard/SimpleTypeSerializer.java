@@ -27,36 +27,36 @@ public class SimpleTypeSerializer
 	}
 
 	@Override
-	public void write(Object object, String name, StreamingOutput stream)
+	public void write(Object object, StreamingOutput stream)
 		throws IOException
 	{
 		if(object instanceof Byte)
 		{
-			stream.write(name, ((Byte) object).intValue());
+			stream.writeInt(((Byte) object).intValue());
 		}
 		else if(object instanceof Integer)
 		{
-			stream.write(name, (Integer) object);
+			stream.writeInt((Integer) object);
 		}
 		else if(object instanceof Long)
 		{
-			stream.write(name, (Long) object);
+			stream.writeLong((Long) object);
 		}
 		else if(object instanceof Float)
 		{
-			stream.write(name, (Float) object);
+			stream.writeFloat((Float) object);
 		}
 		else if(object instanceof Double)
 		{
-			stream.write(name, (Double) object);
+			stream.writeDouble((Double) object);
 		}
 		else if(object instanceof Boolean)
 		{
-			stream.write(name, (Boolean) object);
+			stream.writeBoolean((Boolean) object);
 		}
 		else if(object instanceof String)
 		{
-			stream.write(name, (String) object);
+			stream.writeString((String) object);
 		}
 		else
 		{

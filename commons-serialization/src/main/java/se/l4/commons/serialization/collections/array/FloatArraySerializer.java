@@ -42,15 +42,15 @@ public class FloatArraySerializer
 	}
 
 	@Override
-	public void write(float[] object, String name, StreamingOutput out)
+	public void write(float[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(float v : object)
 		{
-			out.write("item", v);
+			out.writeFloat(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

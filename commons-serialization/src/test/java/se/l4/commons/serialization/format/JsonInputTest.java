@@ -460,8 +460,8 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeObjectEnd();
 
 		assertStream(out, "{}");
 	}
@@ -471,8 +471,8 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("list");
-		out.writeListEnd("list");
+		out.writeListStart();
+		out.writeListEnd();
 
 		assertStream(out, "[]");
 	}
@@ -482,7 +482,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("key", "value");
+		out.writeString("value");
 
 		assertStream(out, "\"value\"");
 	}
@@ -492,7 +492,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("key", 12);
+		out.writeInt(12);
 
 		assertStream(out, "12");
 	}
@@ -502,7 +502,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("key", 12l);
+		out.writeLong(12l);
 
 		assertStream(out, "12");
 	}
@@ -512,7 +512,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("key", 12.0f);
+		out.writeFloat(12.0f);
 
 		assertStream(out, "12.0");
 	}
@@ -522,7 +522,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("key", 12.2);
+		out.writeDouble(12.2);
 
 		assertStream(out, "12.2");
 	}
@@ -532,7 +532,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("key", (short) 12);
+		out.writeInt((short) 12);
 
 		assertStream(out, "12");
 	}
@@ -542,9 +542,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.write("key", "value");
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeString("value");
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":\"value\"}");
 	}
@@ -554,9 +555,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.write("key", 12);
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeInt(12);
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":12}");
 	}
@@ -566,9 +568,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.write("key", 12l);
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeLong(12l);
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":12}");
 	}
@@ -578,9 +581,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.write("key", (short) 12);
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeInt((short) 12);
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":12}");
 	}
@@ -590,9 +594,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.write("key", 3.14f);
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeFloat(3.14f);
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":3.14}");
 	}
@@ -602,9 +607,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.write("key", 3.14);
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeDouble(3.14);
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":3.14}");
 	}
@@ -614,10 +620,11 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.writeObjectStart("key");
-		out.writeObjectEnd("key");
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeObjectStart();
+		out.writeObjectEnd();
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":{}}");
 	}
@@ -627,12 +634,28 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeObjectStart("object");
-		out.writeListStart("key");
-		out.writeListEnd("key");
-		out.writeObjectEnd("object");
+		out.writeObjectStart();
+		out.writeString("key");
+		out.writeListStart();
+		out.writeListEnd();
+		out.writeObjectEnd();
 
 		assertStream(out, "{\"key\":[]}");
+	}
+
+	@Test
+	public void testObjectMultipleKeys()
+		throws IOException
+	{
+		StreamingOutput out = createOutput();
+		out.writeObjectStart();
+		out.writeString("key1");
+		out.writeString("value1");
+		out.writeString("key2");
+		out.writeLong(12l);
+		out.writeObjectEnd();
+
+		assertStream(out, "{\"key1\":\"value1\",\"key2\":12}");
 	}
 
 	@Test
@@ -640,9 +663,9 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", "value");
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeString("value");
+		out.writeListEnd();
 
 		assertStream(out, "[\"value\"]");
 	}
@@ -652,9 +675,9 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", 12);
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeInt(12);
+		out.writeListEnd();
 
 		assertStream(out, "[12]");
 	}
@@ -664,9 +687,9 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", 12l);
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeLong(12l);
+		out.writeListEnd();
 
 		assertStream(out, "[12]");
 	}
@@ -676,9 +699,9 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", (short) 12);
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeShort((short) 12);
+		out.writeListEnd();
 
 		assertStream(out, "[12]");
 	}
@@ -688,9 +711,9 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", 3.14f);
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeFloat(3.14f);
+		out.writeListEnd();
 
 		assertStream(out, "[3.14]");
 	}
@@ -700,9 +723,9 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", 3.14);
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeDouble(3.14);
+		out.writeListEnd();
 
 		assertStream(out, "[3.14]");
 	}
@@ -712,10 +735,10 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.writeListStart("object");
-		out.write("entry", 12);
-		out.write("entry", "value");
-		out.writeListEnd("object");
+		out.writeListStart();
+		out.writeInt(12);
+		out.writeString("value");
+		out.writeListEnd();
 
 		assertStream(out, "[12,\"value\"]");
 	}
@@ -725,7 +748,7 @@ public class JsonInputTest
 		throws IOException
 	{
 		StreamingOutput out = createOutput();
-		out.write("", "kaka".getBytes(StandardCharsets.UTF_8));
+		out.writeBytes("kaka".getBytes(StandardCharsets.UTF_8));
 
 		assertStream(out, "\"a2FrYQ==\"");
 	}

@@ -68,23 +68,16 @@ public class ArraySerializer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void write(Object object, String name, StreamingOutput stream)
+	public void write(Object object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.writeListStart(name);
+		stream.writeListStart();
 		for(int i=0, n=Array.getLength(object); i<n; i++)
 		{
 			Object value = Array.get(object, i);
-			if(value == null)
-			{
-				stream.writeNull("item");
-			}
-			else
-			{
-				itemSerializer.write(value, "item", stream);
-			}
+			stream.writeObject(itemSerializer, value);
 		}
-		stream.writeListEnd(name);
+		stream.writeListEnd();
 	}
 
 	@Override

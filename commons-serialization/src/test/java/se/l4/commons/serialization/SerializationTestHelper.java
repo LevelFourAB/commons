@@ -36,7 +36,7 @@ public class SerializationTestHelper
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try(StreamingOutput so = outputFactory.apply(out))
 		{
-			serializer.write(object, "", so);
+			serializer.write(object, so);
 		}
 		catch(IOException e)
 		{

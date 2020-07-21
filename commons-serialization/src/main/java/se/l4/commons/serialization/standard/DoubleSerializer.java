@@ -42,10 +42,10 @@ public class DoubleSerializer
 	}
 
 	@Override
-	public void write(Double object, String name, StreamingOutput stream)
+	public void write(Double object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeDouble(object);
 	}
 
 	@Override

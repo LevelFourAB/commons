@@ -42,10 +42,10 @@ public class FloatSerializer
 	}
 
 	@Override
-	public void write(Float object, String name, StreamingOutput stream)
+	public void write(Float object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeFloat(object);
 	}
 
 	@Override

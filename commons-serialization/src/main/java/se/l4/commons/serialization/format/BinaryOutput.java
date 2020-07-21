@@ -38,7 +38,7 @@ public class BinaryOutput
 	private final OutputStream out;
 
 	private boolean[] lists;
-	private boolean[] hasData;
+	private boolean nextKey;
 
 	private int level;
 
@@ -47,7 +47,6 @@ public class BinaryOutput
 		this.out = out;
 
 		lists = new boolean[LEVELS];
-		hasData = new boolean[LEVELS];
 	}
 
 	@Override
@@ -66,15 +65,14 @@ public class BinaryOutput
 	private void increaseLevel(boolean list)
 	{
 		level++;
-		if(hasData.length == level)
+		if(lists.length == level)
 		{
 			// Grow lists when needed
-			hasData = Arrays.copyOf(hasData, hasData.length * 2);
-			lists = Arrays.copyOf(lists, hasData.length * 2);
+			lists = Arrays.copyOf(lists, lists.length * 2);
 		}
 
-		hasData[level] = false;
 		lists[level] = list;
+		nextKey = ! list;
 	}
 
 	/**
@@ -86,44 +84,152 @@ public class BinaryOutput
 		throws IOException
 	{
 		level--;
+		nextKey = ! lists[level];
 	}
 
 	/**
-	 * Start a write, will output commas and beautification if needed.
-	 *
-	 * @throws IOException
+	 * Helper to check if this write is a key and if so fail it as this output
+	 * only supports string keys.
 	 */
-	private void startWrite()
+	private void failKey()
 		throws IOException
 	{
-//		if(hasData[level]) writer.write(',');
+		if(nextKey)
+		{
+			throw new IOException("Trying to write a key that is not a string");
+		}
 
-		hasData[level] = true;
+		// If we are reading an object make sure there is a key
+		nextKey = ! lists[level];
 	}
 
-	/**
-	 * Check if the name should be written or not.
-	 *
-	 * @return
-	 */
-	private boolean shouldOutputName()
-	{
-		return level != 0 && ! lists[level];
-	}
-
-	/**
-	 * Write the name if needed.
-	 *
-	 * @param name
-	 * @throws IOException
-	 */
-	private void writeName(String name)
+	@Override
+	public void writeObjectStart()
 		throws IOException
 	{
-		if(shouldOutputName())
+		failKey();
+
+		out.write(TAG_OBJECT_START);
+
+		increaseLevel(false);
+	}
+
+	@Override
+	public void writeObjectEnd()
+		throws IOException
+	{
+		if(! nextKey)
+		{
+			throw new IOException("Trying to end an object without writing a key");
+		}
+
+		decreaseLevel();
+
+		out.write(TAG_OBJECT_END);
+	}
+
+	@Override
+	public void writeListStart()
+		throws IOException
+	{
+		failKey();
+
+		out.write(TAG_LIST_START);
+
+		increaseLevel(true);
+	}
+
+	@Override
+	public void writeListEnd()
+		throws IOException
+	{
+		failKey();
+
+		decreaseLevel();
+		out.write(TAG_LIST_END);
+	}
+
+	@Override
+	public void writeString(String value)
+		throws IOException
+	{
+		if(nextKey)
 		{
 			out.write(TAG_KEY);
-			writeStringNoTag(name);
+
+			nextKey = false;
+		}
+		else
+		{
+			out.write(TAG_STRING);
+
+			nextKey = ! lists[level];
+		}
+
+		writeIntegerNoTag(value.length());
+		for(int i=0, n=value.length(); i<n; i++)
+		{
+			char c = value.charAt(i);
+			if(c <= 0x007f)
+			{
+				out.write((byte) c);
+			}
+			else if(c > 0x07ff)
+			{
+				out.write((byte) (0xe0 | c >> 12 & 0x0f));
+				out.write((byte) (0x80 | c >> 6 & 0x3f));
+				out.write((byte) (0x80 | c >> 0 & 0x3f));
+			}
+			else
+			{
+				out.write((byte) (0xc0 | c >> 6 & 0x1f));
+				out.write((byte) (0x80 | c >> 0 & 0x3f));
+			}
+		}
+	}
+
+	@Override
+	public void writeByte(byte b)
+		throws IOException
+	{
+		writeInt((int) b);
+	}
+
+	@Override
+	public void writeChar(char c)
+		throws IOException
+	{
+		writeInt((int) c);
+	}
+
+	@Override
+	public void writeShort(short s)
+		throws IOException
+	{
+		writeInt((int) s);
+	}
+
+	/**
+	 * Write an integer to the output stream.
+	 *
+	 * @param value
+	 * @throws IOException
+	 */
+	@Override
+	public void writeInt(int value)
+		throws IOException
+	{
+		failKey();
+
+		if(value < 0)
+		{
+			out.write(TAG_NEGATIVE_INT);
+			writeIntegerNoTag(-value);
+		}
+		else
+		{
+			out.write(TAG_POSITIVE_INT);
+			writeIntegerNoTag(value);
 		}
 	}
 
@@ -152,25 +258,29 @@ public class BinaryOutput
 	}
 
 	/**
-	 * Write an integer to the output stream.
+	 * Write a long to the output stream.
 	 *
 	 * @param value
 	 * @throws IOException
 	 */
-	private void writeInteger(int value)
+	@Override
+	public void writeLong(long value)
 		throws IOException
 	{
+		failKey();
+
 		if(value < 0)
 		{
-			out.write(TAG_NEGATIVE_INT);
-			writeIntegerNoTag(-value);
+			out.write(TAG_NEGATIVE_LONG);
+			writeLongNoTag(- value);
 		}
 		else
 		{
-			out.write(TAG_POSITIVE_INT);
-			writeIntegerNoTag(value);
+			out.write(TAG_POSITIVE_LONG);
+			writeLongNoTag(value);
 		}
 	}
+
 
 	/**
 	 * Write a long to the output stream.
@@ -196,74 +306,21 @@ public class BinaryOutput
 		}
 	}
 
-	/**
-	 * Write a long to the output stream.
-	 *
-	 * @param value
-	 * @throws IOException
-	 */
-	private void writeLong(long value)
+	@Override
+	public void writeNull()
 		throws IOException
 	{
-		if(value < 0)
-		{
-			out.write(TAG_NEGATIVE_LONG);
-			writeLongNoTag(- value);
-		}
-		else
-		{
-			out.write(TAG_POSITIVE_LONG);
-			writeLongNoTag(value);
-		}
-	}
+		failKey();
 
-	/**
-	 * Write a string to the output without tagging that its actually a string.
-	 *
-	 * @param value
-	 * @throws IOException
-	 */
-	private void writeStringNoTag(String value)
-		throws IOException
-	{
-		writeIntegerNoTag(value.length());
-		for(int i=0, n=value.length(); i<n; i++)
-		{
-			char c = value.charAt(i);
-			if(c <= 0x007f)
-			{
-				out.write((byte) c);
-			}
-			else if(c > 0x07ff)
-			{
-				out.write((byte) (0xe0 | c >> 12 & 0x0f));
-				out.write((byte) (0x80 | c >> 6 & 0x3f));
-				out.write((byte) (0x80 | c >> 0 & 0x3f));
-			}
-			else
-			{
-				out.write((byte) (0xc0 | c >> 6 & 0x1f));
-				out.write((byte) (0x80 | c >> 0 & 0x3f));
-			}
-		}
-	}
-
-	private void writeString(String value)
-		throws IOException
-	{
-		out.write(TAG_STRING);
-		writeStringNoTag(value);
-	}
-
-	private void writeNull()
-		throws IOException
-	{
 		out.write(TAG_NULL);
 	}
 
-	private void writeFloat(float value)
+	@Override
+	public void writeFloat(float value)
 		throws IOException
 	{
+		failKey();
+
 		out.write(TAG_FLOAT);
 
 		int i = Float.floatToRawIntBits(value);
@@ -273,9 +330,12 @@ public class BinaryOutput
 		out.write((i >> 24) & 0xff);
 	}
 
-	private void writeDouble(double value)
+	@Override
+	public void writeDouble(double value)
 		throws IOException
 	{
+		failKey();
+
 		out.write(TAG_DOUBLE);
 
 		long l = Double.doubleToRawLongBits(value);
@@ -289,149 +349,28 @@ public class BinaryOutput
 		out.write((int) (l >> 56) & 0xff);
 	}
 
-	private void writeBoolean(boolean b)
+	@Override
+	public void writeBoolean(boolean b)
 		throws IOException
 	{
+		failKey();
+
 		out.write(TAG_BOOLEAN);
 
 		out.write(b ? 1 : 0);
 	}
 
-	private void writeByteArray(byte[] data)
+	@Override
+	public void writeBytes(byte[] data)
 		throws IOException
 	{
+		failKey();
+
 		out.write(TAG_BYTE_ARRAY);
 
 		writeIntegerNoTag(data.length);
 
 		out.write(data);
-	}
-
-	@Override
-	public void writeObjectStart(String name)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		out.write(TAG_OBJECT_START);
-
-		increaseLevel(false);
-	}
-
-	@Override
-	public void writeObjectEnd(String name)
-		throws IOException
-	{
-		decreaseLevel();
-
-		out.write(TAG_OBJECT_END);
-	}
-
-	@Override
-	public void writeListStart(String name)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		out.write(TAG_LIST_START);
-
-		increaseLevel(true);
-	}
-
-	@Override
-	public void writeListEnd(String name)
-		throws IOException
-	{
-		decreaseLevel();
-		out.write(TAG_LIST_END);
-	}
-
-	@Override
-	public void write(String name, String value)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-
-		if(value == null)
-		{
-			writeNull();
-		}
-		else
-		{
-			writeString(value);
-		}
-	}
-
-	@Override
-	public void write(String name, int number)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		writeInteger(number);
-	}
-
-	@Override
-	public void write(String name, long number)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		writeLong(number);
-	}
-
-	@Override
-	public void write(String name, float number)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		writeFloat(number);
-	}
-
-	@Override
-	public void write(String name, double number)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		writeDouble(number);
-	}
-
-	@Override
-	public void write(String name, boolean bool)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		writeBoolean(bool);
-	}
-
-	@Override
-	public void write(String name, byte[] data)
-		throws IOException
-	{
-		startWrite();
-
-		writeName(name);
-		writeByteArray(data);
-	}
-
-	@Override
-	public void writeNull(String name)
-		throws IOException
-	{
-		writeName(name);
-		writeNull();
 	}
 
 	@Override

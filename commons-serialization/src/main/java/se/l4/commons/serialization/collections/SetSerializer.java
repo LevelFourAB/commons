@@ -62,24 +62,17 @@ public class SetSerializer<T>
 	}
 
 	@Override
-	public void write(Set<T> object, String name, StreamingOutput stream)
+	public void write(Set<T> object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.writeListStart(name);
+		stream.writeListStart();
 
 		for(T value : object)
 		{
-			if(value == null)
-			{
-				stream.writeNull("item");
-			}
-			else
-			{
-				itemSerializer.write(value, "item", stream);
-			}
+			stream.writeObject(itemSerializer, value);
 		}
 
-		stream.writeListEnd(name);
+		stream.writeListEnd();
 	}
 
 	@Override

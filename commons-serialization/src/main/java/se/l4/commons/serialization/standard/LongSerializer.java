@@ -42,10 +42,10 @@ public class LongSerializer
 	}
 
 	@Override
-	public void write(Long object, String name, StreamingOutput stream)
+	public void write(Long object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeLong(object);
 	}
 
 	@Override

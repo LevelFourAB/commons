@@ -85,7 +85,7 @@ public class CompactDynamicSerializer
 
 		@Override
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public void write(Object object, String name, StreamingOutput stream)
+		public void write(Object object, StreamingOutput stream)
 			throws IOException
 		{
 			Serializer<?> serializer = collection.find(object.getClass());
@@ -93,22 +93,22 @@ public class CompactDynamicSerializer
 			QualifiedName qname = serializer.getName()
 				.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
 
-			stream.writeListStart(name);
+			stream.writeListStart();
 
 			if(! qname.getNamespace().equals(""))
 			{
-				stream.write("namespace", qname.getNamespace());
+				stream.writeString(qname.getNamespace());
 			}
 			else
 			{
-				stream.writeNull("namespace");
+				stream.writeNull();
 			}
 
-			stream.write("name", qname.getName());
+			stream.writeString(qname.getName());
 
-			((Serializer) serializer).write(object, "value", stream);
+			stream.writeObject((Serializer) serializer, object);
 
-			stream.writeListEnd(name);
+			stream.writeListEnd();
 		}
 
 		@Override

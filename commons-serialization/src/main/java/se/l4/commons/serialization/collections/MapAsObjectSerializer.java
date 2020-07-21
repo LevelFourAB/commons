@@ -61,25 +61,20 @@ public class MapAsObjectSerializer<V>
 	}
 
 	@Override
-	public void write(Map<String, V> object, String name, StreamingOutput stream)
+	public void write(Map<String, V> object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.writeObjectStart(name);
+		stream.writeObjectStart();
 
 		for(Entry<String, V> e : object.entrySet())
 		{
 			V value = e.getValue();
-			if(value == null)
-			{
-				stream.writeNull(e.getKey());
-			}
-			else
-			{
-				serializer.write(value, e.getKey(), stream);
-			}
+
+			stream.writeString(e.getKey());
+			stream.writeObject(serializer, value);
 		}
 
-		stream.writeObjectEnd(name);
+		stream.writeObjectEnd();
 	}
 
 	@Override

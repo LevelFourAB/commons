@@ -42,15 +42,15 @@ public class ShortArraySerializer
 	}
 
 	@Override
-	public void write(short[] object, String name, StreamingOutput out)
+	public void write(short[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(short v : object)
 		{
-			out.write("item", v);
+			out.writeInt(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

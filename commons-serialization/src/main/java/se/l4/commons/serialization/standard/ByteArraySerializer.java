@@ -43,10 +43,10 @@ public class ByteArraySerializer
 	}
 
 	@Override
-	public void write(byte[] object, String name, StreamingOutput stream)
+	public void write(byte[] object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeBytes(object);
 	}
 
 	@Override

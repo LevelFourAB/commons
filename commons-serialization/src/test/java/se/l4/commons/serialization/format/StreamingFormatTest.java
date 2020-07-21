@@ -39,7 +39,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.writeNull("");
+			out.writeNull();
 		});
 
 		try(StreamingInput in = in0.get())
@@ -54,7 +54,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", 12);
+			out.writeInt(12);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -70,7 +70,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", -2829);
+			out.writeInt(-2829);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -86,7 +86,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", 1029l);
+			out.writeLong(1029l);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -102,7 +102,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", -1029l);
+			out.writeLong(-1029l);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -118,7 +118,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", 1324475548554l);
+			out.writeLong(1324475548554l);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -134,7 +134,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", false);
+			out.writeBoolean(false);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -150,7 +150,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", true);
+			out.writeBoolean(true);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -166,7 +166,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", 3.14f);
+			out.writeFloat(3.14f);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -182,7 +182,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", 89765.0);
+			out.writeDouble(89765.0);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -198,7 +198,7 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", "string value");
+			out.writeString("string value");
 		});
 
 		try(StreamingInput in = in0.get())
@@ -215,7 +215,7 @@ public abstract class StreamingFormatTest
 	{
 		byte[] data = new byte[] { 0, -28, 42, 100 };
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.write("", data);
+			out.writeBytes(data);
 		});
 
 		try(StreamingInput in = in0.get())
@@ -231,8 +231,8 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.writeObjectStart("");
-			out.writeObjectEnd("");
+			out.writeObjectStart();
+			out.writeObjectEnd();
 		});
 
 		try(StreamingInput in = in0.get())
@@ -248,10 +248,12 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.writeObjectStart("");
-			out.write("key1", "value1");
-			out.write("key2", 12l);
-			out.writeObjectEnd("");
+			out.writeObjectStart();
+			out.writeString("key1");
+			out.writeString("value1");
+			out.writeString("key2");
+			out.writeLong(12l);
+			out.writeObjectEnd();
 		});
 
 		try(StreamingInput in = in0.get())
@@ -275,10 +277,12 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.writeObjectStart("");
-			out.writeNull("key1");
-			out.write("key2", 12);
-			out.writeObjectEnd("");
+			out.writeObjectStart();
+			out.writeString("key1");
+			out.writeNull();
+			out.writeString("key2");
+			out.writeInt(12);
+			out.writeObjectEnd();
 		});
 
 		try(StreamingInput in = in0.get())
@@ -302,8 +306,8 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.writeListStart("");
-			out.writeListEnd("");
+			out.writeListStart();
+			out.writeListEnd();
 		});
 
 		try(StreamingInput in = in0.get())
@@ -319,10 +323,10 @@ public abstract class StreamingFormatTest
 		throws IOException
 	{
 		IOSupplier<StreamingInput> in0 = write(out -> {
-			out.writeListStart("");
-			out.write("entry", "value");
-			out.write("entry", 74749);
-			out.writeListEnd("");
+			out.writeListStart();
+			out.writeString("value");
+			out.writeInt(74749);
+			out.writeListEnd();
 		});
 
 		try(StreamingInput in = in0.get())

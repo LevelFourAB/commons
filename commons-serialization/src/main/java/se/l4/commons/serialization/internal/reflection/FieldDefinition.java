@@ -142,20 +142,22 @@ public class FieldDefinition
 			}
 		}
 
+		stream.writeString(name);
+
 		if(value == null)
 		{
 			if(nullHandling)
 			{
-				serializer.write(null, name, stream);
+				serializer.write(null, stream);
 			}
 			else
 			{
-				stream.writeNull(name);
+				stream.writeNull();
 			}
 		}
 		else
 		{
-			serializer.write(value, name, stream);
+			serializer.write(value, stream);
 		}
 	}
 

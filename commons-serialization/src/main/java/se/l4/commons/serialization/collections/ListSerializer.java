@@ -62,42 +62,29 @@ public class ListSerializer<T>
 	}
 
 	@Override
-	public void write(List<T> object, String name, StreamingOutput stream)
+	public void write(List<T> object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.writeListStart(name);
+		stream.writeListStart();
 
 		if(object instanceof RandomAccess)
 		{
 			for(int i=0, n=object.size(); i<n; i++)
 			{
 				T value = object.get(i);
-				if(value == null)
-				{
-					stream.writeNull("item");
-				}
-				else
-				{
-					itemSerializer.write(value, "item", stream);
-				}
+				stream.writeObject(itemSerializer, value);
 			}
 		}
 		else
 		{
 			for(T value : object)
 			{
-				if(value == null)
-				{
-					stream.writeNull("item");
-				}
-				else
-				{
-					itemSerializer.write(value, "item", stream);
-				}
+				stream.writeObject(itemSerializer, value);
 			}
 		}
 
-		stream.writeListEnd(name);
+		System.out.println("Write end");
+		stream.writeListEnd();
 	}
 
 	@Override

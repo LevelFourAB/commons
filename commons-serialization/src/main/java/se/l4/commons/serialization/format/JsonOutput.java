@@ -40,6 +40,7 @@ public class JsonOutput
 	private boolean[] hasData;
 
 	private int level;
+	private boolean nextKey;
 
 	private final char[] encoded;
 
@@ -185,6 +186,8 @@ public class JsonOutput
 
 		hasData[level] = false;
 		lists[level] = list;
+
+		nextKey = ! list;
 	}
 
 	/**
@@ -196,6 +199,7 @@ public class JsonOutput
 		throws IOException
 	{
 		level--;
+		nextKey = ! lists[level];
 
 		if(beautify && hasData[level])
 		{
@@ -209,6 +213,22 @@ public class JsonOutput
 	}
 
 	/**
+	 * Helper to check if this write is a key and if so fail it as this output
+	 * only supports string keys.
+	 */
+	private void failKey()
+		throws IOException
+	{
+		if(nextKey)
+		{
+			throw new IOException("Trying to write a key that is not a string");
+		}
+
+		// If we are reading an object make sure there is a key
+		nextKey = ! lists[level];
+	}
+
+	/**
 	 * Start a write, will output commas and beautification if needed.
 	 *
 	 * @throws IOException
@@ -216,6 +236,11 @@ public class JsonOutput
 	private void startWrite()
 		throws IOException
 	{
+		if(! lists[level] && ! nextKey)
+		{
+			return;
+		}
+
 		if(hasData[level]) writer.write(',');
 
 		hasData[level] = true;
@@ -231,30 +256,12 @@ public class JsonOutput
 		}
 	}
 
-	/**
-	 * Check if the name should be written or not.
-	 *
-	 * @return
-	 */
-	private boolean shouldOutputName()
-	{
-		return level != 0 && ! lists[level];
-	}
-
 	@Override
-	public void writeObjectStart(String name)
+	public void writeObjectStart()
 		throws IOException
 	{
 		startWrite();
-
-		if(shouldOutputName())
-		{
-			writer.write('"');
-			writeEscaped(name);
-//			writer.write("\": {");
-			writer.write('"');
-			writer.write(':');
-		}
+		failKey();
 
 		writer.write('{');
 
@@ -262,28 +269,24 @@ public class JsonOutput
 	}
 
 	@Override
-	public void writeObjectEnd(String name)
+	public void writeObjectEnd()
 		throws IOException
 	{
-		decreaseLevel();
+		if(! nextKey)
+		{
+			throw new IOException("Trying to end an object without writing a key");
+		}
 
+		decreaseLevel();
 		writer.write('}');
 	}
 
 	@Override
-	public void writeListStart(String name)
+	public void writeListStart()
 		throws IOException
 	{
 		startWrite();
-
-		if(shouldOutputName())
-		{
-			writer.write('"');
-			writeEscaped(name);
-//			writer.write("\": [");
-			writer.write('"');
-			writer.write(':');
-		}
+		failKey();
 
 		writer.write('[');
 
@@ -291,53 +294,58 @@ public class JsonOutput
 	}
 
 	@Override
-	public void writeListEnd(String name)
+	public void writeListEnd()
 		throws IOException
 	{
+		failKey();
 		decreaseLevel();
 		writer.write(']');
 	}
 
 	@Override
-	public void write(String name, String value)
+	public void writeString(String value)
 		throws IOException
 	{
-		startWrite();
+		if(nextKey)
+		{
+			if(value == null)
+			{
+				throw new IOException("Tried writing a null key");
+			}
 
-		if(shouldOutputName())
-		{
-			writer.write('"');
-			writeEscaped(name);
-//			writer.write("\": ");
-			writer.write('"');
-			writer.write(':');
-		}
+			startWrite();
 
-		if(value == null)
-		{
-			writer.write("null");
-		}
-		else
-		{
 			writer.write('"');
 			writeEscaped(value);
 			writer.write('"');
+			writer.write(':');
+
+			nextKey = false;
+		}
+		else
+		{
+			startWrite();
+
+			if(value == null)
+			{
+				writer.write("null");
+			}
+			else
+			{
+				writer.write('"');
+				writeEscaped(value);
+				writer.write('"');
+			}
+
+			nextKey = ! lists[level];
 		}
 	}
 
-	private void writeUnescaped(String name, String value)
+	private void writeUnescaped(String value)
 		throws IOException
 	{
 		startWrite();
-
-		if(shouldOutputName())
-		{
-			writer.write('"');
-			writeEscaped(name);
-//			writer.write("\": ");
-			writer.write('"');
-			writer.write(':');
-		}
+		failKey();
 
 		if(value == null)
 		{
@@ -350,53 +358,68 @@ public class JsonOutput
 	}
 
 	@Override
-	public void write(String name, int number)
+	public void writeByte(byte b)
 		throws IOException
 	{
-		writeUnescaped(name, Integer.toString(number));
+		writeUnescaped(Byte.toString(b));
 	}
 
 	@Override
-	public void write(String name, long number)
+	public void writeChar(char c)
 		throws IOException
 	{
-		writeUnescaped(name, Long.toString(number));
+		failKey();
+		writeString(String.valueOf(c));
 	}
 
 	@Override
-	public void write(String name, float number)
+	public void writeShort(short s)
 		throws IOException
 	{
-		writeUnescaped(name, Float.toString(number));
+		writeUnescaped(Short.toString(s));
 	}
 
 	@Override
-	public void write(String name, double number)
+	public void writeInt(int number)
 		throws IOException
 	{
-		writeUnescaped(name, Double.toString(number));
+		writeUnescaped(Integer.toString(number));
 	}
 
 	@Override
-	public void write(String name, boolean bool)
+	public void writeLong(long number)
 		throws IOException
 	{
-		writeUnescaped(name, Boolean.toString(bool));
+		writeUnescaped(Long.toString(number));
 	}
 
 	@Override
-	public void write(String name, byte[] data)
+	public void writeFloat(float number)
+		throws IOException
+	{
+		writeUnescaped(Float.toString(number));
+	}
+
+	@Override
+	public void writeDouble(double number)
+		throws IOException
+	{
+		writeUnescaped(Double.toString(number));
+	}
+
+	@Override
+	public void writeBoolean(boolean bool)
+		throws IOException
+	{
+		writeUnescaped(Boolean.toString(bool));
+	}
+
+	@Override
+	public void writeBytes(byte[] data)
 		throws IOException
 	{
 		startWrite();
-
-		if(shouldOutputName())
-		{
-			writer.write('"');
-			writeEscaped(name);
-			writer.write('"');
-			writer.write(':');
-		}
+		failKey();
 
 		if(data == null)
 		{
@@ -461,10 +484,10 @@ public class JsonOutput
 	}
 
 	@Override
-	public void writeNull(String name)
+	public void writeNull()
 		throws IOException
 	{
-		write(name, (String) null);
+		writeUnescaped(null);
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class ReflectionTest
 		{
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			JsonOutput jsonOut = new JsonOutput(out);
-			serializer.write(instance, "", jsonOut);
+			jsonOut.writeObject(serializer, instance);
 			jsonOut.flush();
 
 			ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());

@@ -42,10 +42,10 @@ public class UuidSerializer
 	}
 
 	@Override
-	public void write(UUID object, String name, StreamingOutput stream)
+	public void write(UUID object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, toBytes0(object));
+		stream.writeBytes(toBytes0(object));
 	}
 
 	@Override

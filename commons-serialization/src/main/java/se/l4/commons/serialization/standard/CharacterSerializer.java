@@ -42,10 +42,10 @@ public class CharacterSerializer
 	}
 
 	@Override
-	public void write(Character object, String name, StreamingOutput stream)
+	public void write(Character object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeChar(object);
 	}
 
 	@Override

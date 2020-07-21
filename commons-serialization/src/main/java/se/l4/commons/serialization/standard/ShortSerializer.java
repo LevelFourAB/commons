@@ -42,10 +42,10 @@ public class ShortSerializer
 	}
 
 	@Override
-	public void write(Short object, String name, StreamingOutput stream)
+	public void write(Short object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeInt(object);
 	}
 
 	@Override

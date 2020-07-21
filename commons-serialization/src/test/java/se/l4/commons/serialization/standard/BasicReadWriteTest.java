@@ -43,9 +43,9 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		StringSerializer serializer = new StringSerializer();
-		serializer.write("value", "key", output);
+		serializer.write("value", output);
 
-		verify(output).write("key", "value");
+		verify(output).writeString("value");
 	}
 
 	@Test
@@ -69,9 +69,9 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		LongSerializer serializer = new LongSerializer();
-		serializer.write(12l, "key", output);
+		serializer.write(12l, output);
 
-		verify(output).write("key", 12l);
+		verify(output).writeLong(12l);
 	}
 
 	@Test
@@ -95,9 +95,9 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		IntSerializer serializer = new IntSerializer();
-		serializer.write(12, "key", output);
+		serializer.write(12, output);
 
-		verify(output).write("key", 12);
+		verify(output).writeInt(12);
 	}
 
 	@Test
@@ -121,9 +121,9 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		BooleanSerializer serializer = new BooleanSerializer();
-		serializer.write(true, "key", output);
+		serializer.write(true, output);
 
-		verify(output).write("key", true);
+		verify(output).writeBoolean(true);
 	}
 
 	@Test
@@ -147,9 +147,9 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		DoubleSerializer serializer = new DoubleSerializer();
-		serializer.write(3.14, "key", output);
+		serializer.write(3.14, output);
 
-		verify(output).write("key", 3.14);
+		verify(output).writeDouble(3.14);
 	}
 
 	@Test
@@ -173,9 +173,9 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		FloatSerializer serializer = new FloatSerializer();
-		serializer.write(7.4f, "key", output);
+		serializer.write(7.4f, output);
 
-		verify(output).write("key", 7.4f);
+		verify(output).writeFloat(7.4f);
 	}
 
 	@Test
@@ -199,8 +199,8 @@ public class BasicReadWriteTest
 		StreamingOutput output = mock(StreamingOutput.class);
 
 		ShortSerializer serializer = new ShortSerializer();
-		serializer.write((short) 12, "key", output);
+		serializer.write((short) 12, output);
 
-		verify(output).write("key", (short) 12);
+		verify(output).writeInt((short) 12);
 	}
 }

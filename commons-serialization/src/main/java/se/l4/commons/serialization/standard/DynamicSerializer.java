@@ -120,7 +120,7 @@ public class DynamicSerializer
 
 		@Override
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public void write(Object object, String name, StreamingOutput stream)
+		public void write(Object object, StreamingOutput stream)
 			throws IOException
 		{
 			Serializer<?> serializer = collection.find(object.getClass());
@@ -128,18 +128,21 @@ public class DynamicSerializer
 			QualifiedName qname = serializer.getName()
 				.orElseThrow(() -> new SerializationException("Tried to use dynamic serialization for " + object.getClass() + ", but type has no name"));
 
-			stream.writeObjectStart(name);
+			stream.writeObjectStart();
 
 			if(! qname.getNamespace().equals(""))
 			{
-				stream.write("namespace", qname.getNamespace());
+				stream.writeString("namespace");
+				stream.writeString(qname.getNamespace());
 			}
 
-			stream.write("name", qname.getName());
+			stream.writeString("name");
+			stream.writeString(qname.getName());
 
-			((Serializer) serializer).write(object, "value", stream);
+			stream.writeString("value");
+			stream.writeObject((Serializer) serializer, object);
 
-			stream.writeObjectEnd(name);
+			stream.writeObjectEnd();
 		}
 
 		@Override

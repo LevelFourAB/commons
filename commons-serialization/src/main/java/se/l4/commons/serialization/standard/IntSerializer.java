@@ -42,10 +42,10 @@ public class IntSerializer
 	}
 
 	@Override
-	public void write(Integer object, String name, StreamingOutput stream)
+	public void write(Integer object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeInt(object);
 	}
 
 	@Override

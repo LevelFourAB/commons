@@ -42,10 +42,10 @@ public class BooleanSerializer
 	}
 
 	@Override
-	public void write(Boolean object, String name, StreamingOutput stream)
+	public void write(Boolean object, StreamingOutput stream)
 		throws IOException
 	{
-		stream.write(name, object);
+		stream.writeBoolean(object);
 	}
 
 	@Override

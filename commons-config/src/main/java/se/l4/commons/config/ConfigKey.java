@@ -99,10 +99,10 @@ public class ConfigKey
 		}
 
 		@Override
-		public void write(ConfigKey object, String name, StreamingOutput stream)
+		public void write(ConfigKey object, StreamingOutput stream)
 			throws IOException
 		{
-			// Ignore this, keys should never be written
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

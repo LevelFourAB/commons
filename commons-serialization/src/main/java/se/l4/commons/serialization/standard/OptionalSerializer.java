@@ -42,18 +42,18 @@ public class OptionalSerializer<T>
 	}
 
 	@Override
-	public void write(Optional<T> object, String name, StreamingOutput stream)
+	public void write(Optional<T> object, StreamingOutput stream)
 		throws IOException
 	{
 		if(object != null && object.isPresent())
 		{
 			// Use the item serializer to serialize if there is an object present
-			itemSerializer.write(object.get(), name, stream);
+			itemSerializer.write(object.get(), stream);
 		}
 		else
 		{
 			// If there is no object, write a null value
-			stream.writeNull(name);
+			stream.writeNull();
 		}
 	}
 

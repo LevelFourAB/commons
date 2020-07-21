@@ -42,15 +42,15 @@ public class LongArraySerializer
 	}
 
 	@Override
-	public void write(long[] object, String name, StreamingOutput out)
+	public void write(long[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(long v : object)
 		{
-			out.write("item", v);
+			out.writeLong(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

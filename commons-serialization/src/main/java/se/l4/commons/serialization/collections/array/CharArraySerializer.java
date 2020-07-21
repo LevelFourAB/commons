@@ -42,15 +42,15 @@ public class CharArraySerializer
 	}
 
 	@Override
-	public void write(char[] object, String name, StreamingOutput out)
+	public void write(char[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(char v : object)
 		{
-			out.write("item", v);
+			out.writeChar(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

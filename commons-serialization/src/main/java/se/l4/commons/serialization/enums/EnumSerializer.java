@@ -82,32 +82,32 @@ public class EnumSerializer<T extends Enum<T>>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void write(T object, String name, StreamingOutput stream)
+	public void write(T object, StreamingOutput stream)
 		throws IOException
 	{
 		Object value = translator.fromEnum(object);
 		switch(translator.getType())
 		{
 			case BOOLEAN:
-				stream.write(name, (Boolean) value);
+				stream.writeBoolean((Boolean) value);
 				break;
 			case DOUBLE:
-				stream.write(name, (Double) value);
+				stream.writeDouble((Double) value);
 				break;
 			case FLOAT:
-				stream.write(name, (Float) value);
+				stream.writeFloat((Float) value);
 				break;
 			case INTEGER:
-				stream.write(name, (Integer) value);
+				stream.writeInt((Integer) value);
 				break;
 			case LONG:
-				stream.write(name, (Long) value);
+				stream.writeLong((Long) value);
 				break;
 			case SHORT:
-				stream.write(name, (Short) value);
+				stream.writeInt((Short) value);
 				break;
 			case STRING:
-				stream.write(name, (String) value);
+				stream.writeString((String) value);
 				break;
 			default:
 				throw new AssertionError("Unknown type: " + translator.getType());

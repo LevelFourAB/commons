@@ -30,7 +30,7 @@ public class UuidSerializerTest
 		try
 		{
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			serializer.write(uuid, "", new BinaryOutput(out));
+			serializer.write(uuid, new BinaryOutput(out));
 
 			return serializer.read(new BinaryInput(new ByteArrayInputStream(out.toByteArray())));
 		}

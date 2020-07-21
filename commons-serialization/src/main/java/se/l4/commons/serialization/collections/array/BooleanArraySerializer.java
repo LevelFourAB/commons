@@ -42,15 +42,15 @@ public class BooleanArraySerializer
 	}
 
 	@Override
-	public void write(boolean[] object, String name, StreamingOutput out)
+	public void write(boolean[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(boolean v : object)
 		{
-			out.write("item", v);
+			out.writeBoolean(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

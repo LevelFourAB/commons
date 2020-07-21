@@ -50,9 +50,10 @@ public class FileSerializer
 	}
 
 	@Override
-	public void write(File object, String name, StreamingOutput stream)
+	public void write(File object, StreamingOutput stream)
 		throws IOException
 	{
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

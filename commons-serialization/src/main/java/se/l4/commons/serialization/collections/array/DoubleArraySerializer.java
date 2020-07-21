@@ -42,15 +42,15 @@ public class DoubleArraySerializer
 	}
 
 	@Override
-	public void write(double[] object, String name, StreamingOutput out)
+	public void write(double[] object, StreamingOutput out)
 		throws IOException
 	{
-		out.writeListStart(name);
+		out.writeListStart();
 		for(double v : object)
 		{
-			out.write("item", v);
+			out.writeDouble(v);
 		}
-		out.writeListEnd(name);
+		out.writeListEnd();
 	}
 
 }

@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 
+import se.l4.commons.serialization.Serializer;
+
 /**
  * Adapter for streaming results in different output formats.
  *
@@ -15,19 +17,16 @@ public interface StreamingOutput
 {
 	/**
 	 * Write the start of an object.
-	 *
-	 * @param name
 	 */
-	void writeObjectStart(String name)
+	void writeObjectStart()
 		throws IOException;
 
 	/**
 	 * Write the end of an object.
 	 *
-	 * @param name
 	 * @throws IOException
 	 */
-	void writeObjectEnd(String name)
+	void writeObjectEnd()
 		throws IOException;
 
 	/**
@@ -35,128 +34,140 @@ public interface StreamingOutput
 	 *
 	 * @param name
 	 */
-	void writeListStart(String name)
+	void writeListStart()
 		throws IOException;
 
 	/**
 	 * Write the end of a list.
 	 *
-	 * @param name
 	 * @throws IOException
 	 */
-	void writeListEnd(String name)
+	void writeListEnd()
 		throws IOException;
 
 	/**
 	 * Write a string.
 	 *
-	 * @param name
 	 * @param value
 	 * @return
 	 * @throws IOException
 	 */
-	void write(String name, String value)
+	void writeString(String value)
 		throws IOException;
 
 	/**
 	 * Write a single byte value to the output.
 	 *
-	 * @param name
 	 * @param b
 	 * @throws IOException
 	 */
-	default void write(String name, byte b)
-		throws IOException
-	{
-		write(name, (int) b);
-	}
+	void writeByte(byte b)
+		throws IOException;
 
 	/**
 	 * Write a single char value to the output.
 	 *
-	 * @param name
 	 * @param c
 	 * @throws IOException
 	 */
-	default void write(String name, char c)
-		throws IOException
-	{
-		write(name, (int) c);
-	}
+	void writeChar(char c)
+		throws IOException;
+
+	/**
+	 * Write a short to the output.
+	 *
+	 * @param s
+	 * @throws IOException
+	 */
+	void writeShort(short s)
+		throws IOException;
 
 	/**
 	 * Write an integer.
 	 *
-	 * @param name
 	 * @param number
 	 * @return
 	 * @throws IOException
 	 */
-	void write(String name, int number)
+	void writeInt(int number)
 		throws IOException;
 
 	/**
 	 * Write a long.
 	 *
-	 * @param name
 	 * @param number
 	 * @return
 	 * @throws IOException
 	 */
-	void write(String name, long number)
+	void writeLong(long number)
 		throws IOException;
 
 	/**
 	 * Write a float.
 	 *
-	 * @param name
-	 * @param score
+	 * @param number
 	 * @return
 	 * @throws IOException
 	 */
-	void write(String name, float number)
+	void writeFloat(float number)
 		throws IOException;
 
 	/**
 	 * Write a double.
 	 *
-	 * @param name
-	 * @param score
+	 * @param number
 	 * @return
 	 * @throws IOException
 	 */
-	void write(String name, double number)
+	void writeDouble(double number)
 		throws IOException;
 
 	/**
 	 * Write a boolean.
 	 *
-	 * @param name
 	 * @param b
 	 * @return
 	 * @throws IOException
 	 */
-	void write(String name, boolean b)
+	void writeBoolean(boolean b)
 		throws IOException;
 
 	/**
 	 * Write a byte array to the output.
 	 *
-	 * @param name
 	 * @param data
 	 * @throws IOException
 	 */
-	void write(String name, byte[] data)
+	void writeBytes(byte[] data)
 		throws IOException;
 
 	/**
 	 * Write a null value.
 	 *
-	 * @param name
 	 * @return
 	 * @throws IOException
 	 */
-	void writeNull(String name)
+	void writeNull()
 		throws IOException;
 
+	/**
+	 * Write an object to the output.
+	 *
+	 * @param <T>
+	 * @param serializer
+	 * @param object
+	 * @throws IOException
+	 */
+	default <T> void writeObject(Serializer<T> serializer, T object)
+		throws IOException
+	{
+		if(object == null && ! (serializer instanceof Serializer.NullHandling))
+		{
+			writeNull();
+		}
+		else
+		{
+			serializer.write(object, this);
+		}
+	}
 }
