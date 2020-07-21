@@ -3,7 +3,9 @@ package se.l4.commons.serialization.format;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import java.io.OutputStream;
 
+import se.l4.commons.io.Bytes;
 import se.l4.commons.serialization.Serializer;
 
 /**
@@ -139,6 +141,26 @@ public interface StreamingOutput
 	 * @throws IOException
 	 */
 	void writeBytes(byte[] data)
+		throws IOException;
+
+	/**
+	 * Write a {@link Bytes} instance to the output.
+	 *
+	 * @param data
+	 * @throws IOException
+	 */
+	void writeBytes(Bytes data)
+		throws IOException;
+
+	/**
+	 * Get an output stream that can be used to write binary data to this
+	 * output. The output must be closed.
+	 *
+	 * @return
+	 *   stream that can be used to write data to this output
+	 * @throws IOException
+	 */
+	OutputStream writeBytes()
 		throws IOException;
 
 	/**

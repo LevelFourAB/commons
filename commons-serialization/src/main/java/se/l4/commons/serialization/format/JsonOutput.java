@@ -1,11 +1,14 @@
 package se.l4.commons.serialization.format;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import se.l4.commons.io.Bytes;
 
 /**
  * Streamer that outputs JSON.
@@ -441,6 +444,28 @@ public class JsonOutput
 		}
 
 		writer.write('"');
+	}
+
+	@Override
+	public OutputStream writeBytes()
+		throws IOException
+	{
+		return new ByteArrayOutputStream()
+		{
+			@Override
+			public void close()
+				throws IOException
+			{
+				writeBytes(toByteArray());
+			}
+		};
+	}
+
+	@Override
+	public void writeBytes(Bytes data)
+		throws IOException
+	{
+		writeBytes(data.toByteArray());
 	}
 
 	/**

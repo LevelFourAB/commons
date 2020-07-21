@@ -1,8 +1,11 @@
 package se.l4.commons.serialization.format;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+
+import se.l4.commons.io.Bytes;
 
 /**
  * Output for custom binary format.
@@ -371,6 +374,28 @@ public class BinaryOutput
 		writeIntegerNoTag(data.length);
 
 		out.write(data);
+	}
+
+	@Override
+	public OutputStream writeBytes()
+		throws IOException
+	{
+		return new ByteArrayOutputStream()
+		{
+			@Override
+			public void close()
+				throws IOException
+			{
+				writeBytes(toByteArray());
+			}
+		};
+	}
+
+	@Override
+	public void writeBytes(Bytes data)
+		throws IOException
+	{
+		writeBytes(data.toByteArray());
 	}
 
 	@Override
