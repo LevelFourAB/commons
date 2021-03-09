@@ -1,10 +1,17 @@
 # L4 Commons
 
-![Version](https://img.shields.io/maven-central/v/se.l4.commons/commons-base)
-![Dependencies](https://github.com/levelfourab/commons/workflows/CI/badge.svg)
-
 This is a set of Java libraries for common functionality used within the
 open-source projects published by [Level Four AB](https://github.com/LevelFourAB).
+
+## Archived
+
+This project is archived. It has been split up into several smaller libraries:
+
+* [Exobytes](https://github.com/LevelFourAB/exobytes) for serialization
+* [Exoconf](https://github.com/LevelFourAB/exoconf) for configuration
+* [ylem-io](https://github.com/LevelFourAB/ylem-io) for extended IO types
+* [ylem-ids](https://github.com/LevelFourAB/ylem-ids) for id manipulation
+* [ylem-types](https://github.com/LevelFourAB/ylem-types) for type manipulation
 
 ## License
 
